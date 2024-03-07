@@ -1,0 +1,14 @@
+.header {
+  color: black;
+  font-family: "Open Sans", sans-serif;
+  font-size: 25px;
+  padding: 25px;
+}
+
+.header-component {
+  background-color: white;
+  border-bottom: solid;
+  border-color: #e2e2e2;
+  height: 90px;
+  width: 100%;
+}
