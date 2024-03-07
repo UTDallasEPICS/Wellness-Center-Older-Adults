@@ -6,8 +6,4 @@ export default function Footer() {
       <div className="header">This should be a footer</div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main

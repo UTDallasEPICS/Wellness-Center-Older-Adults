@@ -6,23 +6,17 @@
 }
 
 .header-component {
-<<<<<<< HEAD
-=======
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
->>>>>>> origin/main
   background-color: white;
   border-bottom: solid;
   border-color: #e2e2e2;
   height: 90px;
   width: 100%;
 }
-<<<<<<< HEAD
-=======
 
-.logo{
-  height:80px;
-  width:100%;
+.logo {
+  height: 80px;
+  width: 100%;
 }
->>>>>>> origin/main

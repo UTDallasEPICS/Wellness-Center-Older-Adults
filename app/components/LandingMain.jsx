@@ -8,8 +8,4 @@ export default function Header() {
       <button class="button">Log In</button>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main

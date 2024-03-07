@@ -11,8 +11,4 @@ export default function LandingPage() {
       <Footer />
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main
