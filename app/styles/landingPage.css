@@ -1,0 +1,5 @@
+.flex-container {
+  display: flex;
+  background-color: DodgerBlue;
+  flex-direction: column;
+}
