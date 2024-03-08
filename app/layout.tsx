@@ -1,3 +1,4 @@
+import { UserProvider } from './api/auth/[auth0]/auth0'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -16,7 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <UserProvider>
       <body className={inter.className}>{children}</body>
+      </UserProvider>
     </html>
   )
 }
