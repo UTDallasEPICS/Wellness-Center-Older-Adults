@@ -28,7 +28,14 @@ services:
       - "6432:6432"
     depends_on:
       - db
+    volumes:
+      - websockify-data:/opt/websockify/data
+      - websockify-config:/opt/websockify/config
 
 volumes:
   postgres-data:
+    driver: local
+  websockify-data:
+    driver: local
+  websockify-config:
     driver: local
