@@ -1,0 +1,30 @@
+/* Footer.css */
+.footer-container {
+    background-color: #f8f9fa; /* Soft white background */
+    color: #35424a; /* Dark blue-gray text */
+    padding: 20px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+    border-top: 1px solid #eaeaea; /* Adds a light line at the top of the footer */
+  }
+  
+  .footer-container h2 {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #090a0b; /* Adds a touch of color */
+  }
+  
+  .address,
+  .contact {
+    margin: 10px 0;
+    font-size: 1em; /* Ensures the font size is consistent */
+  }
+  
+  .disclaimer {
+    margin-top: 20px;
+    font-size: 0.85em;
+    color: #7c7c7c; /* Soft gray text */
+    font-style: italic;
+  }
+  
