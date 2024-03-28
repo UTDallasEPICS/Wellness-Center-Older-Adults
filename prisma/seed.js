@@ -6,7 +6,7 @@ const { PrismaClient } = require("@prisma/client")
 const prisma = new PrismaClient();
 
 async function main() {
-    const adminEmail = 'asn210007@utdallas.edu';
+    const adminEmail = 'ctv210001@utdallas.edu';
 
     // Checks if the superuser exists when called
     const adminUser = await prisma.user.findUnique({
@@ -21,9 +21,9 @@ async function main() {
         await prisma.user.create({
             data: {
                 email: adminEmail,
-                firstName: 'Arif',
-                lastName: 'Nizami',
-                phone: '4699254860'
+                firstName: 'Calvin',
+                lastName: 'Van',
+                phone: '6626097562'
             },
         });
         console.log("An admin account was not found, so one was created for you.");
