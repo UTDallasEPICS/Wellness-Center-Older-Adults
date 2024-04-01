@@ -20,7 +20,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "20.6.5",
     "@types/react": "18.2.22",
-    "@types/react-dom": "18.2.7",
+    "@types/react-dom": "18.2.23",
     "cookies-next": "^4.1.1",
     "eslint": "8.50.0",
     "eslint-config-next": "13.5.2",
