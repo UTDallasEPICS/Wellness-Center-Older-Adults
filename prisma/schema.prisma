@@ -16,4 +16,12 @@ model User {
   firstName String
   lastName  String
   phone     String   @unique
+  customer  Customer?
+}
+
+model Customer {  
+  user User @relation(fields: [customerID], references: [id])
+  customerID Int @id
+  homeAddress String 
+  @@unique([customerID, homeAddress])
 }
