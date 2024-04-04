@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import "app/styles/register.css"
-import FormInput from "app/components/FormInput";
+import "app/styles/register.css";
+import FormInput from "app/components/FormInput.jsx";
 import Header from "app/components/Header.jsx";
 const Register = () => {
   const [values, setValues] = useState({
