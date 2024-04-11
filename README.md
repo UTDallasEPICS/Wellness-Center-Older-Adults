@@ -101,7 +101,46 @@ echo 'alias npm="pnpm"' >> .zshrc
 
 ## Running This Project
 
-First, run the development server:
+First, install the project dependencies:
+
+```bash
+npm install
+```
+
+Then, you must run the docker compose command:
+
+```bash
+docker compose up
+# or, if you want to keep using the terminal in which you executed the command
+docker compose up -d
+```
+
+Then, you must run the prisma migration command:
+
+```bash
+npx prisma migrate dev --name init
+``` 
+
+Now, in order for logging in to work, you must seed your account information into the local database, AND add your credentials to Auth0
+Edit the seed.js file to match your credentials, and then run this command:
+
+```bash
+npx prisma db seed
+```
+
+Make sure you have created a user in the Auth0 application dashboard as well!
+If you dont already have your .env files setup, make sure to do this as well. you may have to restart your
+docker containers for new env file changes to take effect:
+
+```bash
+docker compose down
+
+docker compose up
+# or
+docker compose up -d
+```
+
+Finally, run this:
 
 ```bash
 npm run dev
