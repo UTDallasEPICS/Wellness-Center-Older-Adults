@@ -13,8 +13,6 @@ const Dashboard = () => {
 
 
   return(
-    
-    
       <SimpleTab activeKey="added">
         {tabs.map(item => <Tab key={item.aKey} aKey={item.aKey} title={item.title}>{item.content}</Tab>)}
       </SimpleTab>
