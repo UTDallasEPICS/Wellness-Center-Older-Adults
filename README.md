@@ -1,4 +1,4 @@
-# UTDesign EPICS [Next.js](https://nextjs.org) Template Project
+# UTDesign EPICS Wellness Center for Older Adults Repository
  
 This project is the template used for all EPICS CS projects. The core technologies used are:
 
