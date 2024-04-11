@@ -1,6 +1,6 @@
 # UTDesign EPICS Wellness Center for Older Adults Repository
  
-This project is the template used for all EPICS CS projects. The core technologies used are:
+This project is based off the template used for all EPICS CS projects. The core technologies used are:
 
 - [Next.js](https://nextjs.org): A full stack web development framework
 - [Prisma](https://prisma.io): A database ORM used to connect Next.js to a database
