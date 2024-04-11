@@ -11,6 +11,10 @@ const links = [
     href: "/dashboardEmployee/volunteers",
   },
   {
+    name: "Clients",
+    href: "/dashboardEmployee/clients",
+  },
+  {
     name: "Settings",
     href: "/dashboardEmployee/settings",
   },
