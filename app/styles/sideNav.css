@@ -1,0 +1,43 @@
+.navBar {
+  background-color: #1d2533;
+  border-radius: 35px;
+  height: 95%;
+  width: 90%;
+  margin: 20px 15px;
+}
+.sideBar {
+  margin-left: 0px;
+}
+.nav-a {
+  text-decoration-line: none;
+}
+.nav-a p:hover {
+  /*color: #4eb123;
+  background: rgba(66, 149, 30, 0.2);*/
+  background-color: #02555a;
+
+  border-radius: 15px;
+  margin-left: 10px;
+  width: 60%;
+}
+.nav-a p:active {
+  background-color: white;
+}
+
+.active {
+  background-color: red;
+}
+
+.nav-p {
+  color: white;
+  padding: 20px 40px;
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 20px;
+  margin: 0;
+  background-color: #1d2533;
+  border-radius: 35px;
+}
+
+/*#151b31*/

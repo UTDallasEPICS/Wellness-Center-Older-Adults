@@ -1,5 +1,10 @@
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
+"use client";
+import "app/styles/sideNav.css";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 const links = [
   { name: "Dashboard", href: "/dashboardEmployee" },
   {
@@ -21,13 +26,20 @@ const links = [
 ];
 
 export default function NavLinks() {
+  const pathname = usePathname();
+  const isActive = (path) => path === pathname;
+
   return (
     <>
       {links.map((link) => {
         return (
-          <a key={link.name} href={link.href}>
-            <p>{link.name}</p>
-          </a>
+          <Link
+            key={link.name}
+            href={link.href}
+            className={isActive(link.path) ? "active" : "nav-a"}
+          >
+            <p className="nav-p">{link.name}</p>
+          </Link>
         );
       })}
     </>

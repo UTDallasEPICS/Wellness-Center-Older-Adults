@@ -1,0 +1,25 @@
+.mainContainer {
+  width: 90%;
+  height: 90%;
+  background-color: white;
+  border-radius: 25px;
+}
+
+.containerText {
+  color: black;
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 20px;
+  padding: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contentElements {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
