@@ -1,13 +1,25 @@
 import SideNav from "@/app/ui/dashboardEmployee/sidenav";
+import "app/styles/employeeLayout.css";
+/* body for page makes menu span entire height*/
 export default function DashboardLayout({
   children, // will be a page or nested layout
 }) {
   return (
-    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-      <div className="w-full flex-none md:w-64">
-        <SideNav />
+    <div className="page">
+      <div className="headerSpace">
+        <p className="headerText">WCOA</p>
       </div>
-      <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
+
+      <div className="mainContent">
+        <div className="col-2 col-s-2 sideBar">
+          <SideNav />
+        </div>
+        <div className="col-10 col-s-9 testA">{children}</div>
+      </div>
+
+      <div className="footerSpace">
+        <p>Footer</p>
+      </div>
     </div>
   );
 }
