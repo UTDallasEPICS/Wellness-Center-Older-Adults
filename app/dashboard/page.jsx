@@ -1,9 +1,10 @@
 "use client";
 import "app/styles/dashboard.css";
+import Ride from "app/components/Ride.jsx";
 import SimpleTab, {Tab} from "app/components/SimpleTab.jsx";
 
 const tabs =[
-  {aKey: "added", title: "Added", content:"Hi"},
+  {aKey: "added", title: "Added", content: <Ride/>},
   {aKey: "reserved", title: "Reserved", content:"Reserved"},
   {aKey: "completed", title: "Completed", content:"Bye"},
 ]
