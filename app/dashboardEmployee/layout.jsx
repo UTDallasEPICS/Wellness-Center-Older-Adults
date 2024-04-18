@@ -7,7 +7,7 @@ export default function DashboardLayout({
   return (
     <div className="page">
       <div className="headerSpace">
-        <p className="headerText">WCOA</p>
+        <a href="/"><p className="headerText">WCOA</p></a>
       </div>
 
       <div className="mainContent">
