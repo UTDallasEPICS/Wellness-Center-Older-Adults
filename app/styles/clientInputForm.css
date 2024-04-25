@@ -1,16 +1,78 @@
-.formPopUp {
+.openButton {
+  height: 45px;
+  width: 45px;
+  border-radius: 50%;
+  color: white;
+  background-color: black;
+  border: none;
+  cursor: pointer;
+}
+
+.popUpBox {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  height: 85%;
+  width: 85%;
+}
+
+.overlayContainer {
   display: none;
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: red;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/*For devices 769px and greater */
+@media only screen and (min-width: 1px) {
+  .formContainer {
+    position: fixed;
+    height: 75%;
+    width: 50%;
+
+    justify-content: center;
+    align-items: center;
+
+    list-style-type: none;
+    border-radius: 5px;
+
+    background-color: #f2f2f2;
+    padding: 20px;
+    top: 0;
+    left: 25%;
+  }
 }
 
 .formContainer {
+  position: fixed;
+  height: 85%;
+  width: 30%;
+
+  justify-content: center;
+  align-items: center;
+
   list-style-type: none;
-  position: relative;
-  border-radius: 5px;
-  height: 950px;
-  width: 500px;
+  border-radius: 35px;
+
   background-color: #f2f2f2;
   padding: 20px;
+  top: 7%;
+  left: 35%;
+  overflow-y: scroll;
+}
+
+h1 {
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 40px;
+  text-align: center;
 }
 
 label {
@@ -28,7 +90,7 @@ legend {
 }
 
 input {
-  width: 250px;
+  width: 150px;
   padding: 12px 20px;
 }
 
@@ -44,10 +106,10 @@ input[type="text"]:focus {
 }
 
 input[type="submit"] {
-  background-color: #0d5e40;
+  background-color: black;
   border: none;
   color: white;
-  padding: 16px 32px;
+  padding: 17px 32px;
   text-decoration: none;
   margin: 20px 2px;
   border-radius: 15px;
@@ -56,4 +118,17 @@ input[type="submit"] {
 
 label + input {
   padding-top: 20px;
+}
+
+.cancelButton {
+  background-color: white;
+  border: none;
+  color: gray;
+  border-style: solid;
+  border-width: 3px;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 20px 2px;
+  border-radius: 15px;
+  cursor: pointer;
 }

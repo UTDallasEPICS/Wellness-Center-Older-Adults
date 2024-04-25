@@ -1,43 +1,92 @@
-.navBar {
-  background-color: #1d2533;
-  border-radius: 35px;
-  height: 95%;
-  width: 90%;
-  margin: 20px 15px;
-}
 .sideBar {
-  margin-left: 0px;
+  margin: 0px;
 }
+
 .nav-a {
   text-decoration-line: none;
 }
-.nav-a p:hover {
-  /*color: #4eb123;
-  background: rgba(66, 149, 30, 0.2);*/
-  background-color: #02555a;
 
-  border-radius: 15px;
-  margin-left: 10px;
-  width: 60%;
-}
-.nav-a p:active {
+/* For mobile phones: */
+.navBar {
+  height: 100%;
+  width: 95%;
+  padding: 20px 0px;
   background-color: white;
+  border-bottom: 0.5px solid #d2d1d1;
+  margin: 0;
+  /*margin: 70px 15px;   margin between heading and first nav button */
+}
+
+.nav-p {
+  color: black;
+  display: inline;
+  padding: 17px 25px;
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 20px;
+
+  margin: 0;
+
+  /*
+  margin-top: 5px;
+  */
+}
+
+.nav-a p:hover {
+  background-color: white;
+  border-bottom: 3px solid black;
+}
+
+/*For devices 769px and greater */
+@media only screen and (min-width: 700px) {
+  .navBar {
+    min-height: calc(100vh - 170px);
+    border-bottom: none;
+    border-right: 0.5px solid #d2d1d1;
+  }
+
+  .nav-p {
+    margin-top: 0;
+    display: block;
+    padding: 25px 40px;
+
+    color: gray;
+    text-align: left;
+    font-family: "Open Sans", sans-serif;
+    font-weight: lighter;
+    font-size: 20px;
+
+    background-color: white;
+
+    /*
+    margin-top: 5px;
+    */
+  }
+
+  .nav-a p:hover {
+    color: black;
+    border-bottom: none;
+    border-right: 4px solid black;
+  }
+}
+
+.nav-a p:active {
+  background-color: blue;
+}
+
+.nav-a nav-a:active {
+  background-color: purple;
 }
 
 .active {
   background-color: red;
 }
 
-.nav-p {
-  color: white;
-  padding: 20px 40px;
-  text-align: left;
-  font-family: "Open Sans", sans-serif;
-  font-weight: lighter;
-  font-size: 20px;
-  margin: 0;
-  background-color: #1d2533;
-  border-radius: 35px;
+.active nav-a:active {
+  background-color: green;
 }
-
-/*#151b31*/
+/*
+#1d2533
+#151b31
+*/

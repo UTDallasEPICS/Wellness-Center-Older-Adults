@@ -7,17 +7,17 @@ export default function listItemContainer(props) {
       <div className="clientName">
         <p>{props.clientName}</p>
       </div>
-      <div className="clientID">
-        <p>{props.clientId}</p>
+      <div className="clientAddress">
+        <p>{props.clientAddress}</p>
       </div>
-      <div className="rideDate">
-        <p>{props.rideDate}</p>
+      <div className="clientEmail">
+        <p>{props.clientEmail}</p>
       </div>
       <div className="clientPhone">
         <p>{props.clientPhone}</p>
       </div>
-      <div className="clientAddress">
-        <p>{props.clientAddress}</p>
+      <div className="clientBirthdate">
+        <p>{props.clientBirthdate}</p>
       </div>
     </div>
   );
