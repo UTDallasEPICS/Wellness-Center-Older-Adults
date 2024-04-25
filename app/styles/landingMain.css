@@ -1,6 +1,6 @@
 .body-container {
   /* width: 58%; */
-  height: 950px;
+  height: 850px;
   background: #fbfcf8;
   list-style-type: none;
   position: relative;
@@ -10,7 +10,7 @@
   font-family: verdana;
   font-size: 120px;
   text-align: center;
-  margin-top: 100px;
+  margin-top: 40px;
   padding: 1rem;
   padding-top: 2rem;
 }
@@ -20,6 +20,7 @@
   font-size: 35px;
   text-align: center;
   padding: 1rem;
+  margin: 5rem;
 }
 
 .button {
@@ -28,7 +29,6 @@
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
   font-size: 25px;
   background-color: #419902;
   position: absolute;
@@ -36,4 +36,6 @@
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+  cursor: pointer;
+  border-radius: 30px;
 }
