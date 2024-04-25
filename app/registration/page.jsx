@@ -65,10 +65,32 @@ const Register = () => {
     },
     ];
 
-  const handleSubmit = (e) =>{
+  const handleSubmit = async(e) =>{
+    
     e.preventDefault();
+    try{
+      const response = await fetch(/api/v2/users, {
+        method: 'POST',
+        headers: {
+          'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(values)
+      });
 
-  }
+      if(!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log(result);
+      alert('Registration successful!');
+    } catch(error) {
+      console.error('Failed to register:', error);
+      alert('Registration failed!');
+
+    }
+
+  };
 
   const onChange =(e)=>{
     setValues({...values, [e.target.name]: e.target.value});
