@@ -16,12 +16,20 @@ model User {
   firstName String
   lastName  String
   phone     String   @unique
-  customer  Customer?
 }
 
-model Customer {  
-  user User @relation(fields: [customerID], references: [id])
-  customerID Int @id
-  homeAddress String 
+model Customer {
+  customerID Int @id @default(autoincrement())
+  customerEmail String @unique
+  customerFname String
+  customerLname String
+  homeAddress String
   @@unique([customerID, homeAddress])
 }
+
+// model Customer {  
+//   user User @relation(fields: [customerID], references: [id])
+//   customerID Int @id
+//   homeAddress String 
+//   @@unique([customerID, homeAddress])
+// }
