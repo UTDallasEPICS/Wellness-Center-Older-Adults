@@ -5,13 +5,17 @@ import "app/styles/register.css";
 import FormInput from "app/components/FormInput.jsx";
 import Header from "app/components/Header.jsx";
 const Register = () => {
-  const [values, setValues] = useState({
-    email:"",
-    firstName:"",
-    lastName:"",
-    password:"",
-    confirmPassword:""
-  });
+
+  const initialState = {
+    email: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    confirmPassword: "",
+    connection: "WCOA-Username-Password"
+  };
+
+  const [values, setValues] = useState(initialState);
 
   const inputs = [
     {
@@ -48,9 +52,9 @@ const Register = () => {
       name:"password",
       type:"password",
       placeholder:"Password",
-      errorMessage:"Password should be 6-20 characters",
+      errorMessage:"Password should be: 8-25 characters, contain one lowercase and one uppercase letter, and a special character.",
       label:"Password",
-      pattern:"^[A-Za-z0-9!@#$%^&*?+=]{6,20}$",
+      pattern:"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
       required: true,
     },
     {
@@ -69,7 +73,7 @@ const Register = () => {
     
     e.preventDefault();
     try{
-      const response = await fetch(/api/v2/users, {
+      const response = await fetch("/api/v2/users", {
         method: 'POST',
         headers: {
           'Content-Type' : 'application/json'
@@ -82,8 +86,8 @@ const Register = () => {
       }
 
       const result = await response.json();
-      console.log(result);
       alert('Registration successful!');
+      setValues(initialState);
     } catch(error) {
       console.error('Failed to register:', error);
       alert('Registration failed!');
@@ -95,7 +99,6 @@ const Register = () => {
   const onChange =(e)=>{
     setValues({...values, [e.target.name]: e.target.value});
   }
-  console.log(values);
   
   return(
   <div>

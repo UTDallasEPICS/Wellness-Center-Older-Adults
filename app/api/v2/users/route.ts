@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getManagementApiToken } from '../auth0';
+import { getManagementApiToken } from '../../auth/auth0';
 // pages/api/create-user.js
 
 interface UserRequestBody {
@@ -8,11 +8,10 @@ interface UserRequestBody {
     connection: string;
 }
  
-export default async function POST(request: NextApiRequest) 
+export async function POST(request: Request) 
 {   
     //const auth0 = params.auth0;
-    
-    const {email, password, connection} = request.body as UserRequestBody;
+    const {email, password, connection} = await request.json() as UserRequestBody;
 
     try {
         const ISSUER_BASEURL = process.env.AUTH0_ISSUER_BASE_URL;
@@ -21,12 +20,12 @@ export default async function POST(request: NextApiRequest)
         const userData = {
             email,
             password,
-            connection,
+            connection
 
             
         };
 
-        const response = await fetch(`${ISSUER_BASEURL}api/v2/users}`, {
+        const response = await fetch(`${ISSUER_BASEURL}api/v2/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,6 +46,7 @@ export default async function POST(request: NextApiRequest)
         
 
     } catch (error) {
+        console.log(error)
         console.error('Error parsing Request:', error);
         return Response.json({
           error: "Invalid Request",
