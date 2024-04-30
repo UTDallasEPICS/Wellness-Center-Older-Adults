@@ -6,54 +6,35 @@
   background-color: black;
   border: none;
   cursor: pointer;
+  text-align: center;
+  font-size: 35px;
 }
 
 .popUpBox {
   display: flex;
   flex-direction: column;
   background-color: white;
-  height: 85%;
-  width: 85%;
+  height: 100%;
+  width: 100%;
 }
 
 .overlayContainer {
   display: none;
   position: fixed;
+  justify-content: center;
+  align-items: center;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+
   background: red;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-/*For devices 769px and greater */
-@media only screen and (min-width: 1px) {
-  .formContainer {
-    position: fixed;
-    height: 75%;
-    width: 50%;
-
-    justify-content: center;
-    align-items: center;
-
-    list-style-type: none;
-    border-radius: 5px;
-
-    background-color: #f2f2f2;
-    padding: 20px;
-    top: 0;
-    left: 25%;
-  }
 }
 
 .formContainer {
   position: fixed;
   height: 85%;
-  width: 30%;
+  width: 100%;
 
   justify-content: center;
   align-items: center;
@@ -62,10 +43,11 @@
   border-radius: 35px;
 
   background-color: #f2f2f2;
-  padding: 20px;
-  top: 7%;
-  left: 35%;
   overflow-y: scroll;
+}
+
+fieldset {
+  border: 0;
 }
 
 h1 {
@@ -87,6 +69,7 @@ legend {
   font-family: "Open Sans", sans-serif;
   font-size: 20px;
   padding: 25px 0;
+  border: none;
 }
 
 input {
@@ -131,4 +114,32 @@ label + input {
   margin: 20px 2px;
   border-radius: 15px;
   cursor: pointer;
+}
+
+/*For devices 769px and greater */
+@media only screen and (min-width: 1px) {
+  .popUpBox {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    height: 85%;
+    width: 85%;
+  }
+
+  .formContainer {
+    position: fixed;
+    height: 75%;
+    width: 30%;
+
+    justify-content: center;
+    align-items: center;
+
+    list-style-type: none;
+    border-radius: 5px;
+
+    background-color: #f2f2f2;
+    padding: 20px;
+    top: 10%;
+    left: 35%;
+  }
 }

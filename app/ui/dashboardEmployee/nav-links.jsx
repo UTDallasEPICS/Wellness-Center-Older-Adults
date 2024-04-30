@@ -1,12 +1,13 @@
-// Map of links to display in the side navigation.
-// Depending on the size of the application, this would be stored in a database.
 "use client";
 import "app/styles/sideNav.css";
+import "app/globalicons.css";
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { name: "Dashboard", href: "/dashboardEmployee" },
+  { name: "Dashboard", href: "/dashboardEmployee" }, // Using icon name from Material Symbols Rounded font
+
   {
     name: "Rides",
     href: "/dashboardEmployee/rides",
@@ -26,17 +27,22 @@ const links = [
 ];
 
 export default function NavLinks() {
+  const [activeLink, setActiveLink] = useState(null);
   const pathname = usePathname();
-  const isActive = (path) => path === pathname;
+
+  const handleClick = (index) => {
+    setActiveLink(index);
+  };
 
   return (
     <>
-      {links.map((link) => {
+      {links.map((link, index) => {
         return (
           <Link
             key={link.name}
             href={link.href}
-            className={isActive(link.path) ? "active" : "nav-a"}
+            className={index === activeLink ? "nav-a active" : "nav-a"}
+            onClick={() => handleClick(index)}
           >
             <p className="nav-p">{link.name}</p>
           </Link>
