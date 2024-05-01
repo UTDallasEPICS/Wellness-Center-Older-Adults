@@ -22,13 +22,13 @@ model Customer {
   customerID Int @id @default(autoincrement())
   customerEmail String @unique
   customerFname String
-  customerMname String // make optional
+  customerMname String? // make optional
   customerLname String
   streetAddress String
   city String
-  state String // make optional
-  birthdate String // make optional
-  customerPhone Int
+  state String? // make optional
+  birthdate DateTime? // make optional
+  customerPhone String
   @@unique([customerID, streetAddress])
 }
 
