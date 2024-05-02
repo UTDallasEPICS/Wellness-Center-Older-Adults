@@ -4,8 +4,8 @@ Updated: 4/18/2024
 Checks for a customer using their email, first name, and last name.
 Creates a new user if one doesn't exist in the database.
 */
+
 const {PrismaClient} = require('@prisma/client');
-const { DraftModeProvider } = require('next/dist/server/async-storage/draft-mode-provider');
 const prisma = new PrismaClient();
 
 async function customerQuery()
