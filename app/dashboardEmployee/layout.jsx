@@ -7,7 +7,7 @@ export default function DashboardLayout({
   return (
     <div className="page">
       <div className="headerSpace">
-        <a href="/"><p className="headerText">WCOA</p></a>
+        <a href="/"><img className="icon" src = "/icon.png"></img></a>
       </div>
 
       <div className="mainContent">
@@ -16,10 +16,7 @@ export default function DashboardLayout({
         </div>
         <div className="col-10 col-s-9 testA">{children}</div>
       </div>
-
-      <div className="footerSpace">
-        <p>Footer</p>
-      </div>
+    
     </div>
   );
 }
