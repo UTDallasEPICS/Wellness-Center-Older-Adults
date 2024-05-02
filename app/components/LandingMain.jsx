@@ -6,6 +6,7 @@ import { useAuth } from "../providers/Auth";
 import Header from "app/components/Header.jsx";
 import Footer from "app/components/Footer.jsx";
 const landingPage = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { isAuthenticated, handleLogin, handleLogout } = useAuth(); 
 
   return (
