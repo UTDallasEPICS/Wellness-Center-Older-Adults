@@ -5,40 +5,39 @@ Checks for a customer using their email, first name, and last name.
 Creates a new user if one doesn't exist in the database.
 */
 const {PrismaClient} = require('@prisma/client');
+const { DraftModeProvider } = require('next/dist/server/async-storage/draft-mode-provider');
 const prisma = new PrismaClient();
 
-async function customerQueries()
+async function customerQuery()
 {
-const customerEmail = 'dummyCustomer@gmail.com'
-const customerFName = 'dummyFName'
-const customerLName = 'dummyLName'
+const customerEmailVar = 'dummyCustomer@gmail.com'
+const customerFNameVar = 'dummyFName'
+const customerLNameVar = 'dummyLName'
 
 const customer = await prisma.customer.findMany({
     where: {
       user: {
-        email: customerEmail,
-        firstName: customerFName,
-        lastName: customerLName
+        customerEmail: customerEmailVar,
+        customerFName: customerFNameVar,
+        customerLName: customerLNameVar
       }
     },
-    include: {
-      user: true // Optionally include the User data in the result
-    }
+    // took out include: user because Customer and User tables don't have any relation
   });
 
 if(!customer[0])
 {
     await prisma.customer.create({
         data: {
-          homeAddress: 'dummy home address',
-          user: {
-            create: {
-              email: customerEmail,
-              firstName: customerFName,
-              lastName: customerLName,
-              phone: "000000000",
-            }
-          }
+          customerEmail: customerEmailVar,
+          customerFname: customerFNameVar,
+          customerMname: "dummy middle name",
+          customerLname: customerLNameVar,
+          customerPhone: "0000000000",
+          streetAddress: "dummy street address",
+          city: "dummy city",
+          state: "dummy state",
+          birthdate: "dummy birthdate",
         }
       });
     console.log('This customer did not exist in the database, new customer created.');
@@ -49,4 +48,4 @@ else
 }
 }
 
-
+module.exports = customerQuery;
