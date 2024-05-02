@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { PrismaClient } from "@prisma/client";
 import "app/styles/register.css";
 import FormInput from "app/components/FormInput.jsx";
 import Header from "app/components/Header.jsx";
 const Register = () => {
+
+  const prisma = new PrismaClient();
 
   const initialState = {
     email: "",
@@ -72,6 +75,7 @@ const Register = () => {
   const handleSubmit = async(e) =>{
     
     e.preventDefault();
+    
     try{
       const response = await fetch("/api/v2/users", {
         method: 'POST',
@@ -85,7 +89,6 @@ const Register = () => {
         throw new Error('Network response was not ok');
       }
 
-      const result = await response.json();
       alert('Registration successful!');
       setValues(initialState);
     } catch(error) {
