@@ -34,10 +34,8 @@
 .formContainer {
   position: fixed;
   height: 85%;
-  width: 100%;
-
-  justify-content: center;
-  align-items: center;
+  width: 90%;
+  left: 5%;
 
   list-style-type: none;
   border-radius: 35px;
@@ -117,7 +115,7 @@ label + input {
 }
 
 /*For devices 769px and greater */
-@media only screen and (min-width: 1px) {
+@media only screen and (min-width: 769px) {
   .popUpBox {
     display: flex;
     flex-direction: column;

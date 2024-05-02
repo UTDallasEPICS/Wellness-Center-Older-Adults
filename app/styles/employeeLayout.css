@@ -124,12 +124,12 @@ body {
 
 .mainContent {
   min-height: calc(100vh - 180px);
-  height: calc(100% - 170px);
+  height: calc(100% - 180px);
   background-color: white;
 }
 
 .sideBarSpace {
-  height: calc(100% - 170px);
+  height: calc(100% - 180px);
 }
 /*Replace these after:*/
 .testA {
@@ -138,24 +138,24 @@ body {
 }
 
 .footerSpace {
-  width: 100%;
-  height: 60px;
+  width: calc(100% - 80px);
+  height: 70px;
   margin-top: auto;
   margin-bottom: 0;
 }
 
 .testFooter {
   /* take this off and add component later*/
+  width: 100%;
+  height: 60px;
+  margin-bottom: 0;
   margin-top: 0px;
   background-color: white;
   border-top: 0.5px solid #d2d1d1;
   font-family: "Open Sans", sans-serif;
   font-weight: lighter;
   font-size: 20px;
-  padding: 20px 40px;
-  width: 100%;
-  height: 70px;
-  margin-bottom: 0;
+  padding: 10px 40px;
 }
 
 .headerSpace {
