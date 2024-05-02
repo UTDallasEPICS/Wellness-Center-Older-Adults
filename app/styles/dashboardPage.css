@@ -1,0 +1,13 @@
+.dashContainer {
+  height: 90%;
+  width: 100%;
+}
+
+.dashTitle {
+  color: black;
+
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 30px;
+}

@@ -1,0 +1,11 @@
+.listContainer {
+  width: 100%;
+  height: 200px;
+}
+
+.listContainer:nth-child(odd) {
+  color: white;
+}
+.listContainer:nth-child(even) {
+  color: gray;
+}
