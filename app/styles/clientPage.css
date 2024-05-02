@@ -1,0 +1,13 @@
+.clientPageContainer {
+  width: 100%;
+  height: 100%;
+}
+
+.clientTitle {
+  color: black;
+  padding: 10px;
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 40px;
+}
