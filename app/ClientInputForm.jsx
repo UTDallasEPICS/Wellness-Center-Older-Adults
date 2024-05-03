@@ -1,29 +1,38 @@
 "use client";
 import { useState } from "react";
 import "app/styles/clientInputForm.css";
-import axios from "axios"; // used for https requests
 import customerQuery from "../prisma/customerQueries"; // importing customerQuery
 
-export default function ClientInputForm() {
-  const [display, setDisplay] = useState(false);
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [customerFName, setCustomerFName] = useState("");
-  const [customerLName, setCustomerLName] = useState("");
+const [clientFirstName, setClientFirstName] = useState("");
+const [clientMiddleName, setClientMiddleName] = useState("");
+const [clientLastName, setClientLastName] = useState("");
+const [clientAddress, setClientAddress] = useState("");
+const [clientCity, setClientCity] = useState("");
+const [clientState, setClientState] = useState("");
+const [clientPhone, setClientPhone] = useState("");
 
-  const addClient = async() =>
-  {
-    const reply = await axios.post("/api/customer/check", {
-        customerEmail,
-        customerFName,
-        customerLName
-    });
+const handleAddClient = async () => {
+  const reply = await fetch("http://localhost:3000/api/customer/check", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      clientFirstName,
+      clientMiddleName,
+      clientLastName,
+      clientAddress,
+      clientCity,
+      clientState,
+      clientPhone
+    })
+  });
 
-        if(!reply.data) // if customer doesn't exist
-        {
+          if(!reply.ok) // if customer doesn't exist
+          {
             await customerQuery(); // calls customerQuery
-        };
-    }
-  }
+          };
+  }// end addClient
 
   return (
     <div>
@@ -31,7 +40,7 @@ export default function ClientInputForm() {
         class="openButton"
         onClick={() => {
             setDisplay((prevDisplay) => !prevDisplay);
-            addClient(); // calls the addClient function
+            handleAddClient(); // calls the addClient function
         }}
       >
         Add new client
@@ -47,13 +56,16 @@ export default function ClientInputForm() {
             <input
               type="text"
               name="clientFirstName"
+              value={clientFirstName}
+              onChange={(e) => setClientFirstName(e.target.value)}
               autofocus
               required
             ></input>
             <br></br>
             <label>Middle name</label>
             <br></br>
-            <input type="text" name="clientMiddleName" optional></input>
+            <input type="text" name="clientMiddleName" optional
+            ></input>
             <br></br>
             <label>Last name</label>
             <br></br>
