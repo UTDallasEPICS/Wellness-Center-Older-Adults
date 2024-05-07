@@ -4,7 +4,7 @@ import "app/styles/clientInputForm.css";
 
 const handleAddClient = async () => {
   try {
-    const reply = await fetch("/api/createCustomerAccount/route", {
+    const reply = await fetch("/api/createCustomerAccount/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -35,7 +35,6 @@ const handleAddClient = async () => {
         class="openButton"
         onClick={() => {
             setDisplay((prevDisplay) => !prevDisplay);
-            handleAddClient(); // calls the addClient function
         }}
       >
         Add new client
@@ -93,7 +92,10 @@ const handleAddClient = async () => {
           <input type="submit" value="Submit"></input>
           <button
             type="button"
-            onClick={() => setDisplay((prevDisplay) => !prevDisplay)}
+            onClick={() => {
+              setDisplay((prevDisplay) => !prevDisplay);
+              handleAddClient(); // calls the addClient function
+            }}
           >
             Cancel
           </button>
