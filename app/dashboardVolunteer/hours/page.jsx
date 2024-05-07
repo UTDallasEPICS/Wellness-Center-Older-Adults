@@ -1,3 +1,9 @@
+import React from "react";
+
 export default function Page() {
-  return <p>Hours Page</p>;
+  return (
+    <div>
+      <p>Hours Page</p>
+    </div>
+  );
 }

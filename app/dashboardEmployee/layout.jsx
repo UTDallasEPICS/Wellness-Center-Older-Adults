@@ -20,7 +20,7 @@ export default function DashboardLayout({
       </div>
 
       <div className="footerSpace">
-        <p className="testFooter">Temp Footer</p>
+        <p className="testFooter">Wellness Center Coordination App 2024</p>
       </div>
     </div>
   );
