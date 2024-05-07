@@ -7,18 +7,20 @@ export default function DashboardLayout({
   return (
     <div className="page">
       <div className="headerSpace">
-        <a href="/"><p className="headerText">WCOA</p></a>
+        <a href="/">
+          <p className="headerText">WCOA</p>
+        </a>
       </div>
 
       <div className="mainContent">
-        <div className="col-2 col-s-2 sideBar">
+        <div className="col-2 col-s-2 sideBarSpace">
           <SideNav />
         </div>
         <div className="col-10 col-s-9 testA">{children}</div>
       </div>
 
       <div className="footerSpace">
-        <p>Footer</p>
+        <p className="testFooter">Wellness Center Coordination App 2024</p>
       </div>
     </div>
   );

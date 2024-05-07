@@ -23,10 +23,10 @@ span{
   display:none;
 }
 
-input:invalid[focused="true"]{
-  border: 1px solid red; 
+input:invalid[focused="true"]:not(:placeholder-shown) {
+  border: 1px solid red;
 }
 
-input:invalid[focused="true"] ~ span{
+input:invalid[focused="true"]:not(:placeholder-shown) ~ span {
   display: block;
 }

@@ -35,6 +35,28 @@ export const loginRedirectUrl = () => {
     return `${ISSUER_BASEURL}oidc/logout?id_token_hint=${id_token}&post_logout_redirect_uri=${encodeURIComponent(BASEURL!+"api/auth/logout-complete")}&nonce=${genState()}`;
   };
 
+  export async function getManagementApiToken() {
+    const ISSUER_BASEURL = process.env.AUTH0_ISSUER_BASE_URL;
+    const CLIENT_SECRET = process.env.AUTH0_CLIENT_SECRET;
+    const CLIENT_ID = process.env.AUTH0_CLIENT_ID;
+    // Implementation to get a management API token from Auth0
+    const response = await fetch(`${ISSUER_BASEURL}oauth/token`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            audience: `${ISSUER_BASEURL}api/v2/`,
+            grant_type: 'client_credentials'
+        })
+    });
+
+    const data = await response.json();
+    return data.access_token;
+}
+
   /**
    * Used to ensure that each nonce is only used one time
    * @param nonce Generated string intended for one-time use
