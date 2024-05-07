@@ -6,23 +6,20 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { name: "Dashboard", href: "/dashboardEmployee" }, // Using icon name from Material Symbols Rounded font
+  { name: "Dashboard", href: "/dashboardVolunteer" }, // Using icon name from Material Symbols Rounded font
 
   {
     name: "Rides",
-    href: "/dashboardEmployee/rides",
+    href: "/dashboardVolunteer/rides",
   },
   {
-    name: "Volunteers",
-    href: "/dashboardEmployee/volunteers",
+    name: "Hours",
+    href: "/dashboardVolunteer/hours",
   },
+
   {
-    name: "Clients",
-    href: "/dashboardEmployee/clients",
-  },
-  {
-    name: "Admin",
-    href: "/dashboardEmployee/admin",
+    name: "Settings",
+    href: "/dashboardVolunteer/settings",
   },
 ];
 
