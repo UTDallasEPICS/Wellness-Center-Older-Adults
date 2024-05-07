@@ -3,14 +3,6 @@ import { useState } from "react";
 import "app/styles/clientInputForm.css";
 import customerQuery from "../prisma/customerQueries"; // importing customerQuery
 
-const [clientFirstName, setClientFirstName] = useState("");
-const [clientMiddleName, setClientMiddleName] = useState("");
-const [clientLastName, setClientLastName] = useState("");
-const [clientAddress, setClientAddress] = useState("");
-const [clientCity, setClientCity] = useState("");
-const [clientState, setClientState] = useState("");
-const [clientPhone, setClientPhone] = useState("");
-
 const handleAddClient = async () => {
   const reply = await fetch("http://localhost:3000/api/customer/check", {
     method: "POST",
@@ -28,12 +20,13 @@ const handleAddClient = async () => {
     })
   });
 
-          if(!reply.ok) // if customer doesn't exist
-          {
-            await customerQuery(); // calls customerQuery
-          };
+  if(!reply.ok) // if customer doesn't exist
+  {
+    await customerQuery(); // calls customerQuery
+  };
   }// end addClient
-
+  
+  const [display, setDisplay] = useState(false);
   return (
     <div>
       <button
@@ -56,8 +49,6 @@ const handleAddClient = async () => {
             <input
               type="text"
               name="clientFirstName"
-              value={clientFirstName}
-              onChange={(e) => setClientFirstName(e.target.value)}
               autofocus
               required
             ></input>
