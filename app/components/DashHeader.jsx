@@ -48,7 +48,7 @@ export default function DashHeader() {
           className="cancelButton"
           onClick={() => setDisplay((prevDisplay) => !prevDisplay)}
         >
-          <span class="material-symbols-rounded">close</span>
+          <span className="material-symbols-rounded">close</span>
         </button>
       </div>
     </div>
