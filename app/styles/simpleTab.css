@@ -1,15 +1,13 @@
 .tab-container {
   text-align: left;
-  margin-top:5%;
+  margin-top: 5%;
   width: 100%;
   background-color: white;
-  
 }
 
 .tabs {
   display: flex;
   position: relative;
-  
 }
 
 .tab-item {
@@ -27,7 +25,6 @@
   opacity: 0.6;
   cursor: pointer;
   transition: all 0.5s ease;
-  
 }
 
 .tab-item:hover {
@@ -44,9 +41,9 @@
 
 .tab-content {
   padding: 28px 20px;
-  border:solid;
-  border-radius:2px;
-  border-color:rgba(83, 82, 81, 1);
+  border: solid;
+  border-radius: 2px;
+  border-color: rgba(83, 82, 81, 1);
   border-width: 4px;
 }
 
@@ -57,7 +54,6 @@
 
 .tab-pane.active {
   display: block;
-  
 }
 
 .tab-pane h2 {
