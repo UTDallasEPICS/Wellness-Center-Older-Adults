@@ -4,7 +4,7 @@ import "app/styles/clientInputForm.css";
 
 const AddClientForm = () => {
   const [customerEmail, setCustomerEmail] = useState("");
-  const [customerFname, setCustomerFName] = useState("");
+  const [customerFName, setCustomerFName] = useState("");
   const [customerMName, setCustomerMName] = useState("");
   const [customerLName, setCustomerLName] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
@@ -62,7 +62,7 @@ const AddClientForm = () => {
               name="clientFirstName"
               autofocus
               required
-              value = {customerFname}
+              value = {customerFName}
               onChange={(e) => setCustomerFName(e.target.value)}
             ></input>
             <br></br>
