@@ -32,14 +32,49 @@
   width: 40px;
   height: 40px;
   margin-left: auto;
-  margin-top: auto;
+  margin-top: 10px;
   margin-bottom: auto;
   margin-right: 50px;
 }
 
 .profile-placeholder {
   border: gray;
-
   width: 40px;
   height: 40px;
+}
+
+.logout-popup {
+  display: none;
+  position: fixed;
+  margin-left: calc(100% - 390px);
+  width: 350px;
+  height: 270px;
+  border-radius: 15%;
+  background-color: ghostwhite;
+}
+
+.cancelButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  height: 45px;
+  width: 45px;
+  border-radius: 50%;
+  border: none;
+}
+.popup-content {
+  margin: 15px;
+  padding: 15px;
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+}
+.changeAccountButton {
+  padding: 15px;
+  /*border-bottom-left-radius: 50%;
+  border-top-left-radius: 50%; */
+}
+
+.logoutButton {
+  padding: 15px;
 }
