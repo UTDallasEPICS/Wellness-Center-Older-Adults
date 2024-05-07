@@ -1,5 +1,5 @@
 "use client";
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import SimpleTab, {Tab} from "app/components/SimpleTab.jsx";
 import AddRidesTable from "app/components/AddRidesTable.jsx";
 import ReservedRidesTable from "app/components/ReservedRidesTable.jsx";

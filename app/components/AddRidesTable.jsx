@@ -65,6 +65,17 @@ const AddRidesTable = ({initialContacts}) => {
         setEditContactId(null);
     }
 
+    const handleCancelClick = () => {
+      setEditContactId(null);
+    }
+
+    const handleDeleteClick = (contactId) => {
+      const newContacts = [...contacts];
+      const index = contacts.findIndex((contact) => contact.id === contactId);
+      newContacts.splice(index, 1);
+      setContacts(newContacts);
+    }
+
   return(
     
     <div className = "tableContainer">
@@ -89,9 +100,10 @@ const AddRidesTable = ({initialContacts}) => {
           {contacts.filter(contact => contact.status === "Added").map(contact => (
             <Fragment>
               {editContactId === contact.id ? (
-              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange}/>
+              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange}
+              handleCancelClick={handleCancelClick}/>
               ) :(
-              <ReadOnlyRow contact={contact} handleEditClick ={handleEditClick}/>
+              <ReadOnlyRow contact={contact} handleEditClick ={handleEditClick} handleDeleteClick={handleDeleteClick}/>
               )}
               
             </Fragment>

@@ -1,27 +1,26 @@
-
 .footer-component {
-  position: absolute;
-  top:90%;
   align-items: center;
   background-color: lightgray;
-  height: 160px;
+  height: 150px;
   width: 100%;
-  margin:0;
+  margin: 0;
+  margin-bottom: 0;
 }
 
 .footer-container {
   background-color: #f8f9fa; /* Soft white background */
   color: #35424a; /* Dark blue-gray text */
-  padding: 20px;
+  padding: 10px;
   text-align: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
   border-top: 1px solid #eaeaea; /* Adds a light line at the top of the footer */
+  margin-bottom: 0;
 }
 
 .footer-container h2 {
-  font-weight: 600;
-  margin-bottom: 15px;
+  font-weight: 60px;
+  margin-bottom: 0px;
   color: #090a0b; /* Adds a touch of color */
 }
 
@@ -37,5 +36,3 @@
   color: #7c7c7c; /* Soft gray text */
   font-style: italic;
 }
-
-

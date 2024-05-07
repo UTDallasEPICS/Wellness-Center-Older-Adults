@@ -1,5 +1,7 @@
-import SideNav from "@/app/ui/dashboardEmployee/sidenav";
-import "app/styles/employeeLayout.css";
+import SideNav from "@/app/ui/dashboardVolunteer/sidenav";
+import DashHeader from "@/app/components/DashHeader.jsx";
+import "app/styles/volunteerLayout.css";
+
 /* body for page makes menu span entire height*/
 export default function DashboardLayout({
   children, // will be a page or nested layout
@@ -7,9 +9,7 @@ export default function DashboardLayout({
   return (
     <div className="page">
       <div className="headerSpace">
-        <a href="/">
-          <p className="headerText">WCOA</p>
-        </a>
+        <DashHeader />
       </div>
 
       <div className="mainContent">
