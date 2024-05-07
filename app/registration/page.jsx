@@ -1,17 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { PrismaClient } from "@prisma/client";
 import "app/styles/register.css";
 import FormInput from "app/components/FormInput.jsx";
 import Header from "app/components/Header.jsx";
 const Register = () => {
-  const [values, setValues] = useState({
-    email:"",
-    firstName:"",
-    lastName:"",
-    password:"",
-    confirmPassword:""
-  });
+
+  const prisma = new PrismaClient();
+
+  const initialState = {
+    email: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    confirmPassword: "",
+    connection: "WCOA-Username-Password"
+  };
+
+  const [values, setValues] = useState(initialState);
 
   const inputs = [
     {
@@ -48,9 +55,9 @@ const Register = () => {
       name:"password",
       type:"password",
       placeholder:"Password",
-      errorMessage:"Password should be 6-20 characters",
+      errorMessage:"Password should be: 8-25 characters, contain one lowercase and one uppercase letter, and a special character.",
       label:"Password",
-      pattern:"^[A-Za-z0-9!@#$%^&*?+=]{6,20}$",
+      pattern:"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
       required: true,
     },
     {
@@ -65,15 +72,36 @@ const Register = () => {
     },
     ];
 
-  const handleSubmit = (e) =>{
+  const handleSubmit = async(e) =>{
+    
     e.preventDefault();
+    
+    try{
+      const response = await fetch("/api/v2/users", {
+        method: 'POST',
+        headers: {
+          'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(values)
+      });
 
-  }
+      if(!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      alert('Registration successful!');
+      setValues(initialState);
+    } catch(error) {
+      console.error('Failed to register:', error);
+      alert('Registration failed!');
+
+    }
+
+  };
 
   const onChange =(e)=>{
     setValues({...values, [e.target.name]: e.target.value});
   }
-  console.log(values);
   
   return(
   <div>
