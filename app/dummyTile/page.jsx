@@ -1,7 +1,12 @@
-import Tile from "app/components/Tile.jsx";
+import RidesReserved from "app/components/RidesReserved.jsx"
+
 
 export default function dummyTile() {
-    return <Tile/>
+    return (
+  
+    <RidesReserved/>  
+  
+    )
     
   }
   

@@ -1,3 +1,10 @@
+import RidesReserved from "app/components/RidesReserved.jsx"
+
 export default function Page() {
-  return <p>Rides Page</p>;
+  return (
+    <div> <RidesReserved />
+    <p>Rides Page</p>;
+    </div>
+  
+  )
 }
