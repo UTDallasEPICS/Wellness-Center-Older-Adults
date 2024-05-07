@@ -100,10 +100,10 @@ const AddRidesTable = ({initialContacts}) => {
           {contacts.filter(contact => contact.status === "Added").map(contact => (
             <Fragment>
               {editContactId === contact.id ? (
-              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange}
+              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange}  status = {contact.status}
               handleCancelClick={handleCancelClick}/>
               ) :(
-              <ReadOnlyRow contact={contact} handleEditClick ={handleEditClick} handleDeleteClick={handleDeleteClick}/>
+              <ReadOnlyRow contact={contact} handleEditClick ={handleEditClick} handleDeleteClick={handleDeleteClick}  status = {contact.status}/>
               )}
               
             </Fragment>

@@ -26,6 +26,7 @@ const CompletedRidesTable = ({initialContacts}) => {
         phoneNumber: contact.phoneNumber,
         address: contact.address,
         startTime: contact.startTime,
+        volunteerName: contact.volunteerName,
       }
       setEditFormData(formValues);
     };
@@ -35,6 +36,7 @@ const CompletedRidesTable = ({initialContacts}) => {
       phoneNumber: "",
       address: "",
       startTime: "",
+      volunteerName: "",
     });
     
     const handleEditFormChange = (event) => {
@@ -55,7 +57,7 @@ const CompletedRidesTable = ({initialContacts}) => {
           phoneNumber: editFormData.phoneNumber,
           address: editFormData.address,
           startTime:editFormData.startTime,
-          volunteerName: contacts.find(contact => contact.id === editContactId).volunteerName,
+          volunteerName: editFormData.volunteerName,
           status: contacts.find(contact => contact.id === editContactId).status,
           hours: contacts.find(contact => contact.id === editContactId).hours
         }
@@ -89,6 +91,7 @@ const CompletedRidesTable = ({initialContacts}) => {
             <th>Contact Number</th>
             <th>Address</th>
             <th>Pick-up Time</th>
+            <th>Volunteer Name</th>
             <th>Actions</th>
             
           </tr>
@@ -101,10 +104,10 @@ const CompletedRidesTable = ({initialContacts}) => {
           {contacts.filter(contact => contact.status === "Completed").map(contact => (
             <Fragment>
               {editContactId === contact.id ? (
-              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange}
+              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange} status = {contact.status}
               handleCancelClick={handleCancelClick}/>
               ) :(
-              <ReadOnlyRow contact={contact} handleEditClick ={handleEditClick} handleDeleteClick={handleDeleteClick}/>
+              <ReadOnlyRow contact={contact} handleEditClick ={handleEditClick} handleDeleteClick={handleDeleteClick} status = {contact.status}/>
               )}
               
             </Fragment>
