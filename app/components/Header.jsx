@@ -7,7 +7,7 @@ export default function Header() {
       
       <div className="header">
         <a href="/">
-        <Image className="logo" src="/logo.png" alt="Logo" width={100} height={50} />
+        <Image className="logo" src="/logo.png" alt="Logo" width={1600} height={800} />
         </a>
       </div>
     </div>
