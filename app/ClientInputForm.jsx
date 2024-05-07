@@ -1,31 +1,33 @@
 "use client";
 import { useState } from "react";
 import "app/styles/clientInputForm.css";
-import customerQuery from "../prisma/customerQueries"; // importing customerQuery
 
 const handleAddClient = async () => {
-  const reply = await fetch("http://localhost:3000/api/customer/check", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      clientFirstName,
-      clientMiddleName,
-      clientLastName,
-      clientAddress,
-      clientCity,
-      clientState,
-      clientPhone
-    })
-  });
+  try {
+    const reply = await fetch("/api/createCustomerAccount/route", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        customerEmail,
+        customerFname,
+        customerLname,
+      })
+    });
 
-  if(!reply.ok) // if customer doesn't exist
-  {
-    await customerQuery(); // calls customerQuery
-  };
-  }// end addClient
-  
+    if (!reply.ok) {
+      console.log('Customer already exists');
+      return;
+    }
+
+    const data = await reply.json();
+    console.log(data); // Log the response from the API
+  } catch (error) {
+    console.error(error); // Log any errors
+  }
+};
+
   const [display, setDisplay] = useState(false);
   return (
     <div>
