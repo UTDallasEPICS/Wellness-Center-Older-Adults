@@ -63,11 +63,15 @@ const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, sta
         </td>) : null}
 
       <td>
-        <button type="submit">Save</button>
-        <button type="button" onClick={handleCancelClick}>Cancel</button>
+        <button type="submit">
+          <span class="material-symbols-rounded">done</span>
+        </button>
+        <button type="button" onClick={handleCancelClick}>
+          <span class="material-symbols-rounded">cancel</span>
+        </button>
       </td>
     </tr>
   );
 };
 
-export default EditableRow
+export default EditableRow;
