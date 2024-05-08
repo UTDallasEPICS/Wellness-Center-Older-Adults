@@ -9,5 +9,14 @@
   text-align: left;
   font-family: "Open Sans", sans-serif;
   font-weight: lighter;
-  font-size: 30px;
+  font-size: 40px;
+  margin-left: 5%;
+}
+
+.dashBoxes {
+  display: flex;
+  height: 100%;
+  margin-left: 5%;
+  margin-top: 50px;
+  gap: 2.5%;
 }

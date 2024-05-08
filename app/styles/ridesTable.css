@@ -1,4 +1,4 @@
-.tableContainer{
+.tableContainer {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -7,24 +7,60 @@
 
 table {
   border-collapse: collapse;
-  width: 100%;
+  margin-left: 0.5%;
+  width: 99%;
 }
 
 th,
 td {
-  border: 1px solid #ffffff;
-  text-align: left;
-  padding: 8px;
-  font-size: 32px;
-  
-}
+  border: none;
+  text-align: center;
 
+  padding: 8px;
+}
+td {
+  font-size: 30px;
+}
 th {
-  background-color: rgb(117, 201, 250);
+  background-color: white;
+  border-bottom: 0.5px solid #555555;
+  font-family: "Open Sans", sans-serif;
+  font-weight: normal;
+  font-size: 20px;
 }
 
 td {
-  background-color: rgb(205, 235, 253);
+  background-color: white;
+
+  padding: 15px 5px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+}
+/*
+tr {
+  border-bottom: 0.5px solid #d2d1d1;
+}
+*/
+input {
+  background-color: #f2f3f4;
+  border-radius: 10px;
+  border: 1px solid #c0c0c0;
+  width: 260px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  margin-right: 10px;
+}
+
+button {
+  color: black;
+  background-color: white;
+  border: none;
+}
+.addButton {
+  color: white;
+  background-color: black;
+  padding: 10px;
+  transform: scale(1);
 }
 
 form {
@@ -32,7 +68,14 @@ form {
   gap: 5px;
 }
 
-
 form * {
-  font-size: 28px;
+  font-size: 20px;
+}
+
+.addRideTitle {
+  margin: 5%;
+}
+
+.addRideForm {
+  margin: 5%;
 }

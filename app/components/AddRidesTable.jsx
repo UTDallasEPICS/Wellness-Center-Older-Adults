@@ -1,15 +1,20 @@
-{/*https://www.youtube.com/watch?v=dYjdzpZv5yc */ }
+{
+  /*https://www.youtube.com/watch?v=dYjdzpZv5yc */
+}
 
 import { useState, Fragment, useEffect } from "react";
 import "app/styles/ridesTable.css";
 import ReadOnlyRow from "app/components/ReadOnlyRow.jsx";
 import EditableRow from "app/components/EditableRow.jsx";
 
-
 const AddRidesTable = ({ initialContacts }) => {
-
-  {/* Creates array of data calling from data file*/ }
-  const [contacts, setContacts] = useState(initialContacts); {/*Change later to pull from data base or replace the data structure from import */ }
+  {
+    /* Creates array of data calling from data file*/
+  }
+  const [contacts, setContacts] = useState(initialContacts);
+  {
+    /*Change later to pull from data base or replace the data structure from import */
+  }
 
   const [editContactId, setEditContactId] = useState(null);
 
@@ -25,7 +30,7 @@ const AddRidesTable = ({ initialContacts }) => {
       phoneNumber: contact.phoneNumber,
       address: contact.address,
       startTime: contact.startTime,
-    }
+    };
     setEditFormData(formValues);
   };
 
@@ -44,7 +49,7 @@ const AddRidesTable = ({ initialContacts }) => {
     const newFormData = { ...editFormData };
     newFormData[fieldName] = fieldValue;
     setEditFormData(newFormData);
-  }
+  };
 
   const handleEditFormSubmit = (event) => {
     event.preventDefault();
@@ -54,30 +59,30 @@ const AddRidesTable = ({ initialContacts }) => {
       phoneNumber: editFormData.phoneNumber,
       address: editFormData.address,
       startTime: editFormData.startTime,
-      volunteerName: contacts.find(contact => contact.id === editContactId).volunteerName,
-      status: contacts.find(contact => contact.id === editContactId).status,
-      hours: contacts.find(contact => contact.id === editContactId).hours
-    }
+      volunteerName: contacts.find((contact) => contact.id === editContactId)
+        .volunteerName,
+      status: contacts.find((contact) => contact.id === editContactId).status,
+      hours: contacts.find((contact) => contact.id === editContactId).hours,
+    };
     const newContacts = [...contacts];
     const index = contacts.findIndex((contact) => contact.id === editContactId);
     newContacts[index] = editedContact;
     setContacts(newContacts);
     setEditContactId(null);
-  }
+  };
 
   const handleCancelClick = () => {
     setEditContactId(null);
-  }
+  };
 
   const handleDeleteClick = (contactId) => {
     const newContacts = [...contacts];
     const index = contacts.findIndex((contact) => contact.id === contactId);
     newContacts.splice(index, 1);
     setContacts(newContacts);
-  }
+  };
 
   return (
-
     <div className="tableContainer">
       <form onSubmit={handleEditFormSubmit}>
         <table>
@@ -88,8 +93,7 @@ const AddRidesTable = ({ initialContacts }) => {
               <th>Contact Number</th>
               <th>Address</th>
               <th>Pick-up Time</th>
-              <th>Actions</th>
-
+              <th> </th>
             </tr>
           </thead>
 
@@ -97,33 +101,31 @@ const AddRidesTable = ({ initialContacts }) => {
           <tbody>
             {/*Pulls element from the data structure to map out information */}
 
-            {contacts.filter(contact => contact.status === "Added").map(contact => (
-              editContactId === contact.id ? (
-                <EditableRow
-                  key={contact.id}
-                  editFormData={editFormData}
-                  handleEditFormChange={handleEditFormChange}
-                  handleCancelClick={handleCancelClick}
-                />
-              ) : (
-                <ReadOnlyRow
-                  key={contact.id}
-                  contact={contact}
-                  handleEditClick={handleEditClick}
-                  handleDeleteClick={handleDeleteClick}
-                />
-              )
-            ))}
-
+            {contacts
+              .filter((contact) => contact.status === "Added")
+              .map((contact) =>
+                editContactId === contact.id ? (
+                  <EditableRow
+                    key={contact.id}
+                    editFormData={editFormData}
+                    handleEditFormChange={handleEditFormChange}
+                    handleCancelClick={handleCancelClick}
+                  />
+                ) : (
+                  <ReadOnlyRow
+                    key={contact.id}
+                    contact={contact}
+                    handleEditClick={handleEditClick}
+                    handleDeleteClick={handleDeleteClick}
+                  />
+                )
+              )}
           </tbody>
         </table>
         {/*Could prob make this a separate component to make it a prompt to add info */}
       </form>
-
-
-
     </div>
   );
-}
+};
 
 export default AddRidesTable;

@@ -2,7 +2,8 @@
   text-align: left;
   font-family: "Open Sans", sans-serif;
   font-weight: lighter;
-  font-size: 30px;
+  font-size: 35px;
+  padding: 0;
 }
 
 input {
