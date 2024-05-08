@@ -1,55 +1,67 @@
-import React from "react";
-
-const EditableRow = ({
-  editFormData,
-  handleEditFormChange,
-  handleCancelClick,
-}) => {
-  return (
+import React from 'react'
+import "app/styles/editableRow.css";
+const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, status}) => {
+  return(
     <tr>
       <td>
-        <input
-          type="text"
-          name="clientName"
-          required="required"
-          placeholder="Enter client's name..."
-          value={editFormData.clientName}
-          onChange={handleEditFormChange}
-        ></input>
+        <textarea className="editInput"
+        type="text" 
+        name="clientName" 
+        required = "required" 
+        placeholder="Enter client's name..."
+        value={editFormData.clientName}
+        onChange={handleEditFormChange}
+        ></textarea>
       </td>
 
       <td>
-        <input
-          type="text"
-          name="phoneNumber"
-          required="required"
+        <textarea className="editInput"
+          type="text" 
+          name="phoneNumber" 
+          required = "required" 
           placeholder="Enter contact number..."
           value={editFormData.phoneNumber}
           onChange={handleEditFormChange}
-        ></input>
+          >
+        </textarea>
       </td>
 
       <td>
-        <input
-          type="text"
-          name="address"
-          placeholder="Enter client's address"
-          required="required"
-          value={editFormData.address}
-          onChange={handleEditFormChange}
-        ></input>
+        <textarea className="editInput"
+        type="text" 
+        name="address"
+        placeholder="Enter client's address" 
+        required = "required"
+        value={editFormData.address}
+        onChange={handleEditFormChange}
+        >
+        </textarea>
       </td>
 
       <td>
-        <input
-          type="text"
-          name="startTime"
-          required="required"
-          placeholder="Enter time of pick-up..."
-          value={editFormData.startTime}
-          onChange={handleEditFormChange}
-        ></input>
+        <textarea className="editInput"
+        type="text" 
+        name="startTime" 
+        required = "required" 
+        placeholder="Enter time of pick-up..."
+        value={editFormData.startTime}
+        onChange={handleEditFormChange}
+        >
+        </textarea>
       </td>
+
+      {status === "Reserved" || status == "Completed" ? (
+        <td>
+          <textarea className="editInput"
+          type="text" 
+          name="volunteerName" 
+          required = "required" 
+          placeholder="Enter volunteer name"
+          value={editFormData.volunteerName}
+          onChange={handleEditFormChange}
+          ></textarea>
+        </td>) : null}
+
       <td>
         <button type="submit">
           <span class="material-symbols-rounded">done</span>

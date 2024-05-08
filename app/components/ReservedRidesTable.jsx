@@ -6,7 +6,7 @@ import "app/styles/ridesTable.css";
 import ReadOnlyRow from "app/components/ReadOnlyRow.jsx";
 import EditableRow from "app/components/EditableRow.jsx";
 
-import data from "app/mock-data.json";
+
 
 
 
@@ -21,29 +21,31 @@ const ReservedRidesTable = ({ initialContacts }) => {
     setContacts(initialContacts);
   }, [initialContacts]);
 
-  const handleEditClick = (event, contact) => {
-    event.preventDefault();
-    setEditContactId(contact.id);
-    const formValues = {
-      clientName: contact.clientName,
-      phoneNumber: contact.phoneNumber,
-      address: contact.address,
-      startTime: contact.startTime,
-    }
-    setEditFormData(formValues);
-  };
+    const handleEditClick = (event, contact) => {
+      event.preventDefault();
+      setEditContactId(contact.id);
+      const formValues = {
+        clientName: contact.clientName,
+        phoneNumber: contact.phoneNumber,
+        address: contact.address,
+        startTime: contact.startTime,
+        volunteerName: contact.volunteerName,
+      }
+      setEditFormData(formValues);
+    };
 
-  const [editFormData, setEditFormData] = useState({
-    clientName: "",
-    phoneNumber: "",
-    address: "",
-    startTime: "",
-  });
-
-  const handleEditFormChange = (event) => {
-    event.preventDefault();
-    const fieldName = event.target.getAttribute("name");
-    const fieldValue = event.target.value;
+    const [editFormData, setEditFormData] = useState({
+      clientName: "",
+      phoneNumber: "",
+      address: "",
+      startTime: "",
+      volunteerName: "",
+    });
+    
+    const handleEditFormChange = (event) => {
+      event.preventDefault();
+      const fieldName = event.target.getAttribute("name");
+      const fieldValue = event.target.value;
 
     const newFormData = { ...editFormData };
     newFormData[fieldName] = fieldValue;
@@ -58,7 +60,7 @@ const ReservedRidesTable = ({ initialContacts }) => {
       phoneNumber: editFormData.phoneNumber,
       address: editFormData.address,
       startTime: editFormData.startTime,
-      volunteerName: contacts.find(contact => contact.id === editContactId).volunteerName,
+      volunteerName: editFormData.volunteerName,
       status: contacts.find(contact => contact.id === editContactId).status,
       hours: contacts.find(contact => contact.id === editContactId).hours
     }
@@ -84,51 +86,40 @@ const ReservedRidesTable = ({ initialContacts }) => {
 
     <div className="tableContainer">
       <form onSubmit={handleEditFormSubmit}>
-        <table>
-          {/* Serves as the header of the table */}
-          <thead>
-            <tr>
-              <th>Client Name</th>
-              <th>Contact Number</th>
-              <th>Address</th>
-              <th>Pick-up Time</th>
-              <th>Actions</th>
+      <table>
+        {/* Serves as the header of the table */}
+        <thead>
+          <tr>
+            <th>Client Name</th>
+            <th>Contact Number</th>
+            <th>Address</th>
+            <th>Pick-up Time</th>
+            <th>Volunteer Name</th>
+            <th>Actions</th>
+            
+          </tr>
+        </thead>
 
-            </tr>
-          </thead>
-
-          {/* Stores the data */}
-          <tbody>
-            {/*Pulls element from the data structure to map out information */}
-
-            {contacts
-              .filter((contact) => contact.status === "Reserved")
-              .map((contact) => {
-                if (editContactId === contact.id) {
-                  return (
-                    <EditableRow
-                      key={contact.id}
-                      editFormData={editFormData}
-                      handleEditFormChange={handleEditFormChange}
-                      handleCancelClick={handleCancelClick}
-                    />
-                  );
-                } else {
-                  return (
-                    <ReadOnlyRow
-                      key={contact.id}
-                      contact={contact}
-                      handleEditClick={handleEditClick}
-                      handleDeleteClick={handleDeleteClick}
-                    />
-                  );
-                }
-              })}
-
-
-          </tbody>
-        </table>
-        {/*Could prob make this a separate component to make it a prompt to add info */}
+        {/* Stores the data */}
+        <tbody>
+          {/*Pulls element from the data structure to map out information */}
+          
+          {contacts.filter(contact => contact.status === "Reserved").map(contact => (
+            <Fragment  key={contact.id}>
+              {editContactId === contact.id ? (
+              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange} status = {contact.status}
+              handleCancelClick={handleCancelClick}/>
+              ) :(
+              <ReadOnlyRow  key={contact.id} contact={contact} handleEditClick ={handleEditClick} handleDeleteClick={handleDeleteClick} status = {contact.status}/>
+              )}
+              
+            </Fragment>
+           
+           ))}
+        
+        </tbody>
+      </table>
+      {/*Could prob make this a separate component to make it a prompt to add info */}
       </form>
 
 
