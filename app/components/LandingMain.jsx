@@ -5,9 +5,11 @@ import "app/styles/landingMain.css";
 import { useAuth } from "../providers/Auth";
 import Header from "app/components/Header.jsx";
 import Footer from "app/components/Footer.jsx";
+import Image from "next/image";
+
 const landingPage = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { isAuthenticated, handleLogin, handleLogout } = useAuth(); 
+  const { isAuthenticated, handleLogin, handleLogout } = useAuth();
 
   return (
     <div className="page-container">
@@ -19,14 +21,14 @@ const landingPage = () => {
           <p className="body">Admin sign in page</p>
           {isAuthenticated ? (
             <>
-            <button className="button" onClick={handleLogout}>
-              Log Out
-            </button>
-            <a href="/dashboardEmployee">
-            <button className="button" style={{ marginTop: '10px' }}>
-              Go Dashboard
-            </button>
-            </a>
+              <button className="button" onClick={handleLogout}>
+                Log Out
+              </button>
+              <a href="/dashboardEmployee">
+                <button className="button" style={{ marginTop: '10px' }}>
+                  Go Dashboard
+                </button>
+              </a>
             </>
           ) : (
             <button className="button" onClick={handleLogin}>
@@ -35,10 +37,12 @@ const landingPage = () => {
           )}
         </div>
 
-        <img
+        <Image
           className="carImage"
           src="/images/croppedCarImage.png"
           alt="Image of car with location icon"
+          width={500}
+          height={600}
         />
       </div>
       {/* */}

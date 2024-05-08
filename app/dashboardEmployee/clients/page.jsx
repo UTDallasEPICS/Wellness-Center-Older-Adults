@@ -16,7 +16,7 @@ export default function Page() {
         </div>
         <div className="editButtonContainer">
           <button type="button" className="editButton">
-            <span class="material-symbols-rounded">edit</span>
+            <span className="material-symbols-rounded">edit</span>
           </button>
         </div>
       </div>

@@ -1,84 +1,84 @@
-{/*https://www.youtube.com/watch?v=dYjdzpZv5yc */}
+{/*https://www.youtube.com/watch?v=dYjdzpZv5yc */ }
 
-import {useState, Fragment, useEffect} from "react";
+import { useState, Fragment, useEffect } from "react";
 import "app/styles/ridesTable.css";
 import ReadOnlyRow from "app/components/ReadOnlyRow.jsx";
 import EditableRow from "app/components/EditableRow.jsx";
 
 
-const AddRidesTable = ({initialContacts}) => {
-  
-    {/* Creates array of data calling from data file*/}
-    const [contacts, setContacts] = useState(initialContacts); {/*Change later to pull from data base or replace the data structure from import */}
-   
-    const [editContactId, setEditContactId] = useState(null);
+const AddRidesTable = ({ initialContacts }) => {
 
-    useEffect(() => {
-      setContacts(initialContacts);
-    }, [initialContacts]);
+  {/* Creates array of data calling from data file*/ }
+  const [contacts, setContacts] = useState(initialContacts); {/*Change later to pull from data base or replace the data structure from import */ }
 
-    const handleEditClick = (event, contact) => {
-      event.preventDefault();
-      setEditContactId(contact.id);
-      const formValues = {
-        clientName: contact.clientName,
-        phoneNumber: contact.phoneNumber,
-        address: contact.address,
-        startTime: contact.startTime,
-      }
-      setEditFormData(formValues);
-    };
+  const [editContactId, setEditContactId] = useState(null);
 
-    const [editFormData, setEditFormData] = useState({
-      clientName: "",
-      phoneNumber: "",
-      address: "",
-      startTime: "",
-    });
-    
-    const handleEditFormChange = (event) => {
-      event.preventDefault();
-      const fieldName = event.target.getAttribute("name");
-      const fieldValue = event.target.value;
+  useEffect(() => {
+    setContacts(initialContacts);
+  }, [initialContacts]);
 
-      const newFormData = {...editFormData };
-      newFormData[fieldName] = fieldValue;
-      setEditFormData(newFormData);
+  const handleEditClick = (event, contact) => {
+    event.preventDefault();
+    setEditContactId(contact.id);
+    const formValues = {
+      clientName: contact.clientName,
+      phoneNumber: contact.phoneNumber,
+      address: contact.address,
+      startTime: contact.startTime,
     }
+    setEditFormData(formValues);
+  };
 
-    const handleEditFormSubmit = (event) => {
-      event.preventDefault();
-        const editedContact = {
-          id: editContactId,
-          clientName: editFormData.clientName,
-          phoneNumber: editFormData.phoneNumber,
-          address: editFormData.address,
-          startTime:editFormData.startTime,
-          volunteerName: contacts.find(contact => contact.id === editContactId).volunteerName,
-          status: contacts.find(contact => contact.id === editContactId).status,
-          hours: contacts.find(contact => contact.id === editContactId).hours
-        }
-        const newContacts = [...contacts];
-        const index = contacts.findIndex((contact)=> contact.id === editContactId);
-        newContacts[index] = editedContact;
-        setContacts(newContacts);
-        setEditContactId(null);
+  const [editFormData, setEditFormData] = useState({
+    clientName: "",
+    phoneNumber: "",
+    address: "",
+    startTime: "",
+  });
+
+  const handleEditFormChange = (event) => {
+    event.preventDefault();
+    const fieldName = event.target.getAttribute("name");
+    const fieldValue = event.target.value;
+
+    const newFormData = { ...editFormData };
+    newFormData[fieldName] = fieldValue;
+    setEditFormData(newFormData);
+  }
+
+  const handleEditFormSubmit = (event) => {
+    event.preventDefault();
+    const editedContact = {
+      id: editContactId,
+      clientName: editFormData.clientName,
+      phoneNumber: editFormData.phoneNumber,
+      address: editFormData.address,
+      startTime: editFormData.startTime,
+      volunteerName: contacts.find(contact => contact.id === editContactId).volunteerName,
+      status: contacts.find(contact => contact.id === editContactId).status,
+      hours: contacts.find(contact => contact.id === editContactId).hours
     }
+    const newContacts = [...contacts];
+    const index = contacts.findIndex((contact) => contact.id === editContactId);
+    newContacts[index] = editedContact;
+    setContacts(newContacts);
+    setEditContactId(null);
+  }
 
-    const handleCancelClick = () => {
-      setEditContactId(null);
-    }
+  const handleCancelClick = () => {
+    setEditContactId(null);
+  }
 
-    const handleDeleteClick = (contactId) => {
-      const newContacts = [...contacts];
-      const index = contacts.findIndex((contact) => contact.id === contactId);
-      newContacts.splice(index, 1);
-      setContacts(newContacts);
-    }
+  const handleDeleteClick = (contactId) => {
+    const newContacts = [...contacts];
+    const index = contacts.findIndex((contact) => contact.id === contactId);
+    newContacts.splice(index, 1);
+    setContacts(newContacts);
+  }
 
-  return(
-    
-    <div className = "tableContainer">
+  return (
+
+    <div className="tableContainer">
       <form onSubmit={handleEditFormSubmit}>
       <table>
         {/* Serves as the header of the table */}
@@ -115,8 +115,8 @@ const AddRidesTable = ({initialContacts}) => {
       {/*Could prob make this a separate component to make it a prompt to add info */}
       </form>
 
-     
-        
+
+
     </div>
   );
 }
