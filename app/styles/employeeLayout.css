@@ -123,8 +123,8 @@ body {
 }
 
 .mainContent {
-  min-height: calc(100vh - 180px);
-  height: calc(100% - 180px);
+  min-height: calc(100% - 180px);
+  height: calc(100vh - 180px);
   background-color: white;
 }
 
@@ -134,7 +134,7 @@ body {
 /*Replace these after:*/
 .testA {
   height: calc(100% - 20px);
-  background-color: #eceeefd6;
+  background-color: white;
 }
 
 .footerSpace {
@@ -174,10 +174,9 @@ body {
   font-size: 20px;
 }
 
-.icon{
+.icon {
   width: 5%;
-  height:100%;
-  
+  height: 100%;
 }
 
 /*

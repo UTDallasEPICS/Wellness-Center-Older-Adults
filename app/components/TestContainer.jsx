@@ -1,13 +1,13 @@
+import React from "react";
 import "app/styles/testContainer.css";
-import TestContainerTwo from "app/components/TestContainerTwo.jsx";
 
-export default function TestContainer() {
+export default function TestContainer(props) {
   return (
     <div className="mainContainer">
-      <p className="containerText">This is example text</p>
-      <div className="contentElements">
-        <TestContainerTwo />
-      </div>
+      <div className="contentNumber">{props.number}</div>
+      <p className="containerText">{props.text}</p>
+
+      <div className="contentElements">{props.elements}</div>
     </div>
   );
 }
