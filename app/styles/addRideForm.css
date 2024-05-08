@@ -1,0 +1,10 @@
+.addRideTitle {
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 30px;
+}
+
+input {
+  padding: 5px;
+}
