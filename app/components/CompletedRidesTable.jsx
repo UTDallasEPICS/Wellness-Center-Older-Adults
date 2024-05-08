@@ -1,20 +1,11 @@
 {/*https://www.youtube.com/watch?v=dYjdzpZv5yc */ }
-{/*https://www.youtube.com/watch?v=dYjdzpZv5yc */ }
 
-import { useState, Fragment, useEffect } from "react";
 import { useState, Fragment, useEffect } from "react";
 import "app/styles/ridesTable.css";
 import ReadOnlyRow from "app/components/ReadOnlyRow.jsx";
 import EditableRow from "app/components/EditableRow.jsx";
 
 
-
-const CompletedRidesTable = ({ initialContacts }) => {
-
-  {/* Creates array of data calling from data file*/ }
-  const [contacts, setContacts] = useState(initialContacts); {/*Change later to pull from data base or replace the data structure from import */ }
-
-  const [editContactId, setEditContactId] = useState(null);
 const CompletedRidesTable = ({ initialContacts }) => {
 
   {/* Creates array of data calling from data file*/ }
@@ -22,12 +13,11 @@ const CompletedRidesTable = ({ initialContacts }) => {
 
   const [editContactId, setEditContactId] = useState(null);
 
+
   useEffect(() => {
     setContacts(initialContacts);
   }, [initialContacts]);
-  useEffect(() => {
-    setContacts(initialContacts);
-  }, [initialContacts]);
+
 
     const handleEditClick = (event, contact) => {
       event.preventDefault();
@@ -59,10 +49,7 @@ const CompletedRidesTable = ({ initialContacts }) => {
     newFormData[fieldName] = fieldValue;
     setEditFormData(newFormData);
   }
-    const newFormData = { ...editFormData };
-    newFormData[fieldName] = fieldValue;
-    setEditFormData(newFormData);
-  }
+
 
   const handleEditFormSubmit = (event) => {
     event.preventDefault();
@@ -86,9 +73,7 @@ const CompletedRidesTable = ({ initialContacts }) => {
   const handleCancelClick = () => {
     setEditContactId(null);
   }
-  const handleCancelClick = () => {
-    setEditContactId(null);
-  }
+ 
 
   const handleDeleteClick = (contactId) => {
     const newContacts = [...contacts];
@@ -96,16 +81,9 @@ const CompletedRidesTable = ({ initialContacts }) => {
     newContacts.splice(index, 1);
     setContacts(newContacts);
   }
-  const handleDeleteClick = (contactId) => {
-    const newContacts = [...contacts];
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    newContacts.splice(index, 1);
-    setContacts(newContacts);
-  }
 
-  return (
 
-    <div className="tableContainer">
+
   return (
 
     <div className="tableContainer">
@@ -145,10 +123,6 @@ const CompletedRidesTable = ({ initialContacts }) => {
       </table>
       {/*Could prob make this a separate component to make it a prompt to add info */}
       </form>
-
-
-
-
 
     </div>
   );
