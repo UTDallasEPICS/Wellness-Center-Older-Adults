@@ -80,44 +80,39 @@ const AddRidesTable = ({ initialContacts }) => {
 
     <div className="tableContainer">
       <form onSubmit={handleEditFormSubmit}>
-        <table>
-          {/* Serves as the header of the table */}
-          <thead>
-            <tr>
-              <th>Client Name</th>
-              <th>Contact Number</th>
-              <th>Address</th>
-              <th>Pick-up Time</th>
-              <th>Actions</th>
+      <table>
+        {/* Serves as the header of the table */}
+        <thead>
+          <tr>
+            <th>Client Name</th>
+            <th>Contact Number</th>
+            <th>Address</th>
+            <th>Pick-up Time</th>
+            <th>Actions</th>
+            
+          </tr>
+        </thead>
 
-            </tr>
-          </thead>
-
-          {/* Stores the data */}
-          <tbody>
-            {/*Pulls element from the data structure to map out information */}
-
-            {contacts.filter(contact => contact.status === "Added").map(contact => (
-              editContactId === contact.id ? (
-                <EditableRow
-                  key={contact.id}
-                  editFormData={editFormData}
-                  handleEditFormChange={handleEditFormChange}
-                  handleCancelClick={handleCancelClick}
-                />
-              ) : (
-                <ReadOnlyRow
-                  key={contact.id}
-                  contact={contact}
-                  handleEditClick={handleEditClick}
-                  handleDeleteClick={handleDeleteClick}
-                />
-              )
-            ))}
-
-          </tbody>
-        </table>
-        {/*Could prob make this a separate component to make it a prompt to add info */}
+        {/* Stores the data */}
+        <tbody>
+          {/*Pulls element from the data structure to map out information */}
+          
+          {contacts.filter(contact => contact.status === "Added").map(contact => (
+            <Fragment key={contact.id}>
+              {editContactId === contact.id ? (
+              <EditableRow editFormData = {editFormData} handleEditFormChange = {handleEditFormChange}  status = {contact.status}
+              handleCancelClick={handleCancelClick}/>
+              ) :(
+              <ReadOnlyRow  key={contact.id} contact={contact} handleEditClick ={handleEditClick} handleDeleteClick={handleDeleteClick}  status = {contact.status}/>
+              )}
+              
+            </Fragment>
+           
+           ))}
+        
+        </tbody>
+      </table>
+      {/*Could prob make this a separate component to make it a prompt to add info */}
       </form>
 
 

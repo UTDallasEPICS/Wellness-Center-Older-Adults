@@ -13,7 +13,7 @@ const landingPage = () => {
 
   return (
     <div className="page-container">
-      <Header />
+      <Header />  
       <div className="main-container">
         <div className="buttonAndText">
           {" "}

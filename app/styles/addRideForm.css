@@ -1,0 +1,58 @@
+.addRideFormDiv {
+  max-width: 70%; /* Adjust the maximum width as needed */
+  margin: 0 auto; /* Center the form horizontally */
+}
+
+.addRideTitle {
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 30px;
+  margin-bottom: 20px; /* Add some spacing below the title */
+}
+
+.inputForm {
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 15px;
+  width: 100%; /* Make inputs fill the available width */
+  padding: 10px; /* Increase padding for better readability and appearance */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  border: 1px solid #ccc; /* Add a subtle border */
+  border-radius: 5px; /* Add some rounded corners */
+  flex: 1; /* Allow inputs to grow and fill available space */
+}
+
+input::placeholder {
+  color: #999; /* Adjust placeholder color */
+}
+
+button {
+  background-color: #419902; /* Blue color for the button */
+  color: #fff; /* White text color */
+  border: none; /* Remove default button border */
+  padding: 10px 30px;
+  
+  font-size: 16px;
+  border-radius: 10px; /* Add some rounded corners */
+  cursor: pointer; /* Change cursor to pointer on hover */
+  margin-left: 10px; /* Add margin between inputs and button */
+}
+
+button[type="submit"]:hover {
+  background-color: #398304; /* Darker blue color on hover */
+}
+
+.formContainer{
+  display: flex;
+  flex-direction: row; /* Stack items vertically */
+  align-items: center; /* Center items horizontally */
+}
+
+@media (max-width: 1280px) { /* Adjust max-width as needed */
+  .formContainer {
+    flex-direction: column; /* Switch to column layout when width is less than 600px */
+    align-items: stretch; /* Stretch items to fill the width */
+  }
+}
