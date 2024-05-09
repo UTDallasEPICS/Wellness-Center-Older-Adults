@@ -2,9 +2,9 @@ import React from 'react'
 import "app/styles/editableRow.css";
 const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, status}) => {
   return(
-    <tr>
-      <td>
-        <textarea className="editInput"
+    <tr className="editableRow">
+      <td className="editableRowInput">
+        <textarea className="editRowInput"
         type="text" 
         name="clientName" 
         required = "required" 
@@ -14,8 +14,8 @@ const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, sta
         ></textarea>
       </td>
 
-      <td>
-        <textarea className="editInput"
+      <td className="editableRowInput"> 
+        <textarea className="editRowInput"
           type="text" 
           name="phoneNumber" 
           required = "required" 
@@ -26,8 +26,8 @@ const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, sta
         </textarea>
       </td>
 
-      <td>
-        <textarea className="editInput"
+      <td className="editableRowInput">
+        <textarea className="editRowInput"
         type="text" 
         name="address"
         placeholder="Enter client's address" 
@@ -36,10 +36,10 @@ const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, sta
         onChange={handleEditFormChange}
         >
         </textarea>
-      </td>
+      </td >
 
-      <td>
-        <textarea className="editInput"
+      <td className="editableRowInput">
+        <textarea className="editRowInput"
         type="text" 
         name="startTime" 
         required = "required" 
@@ -51,8 +51,8 @@ const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, sta
       </td>
 
       {status === "Reserved" || status == "Completed" ? (
-        <td>
-          <textarea className="editInput"
+        <td className="editableRowInput">
+          <textarea className="editRowInput"
           type="text" 
           name="volunteerName" 
           required = "required" 
@@ -62,12 +62,12 @@ const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, sta
           ></textarea>
         </td>) : null}
 
-      <td>
-        <button type="submit">
-          <span class="material-symbols-rounded">done</span>
+      <td className="editRideButtonContainer">
+        <button className="confirmEditButton" type="submit">
+          <span className="material-symbols-rounded">done</span>
         </button>
-        <button type="button" onClick={handleCancelClick}>
-          <span class="material-symbols-rounded">cancel</span>
+        <button className="cancelEditButton" type="button" onClick={handleCancelClick}>
+          <span className="material-symbols-rounded">cancel</span>
         </button>
       </td>
     </tr>

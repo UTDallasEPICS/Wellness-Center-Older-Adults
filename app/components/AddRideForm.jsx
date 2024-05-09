@@ -16,9 +16,9 @@ const AddRideForm = ({
   return (
     <div className="addRideFormDiv ">
       <h2 className="addRideTitle">Add a Ride</h2>
-      <form className="addRideForm formContainer" onSubmit={handleAddFormSubmit}>
+      <form className="addRideFormContainer" onSubmit={handleAddFormSubmit}>
         {/*Just copy the input tags and contents if need more inputs. Edit as needed. Make sure that name is = to the data's element that is being mapped above */}
-        <input className = "inputForm"
+        <input className = "rideInputForm"
           type="text"
           name="clientName"
           required="required"
@@ -26,7 +26,7 @@ const AddRideForm = ({
           value={addFormData.clientName}
           onChange={handleAddFormChange}
         ></input>
-        <input className = "inputForm"
+        <input className = "rideInputForm"
           type="text"
           name="phoneNumber"
           required="required"
@@ -34,7 +34,7 @@ const AddRideForm = ({
           value={addFormData.phoneNumber}
           onChange={handleAddFormChange}
         ></input>
-        <input className = "inputForm"
+        <input className = "rideInputForm"
           type="text"
           name="address"
           required="required"
@@ -42,7 +42,7 @@ const AddRideForm = ({
           value={addFormData.address}
           onChange={handleAddFormChange}
         ></input>
-        <input className = "inputForm"
+        <input className = "rideInputForm"
           type="text"
           name="startTime"
           required="required"
@@ -50,7 +50,7 @@ const AddRideForm = ({
           value={addFormData.startTime}
           onChange={handleAddFormChange}
         ></input>
-        <button className="addButton" type="submit">
+        <button className="addRideButton" type="submit">
           Add
         </button>
       </form>

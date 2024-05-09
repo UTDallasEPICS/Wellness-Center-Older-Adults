@@ -11,7 +11,7 @@
   margin-bottom: 20px; /* Add some spacing below the title */
 }
 
-.inputForm {
+.rideInputForm {
   text-align: left;
   font-family: "Open Sans", sans-serif;
   font-weight: lighter;
@@ -22,13 +22,14 @@
   border: 1px solid #ccc; /* Add a subtle border */
   border-radius: 5px; /* Add some rounded corners */
   flex: 1; /* Allow inputs to grow and fill available space */
+  margin:5px;
 }
 
-input::placeholder {
+.rideInputForm::placeholder {
   color: #999; /* Adjust placeholder color */
 }
 
-button {
+.addRideButton {
   background-color: #419902; /* Blue color for the button */
   color: #fff; /* White text color */
   border: none; /* Remove default button border */
@@ -40,11 +41,11 @@ button {
   margin-left: 10px; /* Add margin between inputs and button */
 }
 
-button[type="submit"]:hover {
+.addRideButton:hover {
   background-color: #398304; /* Darker blue color on hover */
 }
 
-.formContainer{
+.addRideFormContainer{
   display: flex;
   flex-direction: row; /* Stack items vertically */
   align-items: center; /* Center items horizontally */
