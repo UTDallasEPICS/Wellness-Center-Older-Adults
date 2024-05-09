@@ -15,8 +15,13 @@
 
 .dashBoxes {
   display: flex;
-  height: 100%;
-  margin-left: 5%;
-  margin-top: 50px;
-  gap: 2.5%;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media only screen and (min-width: 1000px) {
+  .dashBoxes {
+    display: flex;
+    flex-direction: row;
+  }
 }

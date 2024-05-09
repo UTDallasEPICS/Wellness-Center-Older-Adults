@@ -129,7 +129,7 @@ body {
 }
 
 .sideBarSpace {
-  height: calc(100% - 180px);
+  height: 70px;
 }
 /*Replace these after:*/
 .testA {

@@ -1,14 +1,14 @@
 import "app/styles/dashboardPage.css";
-import TestContainer from "app/components/TestContainer.jsx";
+import TextContainer from "app/components/TextContainer.jsx";
 
 export default function Page() {
   return (
     <div className="dashContainer">
       <h1 className="dashTitle">Dashboard</h1>
       <div className="dashBoxes">
-        <TestContainer text="Number of Recently Completed Rides" number="3" />
-        <TestContainer text="This Week's Volunteer Hours" number="5" />
-        <TestContainer text="Total Rides for the Week" number="17" />
+        <TextContainer text="Recently Completed Rides" number="3" />
+        <TextContainer text="This Week's Volunteer Hours" number="5" />
+        <TextContainer text="Total Rides for the Week" number="17" />
       </div>
     </div>
 

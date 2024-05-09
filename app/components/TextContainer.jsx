@@ -1,7 +1,7 @@
 import React from "react";
-import "app/styles/testContainer.css";
+import "app/styles/textContainer.css";
 
-export default function TestContainer(props) {
+export default function TextContainer(props) {
   return (
     <div className="mainContainer">
       <div className="contentNumber">{props.number}</div>

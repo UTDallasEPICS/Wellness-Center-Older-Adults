@@ -126,10 +126,11 @@ body {
   min-height: calc(100% - 180px);
   height: calc(100vh - 180px);
   background-color: white;
+  overflow-y: scroll;
 }
 
 .sideBarSpace {
-  height: calc(100% - 180px);
+  height: 70px;
 }
 /*Replace these after:*/
 .testA {
