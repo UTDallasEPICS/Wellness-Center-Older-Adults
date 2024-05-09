@@ -1,28 +1,27 @@
-.tableContainer {
+.ridesTableContainer {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 1rem;
   font-family: "Open Sans", sans-serif;
   overflow-x:auto;
+  max-height: 400px; /* Set a max height for the table container */
+  overflow-y: auto; /* Enable vertical scrolling when content overflows */
 }
 
-table {
+.ridesTable {
   border-collapse: collapse;
   margin-left: 0.5%;
   width: 99%;
 }
 
-th,
-td {
+.rideTableHeader{
   border: none;
   text-align: center;
   padding: 8px;
 }
-td {
-  font-size: 30px;
-}
-th {
+
+.rideTableHeader {
   background-color: white;
   border-bottom: 0.5px solid #555555;
   font-family: "Open Sans", sans-serif;
@@ -30,46 +29,13 @@ th {
   font-size: 20px;
 }
 
-td {
-  background-color: white;
 
-  padding: 15px 5px;
-  font-family: "Open Sans", sans-serif;
-  font-weight: lighter;
-}
-/*
-tr {
-  border-bottom: 0.5px solid #d2d1d1;
-}
-*/
-input {
-  background-color: #f2f3f4;
-  border-radius: 10px;
-  border: 1px solid #c0c0c0;
-  width: 260px;
-  font-family: "Open Sans", sans-serif;
-  font-weight: lighter;
-  margin-right: 10px;
-}
-
-button {
-  color: black;
-  background-color: white;
-  border: none;
-}
-.addButton {
-  color: white;
-  background-color: black;
-  padding: 10px;
-  transform: scale(1);
-}
-
-form {
+.rideTableForm {
   display: flex;
   gap: 5px;
 }
 
-form * {
+.rideTableForm * {
   font-size: 20px;
 }
 

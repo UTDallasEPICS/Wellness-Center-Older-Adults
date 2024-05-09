@@ -87,17 +87,17 @@ const CompletedRidesTable = ({ initialContacts }) => {
   return (
 
     <div className="tableContainer">
-      <form onSubmit={handleEditFormSubmit}>
-      <table>
+      <form className="rideTableForm" onSubmit={handleEditFormSubmit}>
+      <table className = "ridesTable">
         {/* Serves as the header of the table */}
         <thead>
           <tr>
-            <th>Client Name</th>
-            <th>Contact Number</th>
-            <th>Address</th>
-            <th>Pick-up Time</th>
-            <th>Volunteer Name</th>
-            <th>Actions</th>
+            <th className="rideTableHeader">Client Name</th>
+            <th className="rideTableHeader">Contact Number</th>
+            <th className="rideTableHeader">Address</th>
+            <th className="rideTableHeader">Pick-up Time</th>
+            <th className="rideTableHeader">Volunteer Name</th>
+            <th className="rideTableHeader">Actions</th>
             
           </tr>
         </thead>
