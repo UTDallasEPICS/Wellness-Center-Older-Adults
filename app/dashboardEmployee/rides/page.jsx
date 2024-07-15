@@ -46,8 +46,6 @@ export default function Page() {
       setAddFormData(newFormData);
     }
   };
-  
-
   const handleAddFormSubmit = (event) => {
     event.preventDefault();
 
