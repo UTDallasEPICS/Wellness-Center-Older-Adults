@@ -1,10 +1,22 @@
 "use client";
 import "app/styles/sideNav.css";
+import { useAuth } from "../../providers/Auth";
 import "app/globalicons.css";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
+
+
+
+export default function NavLinks() {
+  const [activeLink, setActiveLink] = useState(null);
+  const pathname = usePathname();
+
+  const handleClick = (index) => {
+    setActiveLink(index);
+  };
+  const { isAuthenticated, handleLogin, handleLogout } = useAuth();
 const links = [
   { name: "Dashboard", href: "/dashboardEmployee" }, // Using icon name from Material Symbols Rounded font
 
@@ -24,16 +36,12 @@ const links = [
     name: "Admin",
     href: "/dashboardEmployee/admin",
   },
+  {
+      name: "Log Out",
+      href: "/logout",
+      onClick: handleLogout,
+  },
 ];
-
-export default function NavLinks() {
-  const [activeLink, setActiveLink] = useState(null);
-  const pathname = usePathname();
-
-  const handleClick = (index) => {
-    setActiveLink(index);
-  };
-
   return (
     <>
       {links.map((link, index) => {

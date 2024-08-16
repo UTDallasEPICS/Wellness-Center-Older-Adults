@@ -19,9 +19,7 @@ export default function DashboardLayout({
         <div className="col-10 col-s-9 testA">{children}</div>
       </div>
 
-      <div className="footerSpace">
-        <p className="testFooter">Wellness Center Coordination App 2024</p>
-      </div>
+      
     </div>
   );
 }
