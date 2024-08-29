@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import "app/styles/dashHeader.css";
+import "/app/styles/dashHeader.css";
 
 export default function DashHeader() {
   const [display, setDisplay] = useState(false);

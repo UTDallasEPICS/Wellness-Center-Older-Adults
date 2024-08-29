@@ -1,4 +1,4 @@
-import "app/styles/header.css";
+import "/app/styles/header.css";
 import Image from 'next/image';
 
 export default function Header() {

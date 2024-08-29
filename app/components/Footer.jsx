@@ -1,4 +1,4 @@
-import "app/styles/footer.css";
+import "/app/styles/footer.css";
 export default function Footer() {
   return (
     <div className="footer-component">

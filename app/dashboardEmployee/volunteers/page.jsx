@@ -1,7 +1,7 @@
 "use client"
-import MyCalendar from "app/components/calendar.tsx"
-import ListItemContainer from "app/components/ListItemContainer.jsx";
-import "app/styles/clientPage.css";
+import MyCalendar from "/app/components/calendar.tsx"
+import ListItemContainer from "/app/components/ListItemContainer.jsx";
+import "/app/styles/clientPage.css";
 import React, { useState } from "react";
 
 export default function Page() {

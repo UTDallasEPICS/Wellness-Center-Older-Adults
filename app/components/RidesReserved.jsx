@@ -1,4 +1,4 @@
-import "app/styles/reservedRides.css";
+import "/app/styles/reservedRides.css";
 
 // Array of fake names
 const names = ["Bob Ross", "Bob Ross Jr", "Bob Ross II", "Bob Ross III", "Bross"];

@@ -1,5 +1,5 @@
 import React from "react";
-import "app/styles/textContainer.css";
+import "/app/styles/textContainer.css";
 
 export default function TextContainer(props) {
   return (

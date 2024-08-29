@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TimePicker from 'react-time-picker';
-import "app/styles/addRideForm.css";
+import "/app/styles/addRideForm.css";
 
 const AddRideForm = ({
   handleAddFormSubmit,

@@ -1,5 +1,5 @@
 import React from 'react'
-import "app/styles/editableRow.css";
+import "/app/styles/editableRow.css";
 const EditableRow = ({editFormData, handleEditFormChange, handleCancelClick, status}) => {
   return(
     <tr className="editableRow">

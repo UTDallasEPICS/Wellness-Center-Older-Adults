@@ -1,6 +1,6 @@
 import Link from "next/link";
 import NavLinks from "@/app/ui/dashboardEmployee/nav-links";
-import "app/styles/sideNav.css";
+import "/app/styles/sideNav.css";
 
 export default function SideNav() {
   return (

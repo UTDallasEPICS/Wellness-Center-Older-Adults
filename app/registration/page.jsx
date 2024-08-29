@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { PrismaClient } from "@prisma/client";
-import "app/styles/register.css";
-import FormInput from "app/components/FormInput.jsx";
-import Header from "app/components/Header.jsx";
+import "/app/styles/register.css";
+import FormInput from "/app/components/FormInput.jsx";
+import Header from "/app/components/Header.jsx";
 const Register = () => {
 
   const prisma = new PrismaClient();

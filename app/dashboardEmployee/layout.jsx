@@ -1,5 +1,5 @@
 import SideNav from "@/app/ui/dashboardEmployee/sidenav";
-import "app/styles/employeeLayout.css";
+import "/app/styles/employeeLayout.css";
 /* body for page makes menu span entire height*/
 export default function DashboardLayout({
   children, // will be a page or nested layout

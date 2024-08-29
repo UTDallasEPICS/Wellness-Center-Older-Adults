@@ -1,6 +1,6 @@
 
 import React from 'react';
-import "app/styles/addRide.css";
+import "/app/styles/addRide.css";
 
 const AddRide = () => {
   return (

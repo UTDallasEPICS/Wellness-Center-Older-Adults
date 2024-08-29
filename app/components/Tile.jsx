@@ -1,5 +1,5 @@
 import React from 'react';
-import 'app/styles/tile.css'; 
+import '/app/styles/tile.css'; 
 
 const Tile = () => {
   return (

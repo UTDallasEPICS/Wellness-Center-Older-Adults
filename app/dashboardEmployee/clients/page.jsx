@@ -1,7 +1,7 @@
-import "app/styles/clientPage.css";
+import "/app/styles/clientPage.css";
 
-import ClientInputForm from "app/components/ClientInputForm.jsx";
-import ListItemContainer from "app/components/ListItemContainer.jsx";
+import ClientInputForm from "/app/components/ClientInputForm.jsx";
+import ListItemContainer from "/app/components/ListItemContainer.jsx";
 
 export default function Page() {
   return (

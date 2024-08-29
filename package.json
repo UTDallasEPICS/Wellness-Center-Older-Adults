@@ -27,7 +27,7 @@
     "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.45",
-    "next": "14.0.3",
+    "next": "^14.2.7",
     "prism": "^1.0.0",
     "react": "^18.3.1",
     "react-big-calendar": "^1.13.1",

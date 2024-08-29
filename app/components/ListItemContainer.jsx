@@ -1,5 +1,5 @@
 import React from "react";
-import "app/styles/listItemContainer.css";
+import "/app/styles/listItemContainer.css";
 
 export default function listItemContainer(props) {
   return (

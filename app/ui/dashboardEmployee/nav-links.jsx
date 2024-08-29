@@ -1,7 +1,7 @@
 "use client";
-import "app/styles/sideNav.css";
+import "/app/styles/sideNav.css";
 import { useAuth } from "../../providers/Auth";
-import "app/globalicons.css";
+import "/app/globalicons.css";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
@@ -35,27 +35,26 @@ const links = [
   {
     name: "Admin",
     href: "/dashboardEmployee/admin",
-  },
-  {
-      name: "Log Out",
-      href: "/logout",
-      onClick: handleLogout,
-  },
+  }
 ];
-  return (
-    <>
-      {links.map((link, index) => {
-        return (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={index === activeLink ? "nav-a active" : "nav-a"}
-            onClick={() => handleClick(index)}
-          >
-            <p className="nav-p">{link.name}</p>
-          </Link>
-        );
-      })}
-    </>
-  );
+return (
+  <>
+    {links.map((link, index) => (
+      <Link
+        key={link.name}
+        href={link.href}
+        className={index === activeLink ? "nav-a active" : "nav-a"}
+        onClick={() => handleClick(index)}
+      >
+        <p className="nav-p">{link.name}</p>
+      </Link>
+    ))}
+    <button
+      className="nav-a"
+      onClick={handleLogout}
+    >
+      <p className="nav-p">Log Out</p>
+    </button>
+  </>
+);
 }

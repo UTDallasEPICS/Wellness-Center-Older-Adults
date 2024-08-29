@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 
-import "app/styles/clientInputForm.css";
-import "app/globalicons.css";
+import "/app/styles/clientInputForm.css";
+import "/app/globalicons.css";
 
 const AddClientForm = () => {
   const [customerEmail, setCustomerEmail] = useState("");
