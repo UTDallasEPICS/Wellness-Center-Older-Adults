@@ -1,5 +1,5 @@
-import "app/styles/dashboardPage.css";
-import TextContainer from "app/components/TextContainer.jsx";
+import "/app/styles/dashboardPage.css";
+import TextContainer from "/app/components/TextContainer.jsx";
 
 export default function Page() {
   return (

@@ -1,6 +1,6 @@
 {/*https://www.youtube.com/watch?v=VLQ0otNkS5Q&t=136s */}
 import {useState} from "react";
-import "app/styles/simpleTab.css"
+import "/app/styles/simpleTab.css"
 
 const SimpleTab = ({activeKey, children}) =>{
   const [key, setkey] = useState(activeKey)

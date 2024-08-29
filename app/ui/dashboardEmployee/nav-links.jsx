@@ -1,10 +1,22 @@
 "use client";
-import "app/styles/sideNav.css";
-import "app/globalicons.css";
+import "/app/styles/sideNav.css";
+import { useAuth } from "../../providers/Auth";
+import "/app/globalicons.css";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
+
+
+
+export default function NavLinks() {
+  const [activeLink, setActiveLink] = useState(null);
+  const pathname = usePathname();
+
+  const handleClick = (index) => {
+    setActiveLink(index);
+  };
+  const { isAuthenticated, handleLogin, handleLogout } = useAuth();
 const links = [
   { name: "Dashboard", href: "/dashboardEmployee" }, // Using icon name from Material Symbols Rounded font
 
@@ -23,31 +35,26 @@ const links = [
   {
     name: "Admin",
     href: "/dashboardEmployee/admin",
-  },
+  }
 ];
-
-export default function NavLinks() {
-  const [activeLink, setActiveLink] = useState(null);
-  const pathname = usePathname();
-
-  const handleClick = (index) => {
-    setActiveLink(index);
-  };
-
-  return (
-    <>
-      {links.map((link, index) => {
-        return (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={index === activeLink ? "nav-a active" : "nav-a"}
-            onClick={() => handleClick(index)}
-          >
-            <p className="nav-p">{link.name}</p>
-          </Link>
-        );
-      })}
-    </>
-  );
+return (
+  <>
+    {links.map((link, index) => (
+      <Link
+        key={link.name}
+        href={link.href}
+        className={index === activeLink ? "nav-a active" : "nav-a"}
+        onClick={() => handleClick(index)}
+      >
+        <p className="nav-p">{link.name}</p>
+      </Link>
+    ))}
+    <button
+      className="nav-a"
+      onClick={handleLogout}
+    >
+      <p className="nav-p">Log Out</p>
+    </button>
+  </>
+);
 }

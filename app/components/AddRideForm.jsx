@@ -1,5 +1,6 @@
 import { useState } from "react";
-import "app/styles/addRideForm.css";
+import TimePicker from 'react-time-picker';
+import "/app/styles/addRideForm.css";
 
 const AddRideForm = ({
   handleAddFormSubmit,
@@ -42,14 +43,13 @@ const AddRideForm = ({
           value={addFormData.address}
           onChange={handleAddFormChange}
         ></input>
-        <input className = "rideInputForm"
-          type="text"
+        <TimePicker
+          className="rideInputForm"
           name="startTime"
           required="required"
-          placeholder="Pickup Time"
           value={addFormData.startTime}
-          onChange={handleAddFormChange}
-        ></input>
+          onChange={(value) => handleAddFormChange(value)}
+        />
         <button className="addRideButton" type="submit">
           Add
         </button>

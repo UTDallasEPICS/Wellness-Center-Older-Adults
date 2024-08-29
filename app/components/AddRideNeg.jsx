@@ -1,5 +1,5 @@
 import React from 'react';
-import "app/styles/addRideNeg.css";
+import "/app/styles/addRideNeg.css";
 
 const AddRideNeg = () => {
   return (

@@ -1,6 +1,6 @@
 import SideNav from "@/app/ui/dashboardVolunteer/sidenav";
 import DashHeader from "@/app/components/DashHeader.jsx";
-import "app/styles/volunteerLayout.css";
+import "/app/styles/volunteerLayout.css";
 
 /* body for page makes menu span entire height*/
 export default function DashboardLayout({

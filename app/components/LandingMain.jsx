@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import "app/styles/landingMain.css";
+import "/app/styles/landingMain.css";
 import { useAuth } from "../providers/Auth";
-import Header from "app/components/Header.jsx";
-import Footer from "app/components/Footer.jsx";
+import Header from "/app/components/Header.jsx";
+import Footer from "/app/components/Footer.jsx";
 import Image from "next/image";
 
 const landingPage = () => {

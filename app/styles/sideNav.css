@@ -3,8 +3,27 @@
 }
 
 .nav-a {
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  display: flex;
+  align-items: center;
   text-decoration: none;
 }
+
+.nav-a:focus {
+  outline: none;
+}
+
+.nav-a:hover {
+  text-decoration: none;
+}
+
 
 .navBar {
   height: 95%;

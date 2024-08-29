@@ -1,12 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import SimpleTab, { Tab } from "app/components/SimpleTab.jsx";
-import AddRidesTable from "app/components/AddRidesTable.jsx";
-import ReservedRidesTable from "app/components/ReservedRidesTable.jsx";
-import CompletedRidesTable from "app/components/CompletedRidesTable.jsx";
-import AddRideForm from "app/components/AddRideForm.jsx";
-import "app/styles/ridesPageEmployee.css";
-import data from "app/mock-data.json";
+import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
+import AddRidesTable from "/app/components/AddRidesTable.jsx";
+import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
+import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
+import AddRideForm from "/app/components/AddRideForm.jsx";
+import "/app/styles/ridesPageEmployee.css";
+import data from "/app/mock-data.json";
 import { nanoid } from "nanoid";
 
 const tabs = [
@@ -26,22 +26,26 @@ export default function Page() {
   });
 
   const handleAddFormChange = (event) => {
-    event.preventDefault();
-    const fieldName = event.target.getAttribute("name");
-    {
-      /*This is getting the name= attribute from the input form */
+    if (event.preventDefault) {
+      event.preventDefault(); // Prevents default form submission (for input fields)
+      const fieldName = event.target.getAttribute("name");
+      const fieldValue = event.target.value;
+  
+      const newFormData = { ...addFormData };
+      newFormData[fieldName] = fieldValue;
+  
+      setAddFormData(newFormData);
+    } else {
+      // Handling direct value change (for time picker or other components)
+      const fieldName = "startTime"; // Assuming this is the field name for the time picker
+      const fieldValue = event; // 'event' is the new time value
+  
+      const newFormData = { ...addFormData };
+      newFormData[fieldName] = fieldValue;
+  
+      setAddFormData(newFormData);
     }
-    const fieldValue = event.target.value;
-    {
-      /*It is now getting the value stored in that name= attribute */
-    }
-
-    const newFormData = { ...addFormData };
-    newFormData[fieldName] = fieldValue;
-
-    setAddFormData(newFormData);
   };
-
   const handleAddFormSubmit = (event) => {
     event.preventDefault();
 

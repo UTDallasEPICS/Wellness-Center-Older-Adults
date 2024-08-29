@@ -1,5 +1,5 @@
 import SideNav from "@/app/ui/dashboardEmployee/sidenav";
-import "app/styles/employeeLayout.css";
+import "/app/styles/employeeLayout.css";
 /* body for page makes menu span entire height*/
 export default function DashboardLayout({
   children, // will be a page or nested layout
@@ -19,9 +19,7 @@ export default function DashboardLayout({
         <div className="col-10 col-s-9 testA">{children}</div>
       </div>
 
-      <div className="footerSpace">
-        <p className="testFooter">Wellness Center Coordination App 2024</p>
-      </div>
+      
     </div>
   );
 }

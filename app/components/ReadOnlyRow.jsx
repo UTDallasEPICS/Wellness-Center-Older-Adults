@@ -1,5 +1,5 @@
 import React from "react";
-import "app/styles/readOnlyRow.css";
+import "/app/styles/readOnlyRow.css";
 const ReadOnlyRow = ({contact, handleEditClick, handleDeleteClick, status}) => {
   return(
 

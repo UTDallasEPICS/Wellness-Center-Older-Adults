@@ -3,9 +3,9 @@
 }
 
 import { useState, Fragment, useEffect } from "react";
-import "app/styles/ridesTable.css";
-import ReadOnlyRow from "app/components/ReadOnlyRow.jsx";
-import EditableRow from "app/components/EditableRow.jsx";
+import "/app/styles/ridesTable.css";
+import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
+import EditableRow from "/app/components/EditableRow.jsx";
 
 const AddRidesTable = ({ initialContacts }) => {
   {

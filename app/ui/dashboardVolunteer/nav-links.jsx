@@ -1,6 +1,6 @@
 "use client";
-import "app/styles/sideNav.css";
-import "app/globalicons.css";
+import "/app/styles/sideNav.css";
+import "/app/globalicons.css";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
