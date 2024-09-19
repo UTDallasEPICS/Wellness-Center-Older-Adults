@@ -1,0 +1,48 @@
+.ridesTableContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 1rem;
+  font-family: "Open Sans", sans-serif;
+  overflow-x:auto;
+  max-height: 400px; /* Set a max height for the table container */
+  overflow-y: auto; /* Enable vertical scrolling when content overflows */
+}
+
+.ridesTable {
+  border-collapse: collapse;
+  margin-left: 0.5%;
+  width: 99%;
+}
+
+.rideTableHeader{
+  border: none;
+  text-align: center;
+  padding: 8px;
+}
+
+.rideTableHeader {
+  background-color: white;
+  border-bottom: 0.5px solid #555555;
+  font-family: "Open Sans", sans-serif;
+  font-weight: normal;
+  font-size: 20px;
+}
+
+
+.rideTableForm {
+  display: flex;
+  gap: 5px;
+}
+
+.rideTableForm * {
+  font-size: 20px;
+}
+
+.addRideTitle {
+  margin: 5%;
+}
+
+.addRideForm {
+  margin: 5%;
+}

@@ -1,4 +1,4 @@
-import LandingMain from "app/components/LandingMain.jsx";
+import LandingMain from "/app/components/LandingMain.jsx";
 export default function Home() {
   return (
     <div >

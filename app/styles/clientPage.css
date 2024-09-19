@@ -1,0 +1,82 @@
+.clientPageContainer {
+  width: 100%;
+  height: 95%;
+
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+.clientBoxHead {
+  width: 100%;
+  height: 100%;
+
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+}
+
+.clientTitle {
+  color: black;
+  padding-left: 100px;
+  padding-top: 50px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 30px;
+  text-align: left;
+}
+
+.addClientButtonContainer {
+  margin-left: auto;
+  padding-right: 10px;
+  padding-top: 5%;
+  background-color: white;
+}
+.editButtonContainer {
+  padding-top: 5%;
+  padding-right: 10%;
+  background-color: white;
+}
+
+.editButton {
+  height: 45px;
+  width: 45px;
+  border-radius: 50%;
+  color: white;
+  background-color: black;
+  border: none;
+}
+.clientListLabels p {
+  display: inline;
+  margin-left: 10%;
+}
+
+.clientListLabels p + p {
+  padding-left: 40px;
+}
+
+.clientListLabels {
+  color: black;
+  display: inline;
+  padding: 17px 25px;
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: lighter;
+  font-size: 15px;
+  background-color: white;
+  margin: 0;
+}
+
+.clientListContainer {
+  width: 75%;
+  height: 70%;
+  min-height: 700px;
+  margin-left: 7%;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  color: black;
+
+  background-color: white;
+  border-top: 0.5px solid #d2d1d1;
+  border-bottom: 0.5px solid #d2d1d1;
+}

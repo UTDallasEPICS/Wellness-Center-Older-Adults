@@ -1,0 +1,48 @@
+/* editableRow.css */
+.editableRow {
+  background-color: #f2f2f2; /* Light gray background */
+}
+
+.editableRowInput {
+  padding: 8px; /* Add padding to table cells */
+}
+
+.editRowInput {
+  width: calc(100% - 8px); /* Adjusted width */
+  padding: 2px; /* Modified padding */
+  height:20%;
+  border: 1px solid #ccc; /* Add a subtle border */
+  border-radius: 3px; /* Add some rounded corners */
+  box-sizing: border-box; /* Include padding and border in the total width */
+  resize: vertical; /* Allow vertical resizing */
+  display: block; /* Ensure inputs are block elements */
+  margin: 0 auto; /* Center the inputs */
+  text-align: center; /* Center text within inputs */
+  
+  overflow-y: auto; /* Add vertical scrollbar if content overflows */
+  font-family: "Open Sans", sans-serif;
+}
+
+.editRideButtonContainer{
+  margin: 2px;
+  border-radius: 3px;
+  text-align: center; 
+}
+
+.confirmEditButton,
+.cancelEditButton{
+  color:white;
+  background-color:#419902;
+  border: none;
+  margin:2px;
+  padding:10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Add transition effect */
+}
+
+/* Change button color on hover */
+.confirmEditButton:hover,
+.cancelEditButton:hover {
+  background-color: #2b6701; /* Darker green */
+}

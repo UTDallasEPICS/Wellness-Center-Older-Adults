@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
         try {
             const cvtoken = request.cookies.get('cvtoken')?.value;
             let response = NextResponse.next();
-
+            
             if (!cvtoken && request.url !== 'http://localhost:3000/') {
                 // redirect to login if no cvtoken and path requires authentication
                 return NextResponse.redirect(loginRedirectUrl(), { status: 302 } );
@@ -44,6 +44,7 @@ export async function middleware(request: NextRequest) {
                 const user = await client.user.findUnique({
                     where: { email },
                 });
+                console.log(decoded);
                 if (!user) {
                     // If a user that is not found in the db tries to sign in and take action, redirect to login                    
                     response.cookies.set('cvtoken', '');

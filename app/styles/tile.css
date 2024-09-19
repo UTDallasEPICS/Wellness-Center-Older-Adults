@@ -1,0 +1,20 @@
+.tile {
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .summary-table th,
+  .summary-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .detail-info {
+    margin-top: 20px;
+  }

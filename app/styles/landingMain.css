@@ -1,41 +1,73 @@
-.body-container {
+.page-container {
   /* width: 58%; */
-  height: 850px;
+  height: 100%;
+  width: 100%;
   background: #fbfcf8;
-  list-style-type: none;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  width: 95%;
+  height: calc(100% - 280px);
+  display: flex;
+  flex-direction: row;
+}
+
+.buttonAndText {
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 10%;
+  margin-left: 7%;
+  margin-bottom: 5%;
+}
+
+.carImage {
+  width: 50%;
+  margin-top: 50px;
 }
 
 .title {
-  font-family: verdana;
-  font-size: 120px;
-  text-align: center;
-  margin-top: 40px;
-  padding: 1rem;
-  padding-top: 2rem;
+  font-family: "Montserrat", sans-serif;
+  font-weight: lighter;
+  font-size: 75px;
+  text-align: left;
 }
 
 .body {
-  font-family: verdana;
+  font-family: "Montserrat", sans-serif;
+  font-weight: lighter;
+  color: gray;
   font-size: 35px;
-  text-align: center;
-  padding: 1rem;
-  margin: 5rem;
+  text-align: left;
 }
 
 .button {
+  margin: 0px;
+  height: 50px;
+  width: 200px;
+
   border: none;
   color: white;
-  padding: 15px 32px;
-  text-align: center;
+
   text-decoration: none;
   font-size: 25px;
   background-color: #419902;
-  position: absolute;
-  top: 60%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
+
   cursor: pointer;
-  border-radius: 30px;
+  border-radius: 10px;
+
+  /*To center:*/
+  /* 
+  text-align: center;             
+  margin-left: calc(50% - 100px);
+*/
+}
+
+.footer-space {
+  width: 100%;
+  height: 150px;
+  margin-top: auto;
+  margin-bottom: 0;
 }
