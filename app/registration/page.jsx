@@ -55,9 +55,9 @@ const Register = () => {
       name:"password",
       type:"password",
       placeholder:"Password",
-      errorMessage:"Password should be: 8-25 characters, at least one uppercase letter, at least 1 number, and at least 1 special character.",
+      errorMessage:"Password should be: 8-25 characters, contain one lowercase and one uppercase letter, and a special character.",
       label:"Password",
-      pattern:"^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
+      pattern:"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
       required: true,
     },
     {
