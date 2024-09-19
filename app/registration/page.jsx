@@ -5,8 +5,8 @@ import { PrismaClient } from "@prisma/client";
 import "/app/styles/register.css";
 import FormInput from "/app/components/FormInput.jsx";
 import Header from "/app/components/Header.jsx";
-const Register = () => {
 
+const Register = () => {
   const prisma = new PrismaClient();
 
   const initialState = {
@@ -15,107 +15,113 @@ const Register = () => {
     lastName: "",
     password: "",
     confirmPassword: "",
-    connection: "WCOA-Username-Password"
+    connection: "WCOA-Username-Password",
   };
 
   const [values, setValues] = useState(initialState);
 
   const inputs = [
     {
-      id:1,
-      name:"email",
-      type:"email",
-      placeholder:"Email",
-      errorMessage:"Not a valid email address!",
-      label:"Email",
+      id: 1,
+      name: "email",
+      type: "email",
+      placeholder: "Email",
+      errorMessage: "Not a valid email address!",
+      label: "Email",
       required: true,
     },
     {
-      id:2,
-      name:"firstName",
-      type:"text",
-      placeholder:"First Name",
-      errorMessage:"Should only contain letters! (2-25)",
-      label:"First Name",
-      pattern:"^[A-Za-z']{2,25}$",
+      id: 2,
+      name: "firstName",
+      type: "text",
+      placeholder: "First Name",
+      errorMessage: "Should only contain letters! (2-25)",
+      label: "First Name",
+      pattern: "^[A-Za-z']{2,25}$",
       required: true,
     },
     {
-      id:3,
-      name:"lastName",
-      type:"text",
-      placeholder:"Last Name",
-      errorMessage:"Should only contain letters! (2-25 letters)",
-      label:"Last Name",
-      pattern:"^[A-Za-z]{2,25}$",
+      id: 3,
+      name: "lastName",
+      type: "text",
+      placeholder: "Last Name",
+      errorMessage: "Should only contain letters! (2-25 letters)",
+      label: "Last Name",
+      pattern: "^[A-Za-z]{2,25}$",
       required: true,
     },
     {
-      id:4,
-      name:"password",
-      type:"password",
-      placeholder:"Password",
-      errorMessage:"Password should be: 8-25 characters, contain one lowercase and one uppercase letter, and a special character.",
-      label:"Password",
-      pattern:"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
+      id: 4,
+      name: "password",
+      type: "password",
+      placeholder: "Password",
+      errorMessage:
+        "Password should be: 8-25 characters, contain one lowercase and one uppercase letter, and a special character.",
+      label: "Password",
+      pattern:
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
       required: true,
     },
     {
-      id:5,
-      name:"confirmPassword",
-      type:"password",
-      placeholder:"Confirm Password",
-      errorMessage:"Passwords do not match!",
-      label:"Confirm Password",
+      id: 5,
+      name: "confirmPassword",
+      type: "password",
+      placeholder: "Confirm Password",
+      errorMessage: "Passwords do not match!",
+      label: "Confirm Password",
       pattern: values.password,
       required: true,
     },
-    ];
+  ];
 
-  const handleSubmit = async(e) =>{
-    
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    try{
+
+    try {
       const response = await fetch("/api/v2/users", {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type' : 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(values)
+        body: JSON.stringify(values),
       });
 
-      if(!response.ok) {
-        throw new Error('Network response was not ok');
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
 
-      alert('Registration successful!');
+      alert("Registration successful!");
       setValues(initialState);
-    } catch(error) {
-      console.error('Failed to register:', error);
-      alert('Registration failed!');
-
+    } catch (error) {
+      console.error("Failed to register:", error);
+      alert("Registration failed!");
     }
-
   };
 
-  const onChange =(e)=>{
-    setValues({...values, [e.target.name]: e.target.value});
-  }
-  
-  return(
-  <div>
-    <Header/>
-  <div className = "register">
-    <form onSubmit={handleSubmit}>
-      <h1>Register</h1>
-    {inputs.map((input)=>(
-      <FormInput key={input.id} {...input} value={values[input.name]} onChange={onChange}/>
-    ))}
-    <button>Submit</button>
-    </form>
-  </div>
-  </div>
+  const onChange = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
+
+  return (
+    <div>
+      <Header />
+      <div className="flex items-center justify-center h-[80vh] bg-[#fbfcf8]">
+        <form onSubmit={handleSubmit} className="bg-gray-300 px-14 py-6 rounded-lg">
+          <h1 className="text-center text-2xl mb-4">Register</h1>
+          {inputs.map((input) => (
+            <FormInput
+              key={input.id}
+              {...input}
+              value={values[input.name]}
+              onChange={onChange}
+            />
+          ))}
+          <button className="w-full h-[50px] px-4 bg-[#419902] text-white font-bold text-lg cursor-pointer mt-4 mb-8 rounded-full">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

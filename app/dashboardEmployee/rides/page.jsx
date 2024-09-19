@@ -5,15 +5,8 @@ import AddRidesTable from "/app/components/AddRidesTable.jsx";
 import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
 import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
 import AddRideForm from "/app/components/AddRideForm.jsx";
-import "/app/styles/ridesPageEmployee.css";
 import data from "/app/mock-data.json";
 import { nanoid } from "nanoid";
-
-const tabs = [
-  { aKey: "added", title: "Added", content: "Hi" },
-  { aKey: "reserved", title: "Reserved", content: "Reserved" },
-  { aKey: "completed", title: "Completed", content: "Bye" },
-];
 
 export default function Page() {
   const [ridesData, setRidesData] = useState(data);
@@ -27,7 +20,7 @@ export default function Page() {
 
   const handleAddFormChange = (event) => {
     if (event.preventDefault) {
-      event.preventDefault(); // Prevents default form submission (for input fields)
+      event.preventDefault();
       const fieldName = event.target.getAttribute("name");
       const fieldValue = event.target.value;
   
@@ -36,9 +29,8 @@ export default function Page() {
   
       setAddFormData(newFormData);
     } else {
-      // Handling direct value change (for time picker or other components)
-      const fieldName = "startTime"; // Assuming this is the field name for the time picker
-      const fieldValue = event; // 'event' is the new time value
+      const fieldName = "startTime";
+      const fieldValue = event;
   
       const newFormData = { ...addFormData };
       newFormData[fieldName] = fieldValue;
@@ -46,6 +38,7 @@ export default function Page() {
       setAddFormData(newFormData);
     }
   };
+
   const handleAddFormSubmit = (event) => {
     event.preventDefault();
 
@@ -86,8 +79,9 @@ export default function Page() {
       content: <CompletedRidesTable initialContacts={ridesData} />,
     },
   ];
+
   return (
-    <div className=".ridesPageContainer">
+    <div className="h-full w-full bg-white">
       <AddRideForm
         addFormData={addFormData}
         handleAddFormSubmit={handleAddFormSubmit}
