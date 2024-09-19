@@ -43,6 +43,15 @@ const AddRideForm = ({
           value={addFormData.address}
           onChange={handleAddFormChange}
         />
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md flex-1 m-1.5 placeholder-gray-500"
+          type="text"
+          name="startTime"
+          required="required"
+          placeholder="Pick-Up Time"
+          value={addFormData.startTime}
+          onChange={handleAddFormChange}
+        />
         <button
           className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700 ml-2.5"
           type="submit"

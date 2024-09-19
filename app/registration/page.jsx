@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PrismaClient } from "@prisma/client";
 import "/app/styles/register.css";
 import FormInput from "/app/components/FormInput.jsx";
@@ -19,6 +19,12 @@ const Register = () => {
   };
 
   const [values, setValues] = useState(initialState);
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+  // Check if passwords match whenever they change
+  useEffect(() => {
+    setPasswordsMatch(values.password === values.confirmPassword);
+  }, [values.password, values.confirmPassword]);
 
   const inputs = [
     {
@@ -55,11 +61,9 @@ const Register = () => {
       name: "password",
       type: "password",
       placeholder: "Password",
-      errorMessage:
-        "Password should be: 8-25 characters, contain one lowercase and one uppercase letter, and a special character.",
+      errorMessage: "Password should be: 8-25 characters, contain one lowercase and one uppercase letter, and a special character.",
       label: "Password",
-      pattern:
-        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
+      pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?+=])[A-Za-z\\d!@#$%^&*?+=]{8,25}$",
       required: true,
     },
     {
@@ -69,32 +73,35 @@ const Register = () => {
       placeholder: "Confirm Password",
       errorMessage: "Passwords do not match!",
       label: "Confirm Password",
-      pattern: values.password,
       required: true,
     },
   ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!passwordsMatch) {
+      return;
+    }
 
     try {
       const response = await fetch("/api/v2/users", {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(values),
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
 
-      alert("Registration successful!");
+      alert('Registration successful!');
       setValues(initialState);
     } catch (error) {
-      console.error("Failed to register:", error);
-      alert("Registration failed!");
+      console.error('Failed to register:', error);
+      alert('Registration failed!');
     }
   };
 
@@ -116,6 +123,9 @@ const Register = () => {
               onChange={onChange}
             />
           ))}
+          {!passwordsMatch && (
+            <span className="font-bold text-xs text-red-500 mt-1">Passwords do not match!</span>
+          )}
           <button className="w-full h-[50px] px-4 bg-[#419902] text-white font-bold text-lg cursor-pointer mt-4 mb-8 rounded-full">
             Submit
           </button>
