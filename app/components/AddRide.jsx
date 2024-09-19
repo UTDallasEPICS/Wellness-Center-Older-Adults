@@ -1,11 +1,10 @@
-
 import React from 'react';
-import "/app/styles/addRide.css";
 
 const AddRide = () => {
   return (
-    <div className="success-message">
-      Successfully Added Ride! <span className="checkmark">✔</span>
+    <div className="bg-green-500 text-white p-2.5 rounded-md flex items-center justify-center">
+      Successfully Added Ride!
+      <span className="ml-1.5">✔</span>
     </div>
   );
 };

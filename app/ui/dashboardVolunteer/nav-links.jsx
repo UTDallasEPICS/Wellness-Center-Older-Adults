@@ -1,26 +1,13 @@
 "use client";
-import "/app/styles/sideNav.css";
-import "/app/globalicons.css";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { name: "Dashboard", href: "/dashboardVolunteer" }, // Using icon name from Material Symbols Rounded font
-
-  {
-    name: "Rides",
-    href: "/dashboardVolunteer/rides",
-  },
-  {
-    name: "Hours",
-    href: "/dashboardVolunteer/hours",
-  },
-
-  {
-    name: "Settings",
-    href: "/dashboardVolunteer/settings",
-  },
+  { name: "Dashboard", href: "/dashboardVolunteer" },
+  { name: "Rides", href: "/dashboardVolunteer/rides" },
+  { name: "Hours", href: "/dashboardVolunteer/hours" },
+  { name: "Settings", href: "/dashboardVolunteer/settings" },
 ];
 
 export default function NavLinks() {
@@ -38,10 +25,18 @@ export default function NavLinks() {
           <Link
             key={link.name}
             href={link.href}
-            className={index === activeLink ? "nav-a active" : "nav-a"}
+            className={`flex items-center no-underline cursor-pointer ${
+              index === activeLink ? "border-b-3 border-black" : ""
+            }`}
             onClick={() => handleClick(index)}
           >
-            <p className="nav-p">{link.name}</p>
+            <p
+              className={`p-4 text-lg font-light hover:bg-gray-100 ${
+                index === activeLink ? "text-black" : "text-gray-500"
+              }`}
+            >
+              {link.name}
+            </p>
           </Link>
         );
       })}

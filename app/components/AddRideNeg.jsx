@@ -1,10 +1,9 @@
 import React from 'react';
-import "/app/styles/addRideNeg.css";
 
 const AddRideNeg = () => {
   return (
-    <div className="error-message">
-      Ride Not Added, Please Try Again <span className="crossmark">x</span>
+    <div className="bg-red-600 text-white p-2.5 rounded-md flex items-center justify-center">
+      Ride Not Added, Please Try Again <span className="ml-1.5">x</span>
     </div>
   );
 };
