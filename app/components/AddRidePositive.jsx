@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AddRide = () => {
+const AddRidePositive = () => {
   return (
     <div className="bg-green-500 text-white p-2.5 rounded-md flex items-center justify-center">
       Successfully Added Ride!
@@ -9,4 +9,4 @@ const AddRide = () => {
   );
 };
 
-export default AddRide;
+export default AddRidePositive;
