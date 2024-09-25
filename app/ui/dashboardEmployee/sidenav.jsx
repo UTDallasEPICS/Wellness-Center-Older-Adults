@@ -5,7 +5,7 @@ import "/app/styles/sideNav.css";
 export default function SideNav() {
   return (
     <div className="navBar">
-      <Link href="/"></Link>
+      <Link href="/dashboardEmployee"></Link>
       <NavLinks />
     </div>
   );

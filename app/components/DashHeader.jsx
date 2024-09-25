@@ -7,11 +7,11 @@ export default function DashHeader() {
   return (
     <div>
       <div className="header-component">
-        <div className="logo-component">
-          <a href="/">
-            <p className="header-text">WCOA</p>
-          </a>
-        </div>
+      <div className="logo-component">
+  <a href="/dashboardEmployee">
+    <p className="header-text">WCOA</p>
+  </a>
+</div>
         <div className="profile-circle">
           <input
             type="image"
