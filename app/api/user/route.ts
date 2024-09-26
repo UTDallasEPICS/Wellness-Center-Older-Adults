@@ -3,12 +3,11 @@ import { cookies } from 'next/headers';
 import { PrismaClient } from '@prisma/client';
 import { jwtVerify, importX509 } from 'jose';
 
-const prisma = new PrismaClient(); // Move PrismaClient outside the handler to avoid multiple instances
+const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
     const cookieStore = cookies();
-    const cvtoken = cookieStore.get('cvtoken')?.value; // Use cookieStore instead of request.cookies
-
+    const cvtoken = cookieStore.get('cvtoken')?.value; 
     if (!cvtoken) {
         return NextResponse.json({ error: 'Token not found or user not authenticated' }, { status: 401 });
     }
@@ -36,7 +35,7 @@ export async function GET(request: Request) {
 
     const email = decoded.payload.email as string;
 
-    console.log('Decoded email:', email); // Log the decoded email
+    console.log('Decoded email:', email); 
 
     try {
         const user = await prisma.user.findUnique({
