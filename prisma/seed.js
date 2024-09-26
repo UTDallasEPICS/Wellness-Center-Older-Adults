@@ -8,7 +8,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
-    const adminEmail = 'CTV210001@utdallas.edu';
+    const adminEmail = 'anishkothuri@gmail.com';
+
 
   // Checks if the superuser exists when called
   const adminUser = await prisma.user.findUnique({
