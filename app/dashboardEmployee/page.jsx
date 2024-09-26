@@ -1,10 +1,35 @@
+"use client";
+import { useEffect, useState } from "react";
 import "/app/styles/dashboardPage.css";
 import TextContainer from "/app/components/TextContainer.jsx";
 
+
 export default function Page() {
+  const [userName, setUserName] = useState('');
+  useEffect(() => {
+    async function fetchUserName() {
+      try {
+        const response = await fetch('/api/user');
+        const data = await response.json();
+        if (response.ok) {
+          setUserName(data.firstName);
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
+  
+    fetchUserName();
+  }, []);
+  
+  console.log(userName);
+
   return (
+    
     <div className="dashContainer">
-      <h1 className="dashTitle">Dashboard</h1>
+      <h1 className="dashTitle"> Welcome, {userName}!</h1> 
       <div className="dashBoxes">
         <TextContainer text="Recently Completed Rides" number="3" />
         <TextContainer text="This Week's Volunteer Hours" number="5" />

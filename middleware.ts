@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
                     // Token verification
                     const decoded = await jwtVerify(cvtoken, key);
                     const email = decoded.payload.email as string;
-                const user = await client.user.findUnique({
+                    const user = await client.user.findUnique({
                     where: { email },
                 });
                 console.log(decoded);
