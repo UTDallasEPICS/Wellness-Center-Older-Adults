@@ -1,15 +1,10 @@
-{
-  /*https://www.youtube.com/watch?v=dYjdzpZv5yc */
-}
-
 import { useState, Fragment, useEffect } from "react";
-import "/app/styles/ridesTable.css";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
 import EditableRow from "/app/components/EditableRow.jsx";
 
 const AddRidesTable = ({ initialContacts }) => {
   {
-    /* Creates array of data calling from data file*/
+    /* Creates array of data calling from data file */
   }
   const [contacts, setContacts] = useState(initialContacts);
   {
@@ -83,24 +78,23 @@ const AddRidesTable = ({ initialContacts }) => {
   };
 
   return (
-    <div className="ridesTableContainer">
-      <form className="rideTableForm" onSubmit={handleEditFormSubmit}>
-        <table className = "ridesTable">
+    <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
+      <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
+        <table className="border-collapse ml-[0.5%] w-[99%]">
           {/* Serves as the header of the table */}
           <thead>
             <tr>
-              <th className="rideTableHeader">Client Name</th>
-              <th className="rideTableHeader">Contact Number</th>
-              <th className="rideTableHeader">Address</th>
-              <th className="rideTableHeader">Pick-up Time</th>
-              <th className="rideTableHeader">Actions</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Client Name</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
             </tr>
           </thead>
 
           {/* Stores the data */}
           <tbody>
             {/*Pulls element from the data structure to map out information */}
-
             {contacts
               .filter((contact) => contact.status === "Added")
               .map((contact) =>
@@ -122,7 +116,7 @@ const AddRidesTable = ({ initialContacts }) => {
               )}
           </tbody>
         </table>
-        {/*Could prob make this a separate component to make it a prompt to add info */}
+        {/* Could prob make this a separate component to make it a prompt to add info */}
       </form>
     </div>
   );

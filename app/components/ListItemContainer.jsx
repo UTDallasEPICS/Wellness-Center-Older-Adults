@@ -1,22 +1,21 @@
 import React from "react";
-import "/app/styles/listItemContainer.css";
 
 export default function listItemContainer(props) {
   return (
-    <div className="listContainer">
-      <div className="clientName">
+    <div className="w-full h-[80px] flex flex-row">
+      <div className="p-[5px_68px] text-left text-sm font-light bg-white m-0">
         <p>{props.clientName}</p>
       </div>
-      <div className="clientAddress">
+      <div className="p-[5px_68px] text-left text-sm font-light bg-white m-0">
         <p>{props.clientAddress}</p>
       </div>
-      <div className="clientEmail">
+      <div className="p-[5px_68px] text-left text-sm font-light bg-white m-0">
         <p>{props.clientEmail}</p>
       </div>
-      <div className="clientPhone">
+      <div className="p-[5px_68px] text-left text-sm font-light bg-white m-0">
         <p>{props.clientPhone}</p>
       </div>
-      <div className="clientBirthdate">
+      <div className="p-[5px_68px] text-left text-sm font-light bg-white m-0">
         <p>{props.clientBirthdate}</p>
       </div>
     </div>
