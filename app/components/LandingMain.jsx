@@ -1,52 +1,60 @@
 "use client";
 
 import React from "react";
-import "/app/styles/landingMain.css";
 import { useAuth } from "../providers/Auth";
 import Header from "/app/components/Header.jsx";
 import Footer from "/app/components/Footer.jsx";
 import Image from "next/image";
 
 const landingPage = () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { isAuthenticated, handleLogin, handleLogout } = useAuth();
 
   return (
-    <div className="page-container">
-      <Header />  
-      <div className="main-container">
-        <div className="buttonAndText">
-          {" "}
-          <h1 className="title">Driving towards change</h1>
-          <p className="body">Admin sign in page</p>
+    <div className="flex flex-col h-full w-full bg-[#fbfcf8]">
+      <Header />
+      <div className="flex flex-row w-[95%] h-[calc(100%-280px)] mx-auto">
+        <div className="flex flex-col mt-[10%] ml-[7%] mb-[5%]">
+          <h1 className="font-light text-left text-[75px] font-montserrat">
+            Driving towards change
+          </h1>
+          <p className="font-light text-left text-gray-500 text-[35px] font-montserrat">
+            Admin sign in page
+          </p>
           {isAuthenticated ? (
             <>
-              <button className="button" onClick={handleLogout}>
+              <button
+                className="h-[50px] w-[200px] bg-[#419902] text-white text-[25px] rounded-lg cursor-pointer"
+                onClick={handleLogout}
+              >
                 Log Out
               </button>
               <a href="/dashboardEmployee">
-                <button className="button" style={{ marginTop: '10px' }}>
+                <button
+                  className="h-[50px] w-[200px] bg-[#419902] text-white text-[25px] rounded-lg cursor-pointer mt-2"
+                >
                   Go Dashboard
                 </button>
               </a>
             </>
           ) : (
-            <button className="button" onClick={handleLogin}>
+            <button
+              className="h-[50px] w-[200px] bg-[#419902] text-white text-[25px] rounded-lg cursor-pointer"
+              onClick={handleLogin}
+            >
               Log In
             </button>
           )}
         </div>
 
         <Image
-          className="carImage"
+          className="w-[50%] mt-[50px]"
           src="/images/croppedCarImage.png"
           alt="Image of car with location icon"
           width={500}
           height={600}
         />
       </div>
-      {/* */}
-      <div className="footer-space">
+      <div className="w-full h-[150px] mt-auto">
         <Footer />
       </div>
     </div>
