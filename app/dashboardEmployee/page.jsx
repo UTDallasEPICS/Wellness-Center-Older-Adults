@@ -10,7 +10,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchUserName() {
       try {
-        const response = await fetch('/api/user');
+        const response = await fetch('/api/getFirstName');
         const data = await response.json();
         if (response.ok) {
           setUserName(data.firstName);
