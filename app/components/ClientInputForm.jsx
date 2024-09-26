@@ -1,8 +1,6 @@
 "use client";
-import { useState } from "react";
 
-import "/app/styles/clientInputForm.css";
-import "/app/globalicons.css";
+import { useState } from "react";
 
 const AddClientForm = () => {
   const [customerEmail, setCustomerEmail] = useState("");
@@ -16,7 +14,7 @@ const AddClientForm = () => {
   const [display, setDisplay] = useState(false);
 
   const handleAddClient = async (event) => {
-    event.preventDefault(); // Prevents default form submission
+    event.preventDefault();
 
     try {
       const reply = await fetch("/api/createCustomerAccount/", {
@@ -37,28 +35,36 @@ const AddClientForm = () => {
       }
 
       const data = await reply.json();
-      console.log(data); // Log the response from the API
+      console.log(data);
     } catch (error) {
-      console.error(error); // Log any errors
+      console.error(error);
     }
   };
 
   return (
     <div>
       <button
-        className="openButton"
+        className="h-[45px] w-[45px] rounded-full text-white bg-black border-none cursor-pointer text-center text-[35px]"
         onClick={() => setDisplay((prevDisplay) => !prevDisplay)}
       >
         <span className="material-symbols-rounded">add</span>
       </button>
 
-      <div id="formPopUp" style={{ display: display ? "block" : "none" }}>
-        <h1>Input Client Information</h1>
-        <form className="formContainer" onSubmit={handleAddClient}>
-          <fieldset className="formSections">
-            <legend>Full Name:</legend>
-            <label>First name</label>
-            <br />
+      <div
+        id="formPopUp"
+        className={`fixed top-0 left-0 flex justify-center items-center w-full h-full ${
+          display ? "flex" : "hidden"
+        }`}
+      >
+        <form
+          className="fixed h-[85%] w-[90%] bg-gray-100 p-8 rounded-lg overflow-y-scroll"
+          onSubmit={handleAddClient}
+        >
+          <h1 className="text-center font-light text-[40px]">Input Client Information</h1>
+
+          <fieldset className="mt-4">
+            <legend className="font-light text-[20px]">Full Name:</legend>
+            <label className="block text-black text-[15px]">First name</label>
             <input
               type="text"
               name="clientFirstName"
@@ -66,85 +72,90 @@ const AddClientForm = () => {
               required
               value={customerFname}
               onChange={(e) => setCustomerFName(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
-            <br />
-            <label>Middle name</label>
-            <br />
+
+            <label className="block mt-4 text-black text-[15px]">Middle name</label>
             <input
               type="text"
               name="clientMiddleName"
               value={customerMname}
               onChange={(e) => setCustomerMName(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
-            <br />
-            <label>Last name</label>
-            <br />
+
+            <label className="block mt-4 text-black text-[15px]">Last name</label>
             <input
               type="text"
               name="clientLastName"
               required
               value={customerLname}
               onChange={(e) => setCustomerLName(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
           </fieldset>
 
-          <fieldset className="formSections">
-            <legend>Contact</legend>
-            <label>Email</label>
-            <br />
+          <fieldset className="mt-4">
+            <legend className="font-light text-[20px]">Contact</legend>
+            <label className="block text-black text-[15px]">Email</label>
             <input
               type="email"
               name="clientEmail"
               required
               value={customerEmail}
               onChange={(e) => setCustomerEmail(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
-            <br />
-            <label>Address</label>
-            <br />
+
+            <label className="block mt-4 text-black text-[15px]">Address</label>
             <input
               type="text"
               name="clientAddress"
               required
               value={customerAddress}
               onChange={(e) => setCustomerAddress(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
-            <br />
-            <label>City</label>
-            <br />
+
+            <label className="block mt-4 text-black text-[15px]">City</label>
             <input
               type="text"
               name="clientCity"
               required
               value={customerCity}
               onChange={(e) => setCustomerCity(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
-            <br />
-            <label>State</label>
-            <br />
+
+            <label className="block mt-4 text-black text-[15px]">State</label>
             <input
               type="text"
               name="clientState"
               value={customerState}
               onChange={(e) => setCustomerState(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
-            <br />
-            <label>Phone</label>
-            <br />
+
+            <label className="block mt-4 text-black text-[15px]">Phone</label>
             <input
               type="tel"
               name="clientPhone"
               required
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
+              className="block w-full p-3 border border-gray-300 rounded mt-1"
             />
           </fieldset>
 
-          <input type="submit" value="Submit" />
+          <input
+            type="submit"
+            value="Submit"
+            className="mt-6 w-full bg-black text-white py-4 rounded-lg cursor-pointer"
+          />
           <button
             type="button"
-            className="cancelButton"
             onClick={() => setDisplay((prevDisplay) => !prevDisplay)}
+            className="mt-4 w-full border border-gray-400 py-4 rounded-lg text-gray-500"
           >
             Cancel
           </button>
