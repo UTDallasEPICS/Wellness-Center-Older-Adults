@@ -6,7 +6,7 @@ export default function Header() {
     <div className="header-component">
       
       <div className="header">
-        <a href="/">
+        <a href="/dashboardEmployee">
         <Image className="logo" src="/logo.png" alt="Logo" width={1600} height={800} />
         </a>
       </div>
