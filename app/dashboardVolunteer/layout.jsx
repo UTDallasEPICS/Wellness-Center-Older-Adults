@@ -1,26 +1,24 @@
 import SideNav from "@/app/ui/dashboardVolunteer/sidenav";
 import DashHeader from "@/app/components/DashHeader.jsx";
-import "/app/styles/volunteerLayout.css";
 
-/* body for page makes menu span entire height*/
-export default function DashboardLayout({
-  children, // will be a page or nested layout
-}) {
+export default function DashboardLayout({ children }) {
   return (
-    <div className="page">
-      <div className="headerSpace">
+    <div className="w-full min-h-screen flex flex-col">
+      <div className="w-full h-[70px] border-b border-gray-300">
         <DashHeader />
       </div>
 
-      <div className="mainContent">
-        <div className="col-2 col-s-2 sideBarSpace">
+      <div className="flex h-[calc(100vh-180px)] bg-white">
+        <div className="w-2/12 min-h-[calc(100vh-170px)]">
           <SideNav />
         </div>
-        <div className="col-10 col-s-9 testA">{children}</div>
+        <div className="w-10/12 h-[calc(100%-20px)] bg-[#eceeefd6]">{children}</div>
       </div>
 
-      <div className="footerSpace">
-        <p className="testFooter">Wellness Center Coordination App 2024</p>
+      <div className="w-[calc(100%-80px)] h-[70px] mt-auto mb-0">
+        <p className="w-full h-[60px] bg-white border-t border-gray-300 text-gray-900 font-light text-lg p-2.5">
+          Wellness Center Coordination App 2024
+        </p>
       </div>
     </div>
   );

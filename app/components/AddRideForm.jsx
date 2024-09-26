@@ -1,6 +1,4 @@
 import { useState } from "react";
-import TimePicker from 'react-time-picker';
-import "/app/styles/addRideForm.css";
 
 const AddRideForm = ({
   handleAddFormSubmit,
@@ -15,42 +13,49 @@ const AddRideForm = ({
   });
 
   return (
-    <div className="addRideFormDiv ">
-      <h2 className="addRideTitle">Add a Ride</h2>
-      <form className="addRideFormContainer" onSubmit={handleAddFormSubmit}>
-        {/*Just copy the input tags and contents if need more inputs. Edit as needed. Make sure that name is = to the data's element that is being mapped above */}
-        <input className = "rideInputForm"
+    <div className="max-w-[70%] mx-auto">
+      <h2 className="text-left font-light text-2xl mb-5">Add a Ride</h2>
+      <form className="flex flex-row items-center lg:flex-col lg:items-stretch space-y-4 lg:space-y-0 lg:space-x-0 space-x-4" onSubmit={handleAddFormSubmit}>
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md flex-1 m-1.5 placeholder-gray-500"
           type="text"
           name="clientName"
           required="required"
           placeholder="Client Name"
           value={addFormData.clientName}
           onChange={handleAddFormChange}
-        ></input>
-        <input className = "rideInputForm"
+        />
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md flex-1 m-1.5 placeholder-gray-500"
           type="text"
           name="phoneNumber"
           required="required"
           placeholder="Client Phone"
           value={addFormData.phoneNumber}
           onChange={handleAddFormChange}
-        ></input>
-        <input className = "rideInputForm"
+        />
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md flex-1 m-1.5 placeholder-gray-500"
           type="text"
           name="address"
           required="required"
           placeholder="Client Address"
           value={addFormData.address}
           onChange={handleAddFormChange}
-        ></input>
-        <TimePicker
-          className="rideInputForm"
+        />
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md flex-1 m-1.5 placeholder-gray-500"
+          type="text"
           name="startTime"
           required="required"
+          placeholder="Pick-Up Time"
           value={addFormData.startTime}
-          onChange={(value) => handleAddFormChange(value)}
+          onChange={handleAddFormChange}
         />
-        <button className="addRideButton" type="submit">
+        <button
+          className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700 ml-2.5"
+          type="submit"
+        >
           Add
         </button>
       </form>
