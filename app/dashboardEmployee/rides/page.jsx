@@ -6,7 +6,7 @@ import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
 import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
 import AddRideForm from "/app/components/AddRideForm.jsx";
 import "/app/styles/ridesPageEmployee.css";
-import data from "/app/mock-data.json";
+import data from "/app/mockdata/mock-data.json";
 import { nanoid } from "nanoid";
 
 const tabs = [

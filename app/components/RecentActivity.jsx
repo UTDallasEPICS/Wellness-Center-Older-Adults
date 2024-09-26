@@ -1,5 +1,5 @@
 import React from 'react';
-import newMockData from '../mock-data-new.js';
+import newMockData from '../mockdata/mock-data-new.js';
 import '../styles/recentActivity.css';
 
 const RecentActivity = () => {
