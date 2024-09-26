@@ -1,5 +1,6 @@
 import "/app/styles/dashboardPage.css";
 import TextContainer from "/app/components/TextContainer.jsx";
+import RecentActivity from "/app/components/RecentActivity"; 
 
 export default function Page() {
   return (
@@ -10,6 +11,7 @@ export default function Page() {
         <TextContainer text="This Week's Volunteer Hours" number="5" />
         <TextContainer text="Total Rides for the Week" number="17" />
       </div>
+      <RecentActivity />
     </div>
 
     /* 
