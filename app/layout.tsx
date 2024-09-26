@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { UserProvider } from './providers/Auth';
+import './globals.css';
 
 
 export const metadata = {
