@@ -6,7 +6,7 @@ import Header from "/app/components/Header.jsx";
 import Footer from "/app/components/Footer.jsx";
 import Image from "next/image";
 
-const landingPage = () => {
+const LandingPage = () => {
   const { isAuthenticated, handleLogin, handleLogout } = useAuth();
 
   return (
@@ -61,4 +61,4 @@ const landingPage = () => {
   );
 };
 
-export default landingPage;
+export default LandingPage;
