@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 
 interface UserRequestBody {
   customerEmail: string;
-  customerFname: string;
-  customerLname: string;
+  firstName: string;
+  lastName: string;
 }
 
 export async function POST(req: Request) {
@@ -19,14 +19,14 @@ export async function POST(req: Request) {
     });
   }
 
-  const { customerEmail, customerFname, customerLname } = await req.json() as UserRequestBody;
+  const { customerEmail, firstName, lastName } = await req.json() as UserRequestBody;
 
   // searches for the customer with email, first name, and last name
   const existingCustomer = await prisma.customer.findFirst({
     where: {
       customerEmail,
-      customerFname,
-      customerLname
+      firstName,
+      lastName,
     }
   });
 
@@ -41,9 +41,9 @@ export async function POST(req: Request) {
   await prisma.customer.create({
     data: {
       customerEmail,
-      customerFname,
-      customerMname: "dummy middle name",
-      customerLname,
+      firstName,
+      middleName: "dummy middle name",
+      lastName,
       customerPhone: "0000000000",
       streetAddress: "dummy street address",
       city: "dummy city",
