@@ -1,11 +1,10 @@
 import Link from "next/link";
 import NavLinks from "@/app/ui/dashboardEmployee/nav-links";
-import "/app/styles/sideNav.css";
 
 export default function SideNav() {
   return (
-    <div className="navBar">
-      <Link href="/"></Link>
+    <div className="h-[95%] w-[98.5%] p-[20px_0px] bg-white border-b border-gray-300">
+      <Link href="/dashboardEmployee"></Link>
       <NavLinks />
     </div>
   );

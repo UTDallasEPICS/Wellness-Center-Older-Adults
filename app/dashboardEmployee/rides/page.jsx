@@ -5,15 +5,10 @@ import AddRidesTable from "/app/components/AddRidesTable.jsx";
 import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
 import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
 import AddRideForm from "/app/components/AddRideForm.jsx";
-import "/app/styles/ridesPageEmployee.css";
-import data from "/app/mock-data.json";
+import data from "/app/mockdata/mock-data.json";
+import AddRidePositive from "/app/components/AddRidePositive.jsx";
+import AddRideNeg from "/app/components/AddRideNeg.jsx";
 import { nanoid } from "nanoid";
-
-const tabs = [
-  { aKey: "added", title: "Added", content: "Hi" },
-  { aKey: "reserved", title: "Reserved", content: "Reserved" },
-  { aKey: "completed", title: "Completed", content: "Bye" },
-];
 
 export default function Page() {
   const [ridesData, setRidesData] = useState(data);
@@ -25,9 +20,11 @@ export default function Page() {
     startTime: "",
   });
 
+  const [notification, setNotification] = useState(null);
+
   const handleAddFormChange = (event) => {
     if (event.preventDefault) {
-      event.preventDefault(); // Prevents default form submission (for input fields)
+      event.preventDefault();
       const fieldName = event.target.getAttribute("name");
       const fieldValue = event.target.value;
   
@@ -36,9 +33,8 @@ export default function Page() {
   
       setAddFormData(newFormData);
     } else {
-      // Handling direct value change (for time picker or other components)
-      const fieldName = "startTime"; // Assuming this is the field name for the time picker
-      const fieldValue = event; // 'event' is the new time value
+      const fieldName = "startTime";
+      const fieldValue = event;
   
       const newFormData = { ...addFormData };
       newFormData[fieldName] = fieldValue;
@@ -46,9 +42,30 @@ export default function Page() {
       setAddFormData(newFormData);
     }
   };
+
+
   const handleAddFormSubmit = (event) => {
     event.preventDefault();
 
+    // Checks for if any of the inputs are empty
+    if (
+      addFormData.clientName.trim() === "" ||
+      addFormData.phoneNumber.trim() === "" ||
+      addFormData.address.trim() === "" ||
+      addFormData.startTime.trim() === ""
+    ) {
+      // sets the notification to the error notification
+      setNotification(<AddRideNeg />);  
+
+      // Hide error notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+
+      return;  
+    }
+
+    // else we want to add the new ride if the inputs are filled
     const newContact = {
       id: nanoid(),
       clientName: addFormData.clientName,
@@ -59,14 +76,25 @@ export default function Page() {
       volunteerName: "",
       hours: 0,
     };
+
     const newContacts = [...ridesData, newContact];
     setRidesData(newContacts);
+
+   
     setAddFormData({
       clientName: "",
       phoneNumber: "",
       address: "",
       startTime: "",
     });
+
+    //set notification to successfully added
+    setNotification(<AddRidePositive/>); 
+
+  
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
   };
 
   const tabs = [
@@ -86,8 +114,16 @@ export default function Page() {
       content: <CompletedRidesTable initialContacts={ridesData} />,
     },
   ];
+
   return (
-    <div className=".ridesPageContainer">
+    <div className="h-full w-full bg-white">
+       {notification && (
+        <div className="absolute top-4 right-4">
+          {notification}
+        </div>
+      )}
+
+
       <AddRideForm
         addFormData={addFormData}
         handleAddFormSubmit={handleAddFormSubmit}

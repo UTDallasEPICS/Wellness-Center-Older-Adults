@@ -54,7 +54,7 @@ export async function POST (
       const formData = new URLSearchParams(requestBody);
       const id_token = formData.get('id_token');
       const maxAge = 60 * 60 * 24;
-      const ret = NextResponse.redirect("http://localhost:3000", { status: 302 });
+      const ret = NextResponse.redirect("http://localhost:3000/dashboardEmployee", { status: 302 });
       ret.cookies.set({
         name: 'cvtoken',
         value: `${id_token}`,
