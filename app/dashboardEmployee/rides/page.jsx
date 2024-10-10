@@ -5,7 +5,7 @@ import AddRidesTable from "/app/components/AddRidesTable.jsx";
 import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
 import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
 import AddRideForm from "/app/components/AddRideForm.jsx";
-import data from "/app/mockdata/mock-data.json";
+import data from "/app/mockdata/mock-data-new.js";
 import AddRidePositive from "/app/components/AddRidePositive.jsx";
 import AddRideNeg from "/app/components/AddRideNeg.jsx";
 import { nanoid } from "nanoid";
