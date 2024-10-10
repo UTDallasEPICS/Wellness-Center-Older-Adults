@@ -13,7 +13,7 @@ const ReportHoursForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (isNaN(hours) || hours.trim() === '') {
+    if (isNaN(hours) || hours <= 0|| hours.trim() === '') {
       setError('Please enter a valid number');
       return;
     }
