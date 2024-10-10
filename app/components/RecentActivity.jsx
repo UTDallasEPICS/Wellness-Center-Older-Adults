@@ -17,8 +17,7 @@ const RecentActivity = () => {
                   <strong>{activity.date}</strong> at {activity.time}
                 </div>
                 <div><strong>Client Name:</strong> {activity.clientName}</div>
-                <div><strong>Phone Number:</strong> {activity.phoneNumber}</div>
-                <div><strong>Address:</strong> {activity.address}</div>
+                
                 <div><strong>Start Time:</strong> {activity.startTime}</div>
                 <div><strong>Volunteer Name:</strong> {activity.volunteerName}</div>
                 <div><strong>Status:</strong> {activity.status}</div>
@@ -38,3 +37,8 @@ const RecentActivity = () => {
 };
 
 export default RecentActivity;
+
+/*
+<div><strong>Phone Number:</strong> {activity.phoneNumber}</div>
+<div><strong>Address:</strong> {activity.address}</div>
+*/
