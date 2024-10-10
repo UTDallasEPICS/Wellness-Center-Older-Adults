@@ -1,4 +1,4 @@
-.sideBar {
+.sideBar { 
   margin: 0px;
 }
 
@@ -23,7 +23,6 @@
 .nav-a:hover {
   text-decoration: none;
 }
-
 
 .navBar {
   height: 95%;
@@ -52,12 +51,70 @@
 }
 
 .active .nav-p {
-  color: black; /* Change the color of the active tab */
+  color: black;
   border-bottom: 3px solid black;
   background-color: white;
 }
 
-/*For devices 769px and greater */
+
+.sidenav {
+  width: 250px;
+  transition: width 0.3s ease;
+}
+
+.sidenav.collapsed {
+  width: 70px;
+}
+
+
+.sidenav.collapsed .nav-p {
+  display: none; 
+}
+
+
+.sidenav.collapsed .nav-a {
+  justify-content: center;
+}
+
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 25px;
+  height: 20px;
+  margin-right: 10px; 
+}
+
+.hamburger-icon span {
+  background-color: #000;
+  height: 2px;
+  width: 100%;
+  display: block;
+}
+
+
+.collapse-text {
+  font-size: 16px;
+  color: black;
+}
+
+
+.sidenav.collapsed .collapse-text {
+  display: none;
+}
+
+
 @media only screen and (min-width: 700px) {
   .navBar {
     min-height: calc(100vh - 170px);
@@ -83,8 +140,35 @@
   }
 
   .active .nav-p {
-    color: black; /* Change the color of the active tab */
+    color: black;
     border-bottom: none;
     border-right: 4px solid black;
   }
 }
+
+
+@media only screen and (max-width: 767px) {
+  .sidenav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 999;
+    width: 250px; 
+    transition: width 0.3s ease;
+  }
+
+  .sidenav.collapsed {
+    width: 50px; 
+  }
+
+  .main-content {
+    margin-left: 0; 
+  }
+
+  .toggle-btn {
+    right: 0;
+  }
+}
+
+

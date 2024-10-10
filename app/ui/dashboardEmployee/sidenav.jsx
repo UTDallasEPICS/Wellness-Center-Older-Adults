@@ -1,11 +1,22 @@
-import Link from "next/link";
-import NavLinks from "@/app/ui/dashboardEmployee/nav-links";
+import React from "react";
+import NavLinks from "./nav-links"; 
+import "../../styles/sideNav.css"; 
 
-export default function SideNav() {
+const SideNav = ({ toggleCollapse, isCollapsed }) => {
   return (
-    <div className="h-[95%] w-[98.5%] p-[20px_0px] bg-white border-b border-gray-300">
-      <Link href="/dashboardEmployee"></Link>
-      <NavLinks />
+    <div className={`sidenav ${isCollapsed ? "collapsed" : ""}`}>
+      <button className="toggle-btn" onClick={toggleCollapse}>
+        <div className="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        {!isCollapsed && <span className="collapse-text">Collapse</span>}
+      </button>
+      <NavLinks isCollapsed={isCollapsed} />
     </div>
   );
-}
+};
+
+export default SideNav;
+
