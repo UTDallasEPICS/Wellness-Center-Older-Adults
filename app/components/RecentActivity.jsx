@@ -5,7 +5,7 @@ const RecentActivity = () => {
   const activities = Array.isArray(newMockData) ? newMockData : [];
 
   return (
-    <div className="p-5 md:p-10 mt-10 mx-auto bg-green-100 w-full max-w-6xl rounded-2xl shadow-md">
+    <div className="p-5 md:p-10 mt-10 mx-auto bg-grey-100 w-full max-w-6xl rounded-2xl shadow-md">
       <h2>Recent Activity</h2>
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full p-2.5">
         {activities.length > 0 ? (
