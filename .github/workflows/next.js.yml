@@ -37,7 +37,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run ESLint
         run: npm run lint
@@ -68,7 +68,7 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
             
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Create Prisma Generator
         run: |
