@@ -18,7 +18,7 @@ model User {
   firstName String
   lastName  String
   phone     String   @unique
-  rides Ride[]
+  ///rides Ride[]
 
   @@unique([id, firstName, lastName])
 
@@ -44,22 +44,28 @@ model Customer {
 
 model Ride {
   id Int @id @default(autoincrement())
-  customer Customer @relation(fields: [customerID, customerFName, customerLName], references: [id, firstName, lastName])
-  driver User @relation(fields: [driverID, driverFname, driverLname], references: [id, firstName, lastName])
-  driverID Int
-  driverFname String
-  driverLname String
-  customerID Int 
-  customerFName String
-  customerLName String
+  customer Customer @relation(fields: [customerID], references: [id])
+  customerID Int @unique
+  volunteer Volunteer @relation(fields: [volunteerID], references: [id])
+  volunteerID Int @unique
   date DateTime @db.Date
   time DateTime @db.Time(4)
   startLocation String
   endLocation String
+}
 
+model Volunteer{
+  id Int @id @default(autoincrement())
+  volunteerFname String
+  volunteerLname String
+  volunteerEmail String @unique
+  volunteerPhone String
+  rideStatus String?
+  ride Ride? 
+  
 
-  @@unique([customerID, customerFName, customerLName])
-  @@unique([driverID, driverFname, driverLname])
+  @@unique([id, volunteerFname, volunteerLname])
+
 }
 
 // model Customer {  
