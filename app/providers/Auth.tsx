@@ -1,11 +1,8 @@
-"use client";
+'use client';
 
 import React, { useContext, useState, useEffect, createContext, ReactNode } from 'react';
-import cookie from 'cookie';
 
-interface AuthContextType {
-
-}
+interface AuthContextType {}
 
 interface UserProviderProps {
   children: ReactNode;
@@ -36,11 +33,11 @@ function useProvideAuth(): AuthContextType {
   // Marks the user as authenticated if the cvtoken exists and is not blank.
   const checkSession = () => {
     const fetchAuthStatus = async () => {
-        const response = await fetch('/api/auth/session');
-        const data = await response.json();
-        setIsAuthenticated(data.isAuthenticated);
-      };
-      fetchAuthStatus();
+      const response = await fetch('/api/auth/session');
+      const data = await response.json();
+      setIsAuthenticated(data.isAuthenticated);
+    };
+    fetchAuthStatus();
   };
 
   // Redirects user to login page
@@ -50,17 +47,16 @@ function useProvideAuth(): AuthContextType {
       if (!response.ok) {
         throw new Error('Failed to fetch login URL');
       }
-      
+
       // Extract the URL from the response
       const data = await response.json();
       const { url } = data;
-      window.location.href=url;
-  
+      window.location.href = url;
     } catch (error) {
       console.error('Error during login:', error);
     }
   };
-  
+
   // Any call to this function will log the user out of their account
   const handleLogout = async () => {
     try {
@@ -71,7 +67,7 @@ function useProvideAuth(): AuthContextType {
       const data = await response.json();
       const { url } = data;
       setIsAuthenticated(false);
-      window.location.href=url;
+      window.location.href = url;
     } catch (error) {
       console.error('Error during logout:', error);
     }
@@ -81,8 +77,9 @@ function useProvideAuth(): AuthContextType {
   useEffect(() => {
     checkSession();
   }, []);
-  
-  // Return any functions or values here which need to be made public access to components using useAuth()
+
+  // Return any functions or values here which need to be made public
+  // access to components using useAuth()
   return {
     isAuthenticated,
     handleLogin,

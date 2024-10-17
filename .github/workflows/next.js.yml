@@ -1,18 +1,18 @@
-# Sample workflow for building and deploying a Next.js site to GitHub Pages
+# Sample workflow for building and testing a Next.js site
 #
 # To get started with Next.js see: https://nextjs.org/docs/getting-started
 #
 name: Test Next.js build
 
 on:
-  # Runs on pushes targeting the default branch
+  # Runs on pushes targeting the integration and main branches
   push:
-    branches: ["main"]
+    branches: ["integration", "main"]
 
-  # Runs on any open or reopened pull request
+  # Runs on open, reopened, and synchronized pull requests targeting the integration and main branches
   pull_request:
-    types: [opened, reopened]
-    branches: ["main"]
+    types: [opened, reopened, synchronize]
+    branches: ["integration", "main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,36 +23,65 @@ env:
   PRISMA_DB_URL: "postgresql://postgres:postgres@localhost:5432/postgres"
 
 jobs:
-  # Build job
-  build:
+  # ESLint job
+  eslint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "lts/Hydrogen"
-          cache: npm
-      - name: Restore cache
+
+      - name: Cache node_modules
         uses: actions/cache@v3
         with:
-          path: |
-            .next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-node_modules-
+
+      # Install dependencies with --legacy-peer-deps and --no-package-lock to avoid conflicts and prevent generating lock file
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-package-lock --legacy-peer-deps
+
+      - name: Run ESLint
+        run: npm run lint
+
+  # Build job, dependent on eslint job
+  build:
+    runs-on: ubuntu-latest
+    needs: eslint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/Hydrogen"
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install dependencies
+        run: npm install --no-package-lock --legacy-peer-deps
+
+      # Create Prisma Generator
       - name: Create Prisma Generator
         run: |
-          if [ grep -q '^model*' ${{ github.workspace }}/prisma/schema.prisma ]; then
-            npm prisma generate
+          if grep -q '^model*' ${{ github.workspace }}/prisma/schema.prisma; then
+            npx prisma generate
           else
             echo "No models defined in 'prisma.schema'. Prisma Client NOT generated"
           fi
-          exit 0
+
       - name: Build with Next.js
         run: npm run build

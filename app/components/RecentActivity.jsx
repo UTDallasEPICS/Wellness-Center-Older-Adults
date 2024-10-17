@@ -1,20 +1,19 @@
 import React from 'react';
 import newMockData from '../mockdata/mock-data-new.js';
-import '../styles/recentActivity.css';
 
 const RecentActivity = () => {
   const activities = Array.isArray(newMockData) ? newMockData : [];
 
   return (
-    <div className="recent-activity-container">
+    <div className="p-5 md:p-10 mt-10 mx-auto bg-grey-100 w-full max-w-6xl rounded-2xl shadow-md">
       <h2>Recent Activity</h2>
-      <ul className="activity-list">
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full p-2.5">
         {activities.length > 0 ? (
           activities.map((activity) => (
-            <li key={activity.id} className="activity-item">
+            <li key={activity.id} className="border border-gray-300 p-4 mb-4 rounded-2xl bg-white grid grid-cols-[1fr_auto] gap-2.5 items-start shadow-md">
               <div className="activity-details">
                 <div className="activity-header">
-                  <strong>{activity.date}</strong> at {activity.time}
+                  <strong>{activity.date}</strong> at {activity.time} 
                 </div>
                 <div><strong>Client Name:</strong> {activity.clientName}</div>
                 

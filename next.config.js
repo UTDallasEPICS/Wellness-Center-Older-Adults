@@ -2,10 +2,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack(config) {
-    config.experiments ??= {}
-    config.experiments.asyncWebAssembly = true
+    config.experiments ??= {};
+    config.experiments.asyncWebAssembly = true;
 
-    return config
-  }
-}
-module.exports = nextConfig
+    return config;
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+};
+module.exports = nextConfig;

@@ -39,3 +39,6 @@ next-env.d.ts
 postgres-data
 /prisma/migrations
 /prisma/seed.js
+/prisma/customerQueries.js
+# Package Lock
+package-lock.json

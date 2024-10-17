@@ -115,18 +115,18 @@ docker compose up
 docker compose up -d
 ```
 
-Then, you must run the prisma migration command:
-
-```bash
-npx prisma migrate dev --name init
-``` 
-
 Now, in order for logging in to work, you must seed your account information into the local database, AND add your credentials to Auth0
 Edit the seed.js file to match your credentials, and then run this command:
 
 ```bash
 npx prisma db seed
 ```
+
+Then, you must run the prisma push command:
+
+```bash
+npx prisma db push
+``` 
 
 Make sure you have created a user in the Auth0 application dashboard as well!
 If you dont already have your .env files setup, make sure to do this as well. you may have to restart your
@@ -139,6 +139,12 @@ docker compose up
 # or
 docker compose up -d
 ```
+
+Also, make sure to run:
+```bash
+npx husky init
+```
+In order to setup the pre-commit hooks.
 
 Finally, run this:
 
