@@ -32,7 +32,7 @@ const config = [
           semi: true, // Enforce semicolons
           trailingComma: 'es5', // Require trailing commas where valid
           printWidth: 100, // Set max line length to 100
-          endOfLine: 'auto' // Handle carriage returns for different OS
+          endOfLine: 'auto', // Handle carriage returns for different OS
         },
       ],
 
