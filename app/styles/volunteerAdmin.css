@@ -1,0 +1,45 @@
+/* header.css */
+.register {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh; 
+    background: #fbfcf8; 
+    width: 100%;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333333;
+  }
+  
+  .page-description {
+    color: #555555; 
+    margin-bottom: 20px; 
+    font-size: 16px; 
+  }
+  
+  .register-button {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
+    width: 50%; 
+    height: 50px; 
+    padding: 10px; 
+    border: none; 
+    background-color: #419902; 
+    color: white; 
+    font-weight: bold; 
+    font-size: 18px;
+    cursor: pointer; 
+    margin: 15px auto; 
+    transition: background-color 0.3s; 
+  }
+  
+  .register-button:hover {
+    align-items: center; 
+    justify-content: center; 
+    background-color: #357a01;
+  }
+  
