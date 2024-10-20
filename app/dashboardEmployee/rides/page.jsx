@@ -9,6 +9,7 @@ import data from "/app/mockdata/mock-data.json";
 import AddRidePositive from "/app/components/AddRidePositive.jsx";
 import AddRideNeg from "/app/components/AddRideNeg.jsx";
 import { nanoid } from "nanoid";
+import { add } from "date-fns";
 
 export default function Page() {
   const [ridesData, setRidesData] = useState(data);
@@ -44,7 +45,7 @@ export default function Page() {
   };
 
 
-  const handleAddFormSubmit = (event) => {
+  const handleAddFormSubmit = async (event) => {
     event.preventDefault();
 
     // Checks for if any of the inputs are empty
@@ -65,6 +66,34 @@ export default function Page() {
       return;  
     }
 
+    
+
+
+
+
+
+    try {
+      const reply = await fetch("/api/createRide/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          clientName: addFormData.clientName,        
+          address: addFormData.address,
+          startTime: addFormData.startTime,
+        }),
+      });
+
+      const data = await reply.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+
+
+       
+  
     // else we want to add the new ride if the inputs are filled
     const newContact = {
       id: nanoid(),
