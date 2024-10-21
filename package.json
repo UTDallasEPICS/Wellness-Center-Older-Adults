@@ -23,7 +23,7 @@
     "cookies-next": "^4.1.1",
     "date-fns": "^3.6.0",
     "eslint": "8.50.0",
-    "eslint-config-next": "13.5.2",
+    "eslint-config-next": "14.2.15",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
