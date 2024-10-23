@@ -27,4 +27,4 @@ const CancelRidesModel = ({ handleConfirmDelete, handleCancelDelete }) => {
   );
 };
 
-export default DeleteConfirmationModal;
+export default CancelRidesModel;
