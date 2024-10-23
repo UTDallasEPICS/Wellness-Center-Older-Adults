@@ -1,10 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-
 }
 
 datasource db {
@@ -13,59 +9,59 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int    @id @default(autoincrement())
+  email     String @unique
   firstName String
   lastName  String
-  phone     String   @unique
-  rides Ride[]
+  phone     String @unique
 
   @@unique([id, firstName, lastName])
-
 }
 
 model Customer {
-  id Int @id @default(autoincrement())
-  customerEmail String @unique
-  firstName String
-  middleName String? // make optional
-  lastName String
-  streetAddress String 
-  city String
-  state String? // make optional
-  birthdate DateTime? // make optional
+  customerEmail String    @unique
+  firstName     String
+  middleName    String?
+  lastName      String
+  streetAddress String
+  city          String
+  state         String?
+  birthdate     DateTime?
   customerPhone String
-  ride Ride?
+  customerID    Int       @id @default(autoincrement())
+  zipcode       String
+  rides         Ride[]    @relation("CustomerRides")
 
-  @@unique([id, firstName, lastName])
-
+  @@unique([customerID, firstName, lastName])
 }
 
+model Volunteer {
+  volunteerID    Int       @id @default(autoincrement())
+  volunteerEmail String    @unique
+  firstName      String
+  middleName     String?
+  lastName       String
+  streetAddress  String
+  city           String
+  state          String?
+  zipcode        String
+  birthdate      DateTime?
+  volunteerPhone String
+  rides          Ride[]    @relation("VolunteerRides")
+
+  @@unique([volunteerID, firstName, lastName])
+}
 
 model Ride {
-  id Int @id @default(autoincrement())
-  customer Customer @relation(fields: [customerID, customerFName, customerLName], references: [id, firstName, lastName])
-  driver User @relation(fields: [driverID, driverFname, driverLname], references: [id, firstName, lastName])
-  driverID Int
-  driverFname String
-  driverLname String
-  customerID Int 
-  customerFName String
-  customerLName String
-  date DateTime @db.Date
-  time DateTime @db.Time(4)
+  customerID    Int
+  time          DateTime  @db.Time(4)
   startLocation String
-  endLocation String
+  date          DateTime  @db.Date
+  endLocation   String
+  rideID        Int       @id @default(autoincrement())
+  volunteerID   Int
+  customer      Customer  @relation("CustomerRides", fields: [customerID], references: [customerID], onDelete: Cascade)
+  volunteer     Volunteer @relation("VolunteerRides", fields: [volunteerID], references: [volunteerID], onDelete: Cascade)
 
-
-  @@unique([customerID, customerFName, customerLName])
-  @@unique([driverID, driverFname, driverLname])
+  @@unique([customerID, volunteerID])
 }
-
-// model Customer {  
-//   user User @relation(fields: [customerID], references: [id])
-//   customerID Int @id
-//   homeAddress String 
-//   @@unique([customerID, homeAddress])
-// }
-

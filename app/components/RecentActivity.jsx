@@ -1,8 +1,68 @@
-import React from 'react';
-import newMockData from '../mockdata/mock-data-new.js';
+import React, { useState, useEffect } from 'react';
 
 const RecentActivity = () => {
-  const activities = Array.isArray(newMockData) ? newMockData : [];
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRides = async () => {
+      try {
+        const response = await fetch('/api/getRides');
+        if(!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const rides = await response.json();
+
+
+        const mappedActivities = rides.map((ride) => {
+          const formattedDate = new Date(ride.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          });
+
+          const rideTime = new Date(ride.time); // This will handle the ISO string correctly
+          const formattedTime = rideTime.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true, // Use 12-hour format
+          });
+        
+          return {
+            id: ride.rideID,
+            date: formattedDate,
+            time: formattedTime,
+            clientName: `${ride.customer.firstName} ${ride.customer.lastName}`,
+            phoneNumber: ride.customer.customerPhone,
+            address: `${ride.customer.streetAddress}, ${ride.customer.city}, ${ride.customer.zipcode}`,
+            startTime: formattedTime,
+            volunteerName: `${ride.volunteer.firstName} ${ride.volunteer.lastName}`,
+            status: 'Completed', 
+            hours: '3 hrs',
+          };
+        });
+        
+        setActivities(mappedActivities);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching rides:', error);
+        setError('Failed to load recent activity.');
+        setLoading(false);
+      }
+    };
+    fetchRides();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
 
   return (
     <div className="p-5 md:p-10 mt-10 mx-auto bg-grey-100 w-full max-w-6xl rounded-2xl shadow-md">
@@ -13,7 +73,7 @@ const RecentActivity = () => {
             <li key={activity.id} className="border border-gray-300 p-4 mb-4 rounded-2xl bg-white grid grid-cols-[1fr_auto] gap-2.5 items-start shadow-md">
               <div className="activity-details">
                 <div className="activity-header">
-                  <strong>{activity.date}</strong> at {activity.time} 
+                  <strong>{activity.date}</strong>
                 </div>
                 <div><strong>Client Name:</strong> {activity.clientName}</div>
                 <div><strong>Phone Number:</strong> {activity.phoneNumber}</div>
