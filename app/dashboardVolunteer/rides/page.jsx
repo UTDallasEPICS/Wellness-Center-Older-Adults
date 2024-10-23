@@ -5,6 +5,7 @@ import DisplayRidesTable from "../../components/DisplayRidesTable";
 import ViewOnlyRow from "../../components/ViewOnlyRow";
 import data from "/app/mockdata/mock-data-new.js";
 
+
 export default function Page() {
   const [ridesData, setRidesData] = useState(data);
 

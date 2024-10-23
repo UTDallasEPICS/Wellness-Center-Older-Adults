@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-
 const ViewOnlyRow = ({ contact }) => {
   const [isReserved, setIsReserved] = useState(false);
 
   const handleButtonClick = () => {
     setIsReserved(!isReserved); 
+
   };
 
   return (
