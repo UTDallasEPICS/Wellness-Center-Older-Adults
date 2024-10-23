@@ -4,11 +4,12 @@ import "/app/styles/volunteerAdmin.css"
 
 export default function Page() {
   return (
-    <div className="page-component">
+    <div className="flex items-center justify-center h-[80vh] bg-[#fbfcf8] w-full" >
       <div className="page">
-        <h1 className="page-title">Welcome to the Admin Portal</h1>
+      <h1 class="text-center text-[#333333]">Welcome to the Admin Portal</h1>
         <a href="/registration">
-          <button className="register-button">Register Admin Here</button>
+        <button class="flex items-center justify-center text-center w-1/2 h-[50px] p-2 bg-[#419902] text-white font-bold text-lg cursor-pointer my-4 mx-auto transition-colors duration-300 hover:bg-[#357a01]">
+Register </button>
         </a>
       </div>
     </div>
