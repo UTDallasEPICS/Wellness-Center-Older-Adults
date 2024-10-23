@@ -1,18 +1,18 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, VolunteerStatus } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
   const volunteer = await prisma.volunteer.create({
     data: {
-      volunteerFname: 'John',
-      volunteerLname: 'Doe',
-      volunteerEmail: 'JohnDoe@email.com',
+      volunteerFName: 'Jane',
+      volunteerLName: 'Mary',
+      volunteerEmail: 'JaneMary@email.com',
       volunteerPhone: '123-456-7890',
-      rideStatus: 'available',
+      volunteerStatus: VolunteerStatus.OCCUPIED
     },
   });
 
-
+  console.log('Volunteer Added: ', volunteer);
 }
 
 main()

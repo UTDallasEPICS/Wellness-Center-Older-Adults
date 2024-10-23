@@ -14,7 +14,7 @@ export async function GET() {
         volunteerLname: true,
         volunteerEmail: true,
         volunteerPhone: true,
-        rideStatus: true,
+        volunteerStatus: true,
       },
     });
 

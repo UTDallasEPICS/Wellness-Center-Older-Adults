@@ -2,29 +2,29 @@
 import { useEffect, useState } from 'react';
 
 export default function test() {
-  const [volunteer, setVolunteer] = useState(null);
+  const [volunteers, setVolunteers] = useState([]);
   const [error, setError] = useState(null);
 
 
   useEffect(() => {
-    async function fetchVolunteer() {
+    async function fetchVolunteers() {
       try {
-        const response = await fetch('/api/getVolunteer');
+        const response = await fetch('/api/getAllVolunteers');
         const data = await response.json();
 
         if (response.ok) {
-          setVolunteer(data);
+          setVolunteers(data);
         }
         else{
           setError(data.error);
         }
       } catch (error) {
-        setError('Error fetching volunteer data');
+        setError('Error fetching volunteers data');
         console.error(error);
       }
     }
 
-    fetchVolunteer();
+    fetchVolunteers();
   }, []);
 
   if (error) {
@@ -33,21 +33,26 @@ export default function test() {
     </div>);
   }
 
-  if (!volunteer) {
+  if (!volunteers) {
     return (<div>
-      Loading volunteer...
+      Loading volunteers...
     </div>);
   }
 
   return(
     <div>
-      <h1>Volunteer Information</h1>
-      <p><strong>First Name:</strong> {volunteer.volunteerFname}</p>
-      <p><strong>Last Name:</strong> {volunteer.volunteerLname}</p>
-      <p><strong>Email:</strong> {volunteer.volunteerEmail}</p>
-      <p><strong>Phone:</strong> {volunteer.volunteerPhone}</p>
-      <p><strong>Ride Status:</strong> {volunteer.rideStatus}</p>
-    </div>
+      <h1>All Volunteer Information</h1>
+      {volunteers.map((volunteer, index) => (
+        <div key={index}>
+          <p><strong>First Name:</strong> {volunteer.volunteerFname}</p>
+          <p><strong>Last Name:</strong> {volunteer.volunteerLname}</p>
+          <p><strong>Email:</strong> {volunteer.volunteerEmail}</p>
+          <p><strong>Phone Number:</strong> {volunteer.volunteerPhone}</p>
+          <p><strong>Status:</strong> {volunteer.volunteerStatus}</p>
+          <hr />
+        </div>
+      ))}
+      </div>
   );
 
 
