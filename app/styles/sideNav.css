@@ -38,7 +38,6 @@
   padding: 17px 25px;
   text-align: left;
   margin: 0;
-
   color: black;
   font-family: "Open Sans", sans-serif;
   font-weight: lighter;
@@ -56,36 +55,34 @@
   background-color: white;
 }
 
-
 .sidenav {
+  position: fixed; 
+  left: 0;
+  top: 70px; 
+  height: calc(100vh - 70px); 
   width: 250px;
+  background-color: white;
   transition: width 0.3s ease;
+  z-index: 10; /* Updated to be lower than the modal */
 }
 
 .sidenav.collapsed {
-  width: 70px;
+  width: 70px; 
 }
 
-
-.sidenav.collapsed .nav-p {
-  display: none; 
-}
-
-
-.sidenav.collapsed .nav-a {
-  justify-content: center;
-}
-
-
-.toggle-btn {
+.sidenav .toggle-btn {
+  position: absolute;
+  top: 0;
+  right: 0; 
   display: flex;
   align-items: center;
-  margin: 10px;
+  justify-content: center; 
+  height: 70px;
+  width: 70px; 
+  background-color: #fff;
   cursor: pointer;
-  background: none;
-  border: none;
+  z-index: 1001;
 }
-
 
 .hamburger-icon {
   display: flex;
@@ -93,7 +90,6 @@
   justify-content: space-around;
   width: 25px;
   height: 20px;
-  margin-right: 10px; 
 }
 
 .hamburger-icon span {
@@ -103,72 +99,60 @@
   display: block;
 }
 
-
-.collapse-text {
-  font-size: 16px;
-  color: black;
+.sidenav.collapsed .hamburger-icon {
+  margin-left: 0; 
 }
 
-
-.sidenav.collapsed .collapse-text {
-  display: none;
+.sidenav .collapse-text {
+  display: none; 
 }
 
-
-@media only screen and (min-width: 700px) {
-  .navBar {
-    min-height: calc(100vh - 170px);
-    border-bottom: none;
-    border-right: 0.5px solid #d2d1d1;
-  }
-
-  .nav-p {
-    margin-top: 0;
-    display: block;
-    padding: 20px 35px;
-    text-align: left;
-
-    color: gray;
-    font-family: "Open Sans", sans-serif;
-    font-weight: lighter;
-    font-size: 20px;
-    background-color: white;
-  }
-
-  .nav-link:hover .nav-p {
-    background-color: whitesmoke;
-  }
-
-  .active .nav-p {
-    color: black;
-    border-bottom: none;
-    border-right: 4px solid black;
-  }
+.sidenav.collapsed .nav-p {
+  display: none; 
 }
 
-
-@media only screen and (max-width: 767px) {
+@media only screen and (min-width: 1024px) {
   .sidenav {
     position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    z-index: 999;
+    top: 70px;
     width: 250px; 
+  }
+
+  .sidenav.collapsed {
+    width: 70px; 
+  }
+
+  .main-content {
+    margin-left: 250px; 
+    width: calc(100% - 250px); 
+    transition: margin-left 0.3s ease, width 0.3s ease;
+  }
+
+  .sidenav.collapsed ~ .main-content {
+    margin-left: 70px; 
+    width: calc(100% - 70px);
+  }
+}
+
+@media only screen and (max-width: 1023px) {
+  .sidenav {
+    position: fixed; 
+    width: 250px;
     transition: width 0.3s ease;
   }
 
   .sidenav.collapsed {
-    width: 50px; 
+    width: 70px;
   }
 
   .main-content {
-    margin-left: 0; 
+    margin-left: 70px; 
+    width: calc(100% - 70px);
+    transition: margin-left 0.3s ease, width 0.3s ease;
   }
 
-  .toggle-btn {
-    right: 0;
+  .sidenav:not(.collapsed) ~ .main-content {
+    margin-left: 0; 
+    width: 100%;
   }
 }
-
-

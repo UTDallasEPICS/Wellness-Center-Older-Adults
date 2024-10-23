@@ -17,16 +17,13 @@ export default function DashboardLayout({ children }) {
         </a>
       </div>
 
-      <div className="flex h-[calc(100vh-180px)] bg-white overflow-y-scroll">
-        <div className={` ${isCollapsed ? 'w-1/12' : 'w-2/12'} min-h-[calc(100vh-170px)]`}>
-          <SideNav toggleCollapse={toggleCollapse} isCollapsed={isCollapsed} />
-        </div>
-        <div className={`${isCollapsed ? 'w-11/12' : 'w-10/12'} h-[calc(100%-20px)] bg-white`}>
+      <div className="flex bg-white overflow-y-scroll">
+        <SideNav toggleCollapse={toggleCollapse} isCollapsed={isCollapsed} />
+        <div className={`main-content h-[calc(100%-70px)] bg-white`}>
           {children}
         </div>
       </div>
     </div>
   );
 }
-
 

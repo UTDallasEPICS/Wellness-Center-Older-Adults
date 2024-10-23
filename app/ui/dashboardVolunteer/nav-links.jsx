@@ -1,45 +1,62 @@
 "use client";
+import { useAuth } from "../../providers/Auth";
 import Link from "next/link";
-import { useState } from "react";
+import { useState } from "react"; 
 import { usePathname } from "next/navigation";
+import "/app/globalicons.css";
 
-const links = [
-  { name: "Dashboard", href: "/dashboardVolunteer" },
-  { name: "Rides", href: "/dashboardVolunteer/rides" },
-  { name: "Hours", href: "/dashboardVolunteer/hours" },
-  { name: "Settings", href: "/dashboardVolunteer/settings" },
-];
-
-export default function NavLinks() {
+export default function NavLinks({ isCollapsed }) {
   const [activeLink, setActiveLink] = useState(null);
   const pathname = usePathname();
+  const { handleLogout } = useAuth();
 
   const handleClick = (index) => {
     setActiveLink(index);
   };
 
+  const links = [
+    { name: "Dashboard", href: "/dashboardVolunteer" },
+    { name: "Rides", href: "/dashboardVolunteer/rides" },
+    { name: "Hours", href: "/dashboardVolunteer/hours" },
+    { name: "Settings", href: "/dashboardVolunteer/settings" },
+  ];
+  
+
   return (
     <>
-      {links.map((link, index) => {
-        return (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={`flex items-center no-underline cursor-pointer ${
-              index === activeLink ? "border-b-3 border-black" : ""
+      {links.map((link, index) => (
+        <Link
+          key={link.name}
+          href={link.href}
+          className={`flex items-center text-left p-0 no-underline cursor-pointer focus:outline-none ${
+            index === activeLink ? "active" : ""
+          }`}
+          onClick={() => handleClick(index)}
+        >
+          <p
+            className={`nav-p p-4 text-lg font-light no-underline hover:bg-gray-100 ${
+              isCollapsed ? "hidden" : ""
             }`}
-            onClick={() => handleClick(index)}
           >
-            <p
-              className={`p-4 text-lg font-light hover:bg-gray-100 ${
-                index === activeLink ? "text-black" : "text-gray-500"
-              }`}
-            >
-              {link.name}
-            </p>
-          </Link>
-        );
-      })}
+            {link.name}
+          </p>
+        </Link>
+      ))}
+      <button
+        className="flex items-center text-left p-0 no-underline cursor-pointer focus:outline-none"
+        onClick={handleLogout}
+      >
+        <p
+          className={`nav-p p-4 text-lg font-light no-underline hover:bg-gray-100 ${
+            isCollapsed ? "hidden" : ""
+          }`}
+        >
+          Log Out
+        </p>
+      </button>
     </>
   );
 }
+
+
+
