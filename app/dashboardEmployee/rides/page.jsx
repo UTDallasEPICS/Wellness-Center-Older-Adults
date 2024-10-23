@@ -79,7 +79,8 @@ export default function Page() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          clientName: addFormData.clientName,        
+          clientName: addFormData.clientName,   
+          phoneNumber: addFormData.phoneNumber,     
           address: addFormData.address,
           startTime: addFormData.startTime,
         }),

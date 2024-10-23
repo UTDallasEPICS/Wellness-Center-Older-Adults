@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 
 interface RideRequestBody {
   clientName: String;
+  phoneNumber: String;
   address: String;
   startTime: String;
 }
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const { clientName, address, startTime } = (await req.json()) as RideRequestBody;
+  const { clientName, phoneNumber, address, startTime } = (await req.json()) as RideRequestBody;
 
   const time = new Date();
 
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
     data: {
       customerName: clientName.valueOf(),
       time: time,
+      customerPhone: phoneNumber.valueOf(),
       startLocation: address.valueOf(),
     },
   });

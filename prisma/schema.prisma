@@ -49,6 +49,8 @@ model Ride {
   customerName String
   driver User? @relation(fields: [driverID], references: [id])
   driverID Int? @unique
+  
+  customerPhone String
  
 
   //date DateTime @db.Date
