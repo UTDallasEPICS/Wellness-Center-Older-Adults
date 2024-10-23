@@ -1,6 +1,5 @@
 
 import Image from 'next/image';
-import "/app/styles/volunteerAdmin.css"
 
 export default function Page() {
   return (
