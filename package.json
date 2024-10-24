@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.0",
-    "@types/node": "^20.11.30",
+    "@types/node": "^22.7.9",
     "@types/react": "^18.2.73",
     "@types/react-big-calendar": "^1.8.9",
     "@types/ws": "^8.5.10",
