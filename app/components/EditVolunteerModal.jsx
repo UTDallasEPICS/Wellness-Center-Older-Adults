@@ -16,7 +16,7 @@ const EditVolunteerModal = ({
             <input
               type="text"
               name="name"
-              value={editFormData.name}
+              value={editFormData.name}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
             />
@@ -26,7 +26,7 @@ const EditVolunteerModal = ({
             <input
               type="text"
               name="phone"
-              value={editFormData.phone}
+              value={editFormData.phone}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
             />
@@ -36,7 +36,7 @@ const EditVolunteerModal = ({
             <input
               type="email"
               name="email"
-              value={editFormData.email}
+              value={editFormData.email} 
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
             />

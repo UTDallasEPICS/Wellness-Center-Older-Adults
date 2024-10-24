@@ -1,29 +1,46 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SideNav from "@/app/ui/dashboardEmployee/sidenav"; 
 
 export default function DashboardLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
+  const handleResize = () => {
+    if (window.innerWidth <= 768) {
+      setIsCollapsed(true); 
+    } else {
+      setIsCollapsed(false); 
+    }
   };
 
+  useEffect(() => {
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
-    <div className="w-full min-h-screen flex flex-col m-0">
+    <div className="flex flex-col w-full min-h-screen">
       <div className="w-full h-[70px] border-b border-gray-300">
         <a href="/dashboardEmployee">
-          <p className="text-gray-900 w-1/2 p-5 text-left font-light text-lg">WCOA</p>
+          <p className="p-5 text-lg font-light text-left text-gray-900 w-1/2">WCOA</p>
         </a>
       </div>
 
-      <div className="flex bg-white overflow-y-scroll">
-        <SideNav toggleCollapse={toggleCollapse} isCollapsed={isCollapsed} />
-        <div className={`main-content h-[calc(100%-70px)] bg-white`}>
+      <div className="flex bg-white">
+        <SideNav toggleCollapse={() => setIsCollapsed(!isCollapsed)} isCollapsed={isCollapsed} />
+        <div 
+          className={`flex-1 h-[calc(100vh-70px)] transition-all ease-in-out duration-300 ${isCollapsed ? "ml-[70px]" : "ml-0"} md:${isCollapsed ? "ml-[70px]" : "ml-[250px]"}`}
+          style={{
+            paddingLeft: window.innerWidth > 768 ? (isCollapsed ? '70px' : '250px') : '0',
+          }}
+        >
           {children}
         </div>
       </div>
     </div>
   );
 }
-

@@ -45,16 +45,16 @@ const EditableVolunteerRow = ({
         <button
           type="button"
           onClick={handleSaveClick}
-          className="bg-green-700 p-2 text-white rounded-md"
+          className="bg-green-700 p-2 text-white rounded-md" 
         >
-          ✅
+          Save
         </button>
         <button
           type="button"
           onClick={handleCancelClick}
-          className="bg-green-700 p-2 text-white rounded-md"
+          className="bg-red-700 p-2 text-white rounded-md" 
         >
-          ❌
+          Cancel
         </button>
       </td>
     </tr>
@@ -62,5 +62,3 @@ const EditableVolunteerRow = ({
 };
 
 export default EditableVolunteerRow;
-
-
