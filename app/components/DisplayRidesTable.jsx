@@ -1,12 +1,15 @@
+
 import { useState, useEffect } from "react";
 import ViewOnlyRow from "./ViewOnlyRow";
 
 const DisplayRidesTable = ({ initialContacts }) => {
   const [contacts, setContacts] = useState(initialContacts);
 
+
   useEffect(() => {
     setContacts(initialContacts);
   }, [initialContacts]);
+
 
   
   const unreservedContacts = contacts.filter(
@@ -53,6 +56,8 @@ const DisplayRidesTable = ({ initialContacts }) => {
           )}
         </tbody>
       </table>
+
+
     </div>
   );
 };

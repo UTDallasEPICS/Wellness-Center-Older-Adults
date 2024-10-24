@@ -27,4 +27,3 @@ const ViewOnlyRow = ({ contact }) => {
 };
 
 export default ViewOnlyRow;
-
