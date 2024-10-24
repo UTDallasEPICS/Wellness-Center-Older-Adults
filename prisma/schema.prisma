@@ -37,6 +37,7 @@ model Customer {
   customerPhone String
 
 
+
   @@unique([id, firstName, lastName])
 
 
@@ -50,12 +51,29 @@ model Ride {
   customerName String
   driver User? @relation(fields: [driverID], references: [id])
   driverID Int? @unique
+  
+  customerPhone String
+ 
+
   //date DateTime @db.Date
   time DateTime @db.Time(4)
   startLocation String
   //endLocation String
   status Status @default(AVAILABLE)
+
+
+
 }
+
+enum Status{
+
+  COMPLETED
+  AVAILABLE
+  RESERVED
+
+}
+
+
 
 model Volunteer{
   id Int @id @default(autoincrement())
@@ -67,14 +85,6 @@ model Volunteer{
   
 
   @@unique([id, volunteerFname, volunteerLname])
-
-}
-
-enum Status{
-  
-  COMPLETED
-  AVAILABLE
-  RESERVED
 
 }
 

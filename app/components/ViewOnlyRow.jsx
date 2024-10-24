@@ -1,11 +1,32 @@
 import React, { useState } from "react";
+import CancelRidesModel from "/app/components/CancelRidesModel.jsx"
 
 const ViewOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) => {
   const [isReserved, setIsReserved] = useState(false);
 
+  const [isCancelModelOpen, setIsCancelModelOpen] = useState(false);
+
+
+
+
+  const handleDenyCancel = () => {
+    setIsCancelModelOpen(false);
+  };
+
+  const handleConfirmCancel = () => {
+    setIsReserved(!isReserved);
+    setIsCancelModelOpen(false);
+  }
+
+
   const handleButtonClick = (event) => {
-  //  handleEditClick(event, contact); // Call the passed in handler for any additional logic
-    setIsReserved(!isReserved); // Toggle the reserved state
+    if (isReserved) {
+      setIsCancelModelOpen(true); // Show modal if cancelling
+    }
+    else{
+      setIsReserved(!isReserved);
+
+    }
   };
 
   return (
@@ -38,6 +59,15 @@ const ViewOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) =>
           </span>
         </button>
       </td>
+
+      {isCancelModelOpen && (
+        <CancelRidesModel
+          handleConfirmCancel={handleConfirmCancel}
+          handleDenyCancel = {handleDenyCancel}
+          
+        />
+      )}
+
     </tr>
   );
 };
