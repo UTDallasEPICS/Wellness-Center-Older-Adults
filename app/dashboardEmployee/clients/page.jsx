@@ -60,7 +60,7 @@ export default function Page() {
         {customers.map((customer, index) => (
           <div key={index} className="grid grid-cols-5 py-4 border-b border-gray-300 px-6">
             <p>{`${customer.firstName} ${customer.lastName}`}</p>
-            <p>{`${customer.streetAddress}, ${customer.city}, ${customer.state}, ${customer.zipcode}`}</p>
+            <p>{`${customer.streetAddress}, ${customer.city}, ${customer.state} ${customer.zipcode}`}</p>
             <p>{customer.customerEmail}</p>
             <p>{customer.customerPhone}</p>
             <p>{customer.birthdate ? new Date(customer.birthdate).toLocaleDateString() : 'N/A'}</p>
