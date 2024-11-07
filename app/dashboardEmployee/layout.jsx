@@ -6,7 +6,7 @@ export default function DashboardLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleResize = () => {
-    if (window.innerWidth <= 768) {
+    if (typeof window !== "undefined" && window.innerWidth <= 768) {
       setIsCollapsed(true); 
     } else {
       setIsCollapsed(false); 
@@ -14,12 +14,14 @@ export default function DashboardLayout({ children }) {
   };
 
   useEffect(() => {
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener('resize', handleResize);
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }
   }, []);
 
   return (
@@ -35,7 +37,7 @@ export default function DashboardLayout({ children }) {
         <div 
           className={`flex-1 h-[calc(100vh-70px)] transition-all ease-in-out duration-300 ${isCollapsed ? "ml-[70px]" : "ml-0"} md:${isCollapsed ? "ml-[70px]" : "ml-[250px]"}`}
           style={{
-            paddingLeft: window.innerWidth > 768 ? (isCollapsed ? '70px' : '250px') : '0',
+            paddingLeft: typeof window !== "undefined" && window.innerWidth > 768 ? (isCollapsed ? '70px' : '250px') : '0',
           }}
         >
           {children}
