@@ -8,7 +8,10 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "eslint .",
-    "cypress:open": "cypress open"
+    "prisma:seede2e": "node prisma/seed.e2e.js",
+    "dev:test": "env-cmd -f .env.test next dev",
+    "post-e2e": "docker compose -f docker-compose.e2e.yml down -v",
+    "test:e2e": "docker compose -f docker-compose.e2e.yml down -v && docker compose -f docker-compose.e2e.yml up -d e2e_postgres && cross-env sleep 2 && env-cmd -f .env.test npx prisma db push && env-cmd -f .env.test npm run prisma:seede2e && concurrently --kill-others --success first \"npm run dev:test\" \"wait-on http://localhost:3000 && npx cypress open\" && npm run post-e2e"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs}": [
@@ -56,8 +59,12 @@
     "@typescript-eslint/eslint-plugin": "^8.9.0",
     "@typescript-eslint/parser": "^8.9.0",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
     "copy-webpack-plugin": "^12.0.2",
+    "cross-env": "^7.0.3",
+    "cross-os": "^1.5.0",
     "cypress": "^13.15.1",
+    "env-cmd": "^10.1.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.12.0",
     "eslint-config-next": "^14.2.15",
@@ -70,7 +77,8 @@
     "prettier": "^3.3.3",
     "prisma": "^5.15.0",
     "tailwindcss": "^3.4.13",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "wait-on": "^8.0.1"
   },
   "overrides": {
     "eslint": "$eslint"

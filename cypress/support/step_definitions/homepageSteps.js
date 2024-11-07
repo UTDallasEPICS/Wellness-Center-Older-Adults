@@ -29,6 +29,7 @@ Then("the user logs in with valid credentials", () => {
 Then("the user is authenticated and redirected back to the dashboard", () => {
   cy.wait(1000);
   HomePage.verifyTitle();
+  cy.url().should("include", "dashboard");
 });
 
 Given("the user is logged in", () => {

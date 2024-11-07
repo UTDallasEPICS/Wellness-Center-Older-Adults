@@ -20,5 +20,6 @@ export default defineConfig({
   env: {
     AUTH0_USERNAME: process.env.CYPRESS_AUTH0_USERNAME,
     AUTH0_PASSWORD: process.env.CYPRESS_AUTH0_PASSWORD,
+    POSTGRES_PRISMA_URL: process.env.POSTGRES_PRISMA_URL,
   },
 });

@@ -6,12 +6,12 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { jwtVerify, importX509 } from 'jose';
 
-const localDatabasePort = 6432;
+const localDatabasePort = process.env.WEBSOCKET_PORT || 6432;;
 const localDatabaseHost = 'localhost';
 neonConfig.fetchEndpoint = `http://${localDatabaseHost}:${localDatabasePort}`;
 neonConfig.useSecureWebSocket = false; // SET TO TRUE IN PROD
 neonConfig.pipelineConnect = false;
-neonConfig.wsProxy = 'localhost:6432';
+neonConfig.wsProxy = `localhost:${localDatabasePort}`;
 const neon = new Pool({ connectionString: process.env.POSTGRES_PRISMA_URL });
 const adapter = new PrismaNeon(neon);
 const client = new PrismaClient({ adapter });
