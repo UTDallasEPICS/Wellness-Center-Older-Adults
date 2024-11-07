@@ -35,7 +35,7 @@ model Customer {
   state String? // make optional
   birthdate DateTime? // make optional
   customerPhone String
-  ride Ride?
+
 
   @@unique([id, firstName, lastName])
 
@@ -44,22 +44,31 @@ model Customer {
 
 model Ride {
   id Int @id @default(autoincrement())
-  customer Customer @relation(fields: [customerID, customerFName, customerLName], references: [id, firstName, lastName])
-  driver User @relation(fields: [driverID, driverFname, driverLname], references: [id, firstName, lastName])
-  driverID Int
-  driverFname String
-  driverLname String
-  customerID Int 
-  customerFName String
-  customerLName String
-  date DateTime @db.Date
+  //customer Customer @relation(fields: [customerID], references: [id])
+  //customerID Int @unique
+  customerName String
+  driver User? @relation(fields: [driverID], references: [id])
+  driverID Int? @unique
+  
+  customerPhone String
+ 
+
+  //date DateTime @db.Date
   time DateTime @db.Time(4)
   startLocation String
-  endLocation String
+  //endLocation String
+  status Status @default(AVAILABLE)
 
 
-  @@unique([customerID, customerFName, customerLName])
-  @@unique([driverID, driverFname, driverLname])
+
+}
+
+enum Status{
+
+  COMPLETED
+  AVAILABLE
+  RESERVED
+
 }
 
 // model Customer {  
