@@ -32,13 +32,13 @@ const ViewOnlyRow = ({ contact }) => {
 
   return (
     <tr>
-      <td>{contact.clientName}</td>
-      <td>{contact.phoneNumber}</td>
-      <td>{contact.address}</td>
-      <td>{contact.startTime}</td>
-      <td>
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{contact.clientName}</td>
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{contact.phoneNumber}</td>
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{contact.address}</td>
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{contact.startTime}</td>
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         <button
-          className={`text-white ${isReserved ? "bg-red-600" : "bg-green-600"} cursor-pointer mx-1 px-4 py-2 rounded-md`}
+          className={`text-white ${isReserved ? "bg-red-600" : "bg-[#419902]"} cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-opacity-90`}
           type="button"
           onClick={handleButtonClick}
         >

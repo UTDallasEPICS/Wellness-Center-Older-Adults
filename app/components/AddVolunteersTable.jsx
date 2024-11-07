@@ -7,7 +7,7 @@ const AddVolunteersTable = ({
   handleDeleteClick,
 }) => {
   return (
-    <div className="flex flex-col gap-2.5 p-4 max-h-[400px] overflow-x-auto overflow-y-auto font-sans rounded-lg border border-gray-300">
+    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-white">
       <h2 className="text-center text-[1.2rem] font-light text-gray-500 mt-4 mb-2">
         Volunteers
       </h2>
@@ -16,10 +16,10 @@ const AddVolunteersTable = ({
       <table className="border-collapse w-full">
         <thead>
           <tr>
-            <th className="bg-white text-center p-2 text-sm font-semibold border-b-[0.5px] border-gray-700">Name</th>
-            <th className="bg-white text-center p-2 text-sm font-semibold border-b-[0.5px] border-gray-700">Phone</th>
-            <th className="bg-white text-center p-2 text-sm font-semibold border-b-[0.5px] border-gray-700">Email</th>
-            <th className="bg-white text-center p-2 text-sm font-semibold border-b-[0.5px] border-gray-700">Actions</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Name</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Phone</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Email</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
           </tr>
         </thead>
         <tbody>
