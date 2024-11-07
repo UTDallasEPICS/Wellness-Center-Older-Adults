@@ -16,12 +16,12 @@ export default function Page() {
                 </th>
                 <th className="p-4 border-b border-r border-gray-300 bg-blue-gray-50">
                   <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Job
+                    Hours
                   </p>
                 </th>
                 <th className="p-4 border-b border-gray-300 bg-blue-gray-50">
                   <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Employed
+                    Date
                   </p>
                 </th>
               </tr>
@@ -35,7 +35,7 @@ export default function Page() {
                 </td>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Manager
+                    10
                   </p>
                 </td>
                 <td className="p-4 border-b border-gray-300">
@@ -47,12 +47,12 @@ export default function Page() {
               <tr>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Alexa Liras
+                    Bob
                   </p>
                 </td>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Developer
+                    4
                   </p>
                 </td>
                 <td className="p-4 border-b border-gray-300">
@@ -69,7 +69,7 @@ export default function Page() {
                 </td>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Executive
+                    4
                   </p>
                 </td>
                 <td className="p-4 border-b border-gray-300">
@@ -86,7 +86,7 @@ export default function Page() {
                 </td>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Developer
+                    3
                   </p>
                 </td>
                 <td className="p-4 border-b border-gray-300">
@@ -103,7 +103,7 @@ export default function Page() {
                 </td>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Manager
+                    6
                   </p>
                 </td>
                 <td className="p-4 border-b border-gray-300">
@@ -121,7 +121,7 @@ export default function Page() {
                 </td>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Designer
+                    5
                   </p>
                 </td>
                 <td className="p-4 border-b border-gray-300">
@@ -138,7 +138,7 @@ export default function Page() {
                 </td>
                 <td className="p-4 border-b border-r border-gray-300">
                   <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Product Manager
+                    8
                   </p>
                 </td>
                 <td className="p-4 border-b border-gray-300">
