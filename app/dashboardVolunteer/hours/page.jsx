@@ -6,7 +6,7 @@ export default function Page() {
       <div className="flex w-full">
         {/* Table Section */}
         <div className="w-3/4">
-          <table className="w-full text-left table-auto min-w-max border-collapse border border-8 border-white">
+          <table className="w-full text-left table-auto min-w-max border-collapse border border-4 border-[#65b037]">
             <thead>
               <tr>
                 <th className="p-4 border-b border-r border-gray-300 bg-blue-gray-50">
@@ -153,8 +153,8 @@ export default function Page() {
 
         {/* Total Hours Section */}
         <div className="flex items-center justify-center w-1/4 mt-6">
-          <div className="w-60 h-60 rounded-full inline-flex items-center justify-center bg-custom-green text-gray-700 text-xl font-bold">
-            Total Hours
+          <div className="text-[#65b037] text-[140px] bg-[#65b037]/30 w-[230px] h-[230px] rounded-full flex justify-center items-center mx-auto mt-[10%]">
+            4
           </div>
         </div>
       </div>
