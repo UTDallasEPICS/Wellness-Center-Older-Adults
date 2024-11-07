@@ -42,3 +42,6 @@ postgres-data
 /prisma/customerQueries.js
 # Package Lock
 package-lock.json
+
+#Cypress env
+cypress.env.json
