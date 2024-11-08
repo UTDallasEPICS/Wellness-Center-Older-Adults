@@ -1,4 +1,3 @@
-// mock-data-new.js
 const newMockData = [
   {
     id: 1,
@@ -59,6 +58,31 @@ const newMockData = [
     hours: 1,
     date: '2024-09-20',
     time: '5:00 PM',
+  },
+  // Added Unreserved Rides
+  {
+    id: 6,
+    clientName: 'Karen White',
+    phoneNumber: '555-666-7890',
+    address: '567 Birch St, Anytown, FL 67890',
+    startTime: '2:00 PM',
+    volunteerName: '',
+    status: 'Unreserved',
+    hours: 0,
+    date: '2024-09-19',
+    time: '2:30 PM',
+  },
+  {
+    id: 7,
+    clientName: 'Henry Black',
+    phoneNumber: '555-444-9876',
+    address: '890 Cedar St, Anytown, CA 12345',
+    startTime: '3:00 PM',
+    volunteerName: '',
+    status: 'Unreserved',
+    hours: 0,
+    date: '2024-09-18',
+    time: '3:45 PM',
   },
 ];
 
