@@ -35,6 +35,8 @@ model Customer {
   state String? // make optional
   birthdate DateTime? // make optional
   customerPhone String
+  zipcode String 
+  rides Ride[]
 
 
   @@unique([id, firstName, lastName])
@@ -51,16 +53,62 @@ model Ride {
   driverID Int? @unique
   
   customerPhone String
- 
+  //references employeeID 
+  volunteer Volunteer? @relation(fields: [volunteerID], references: [VolunteerID])
+  volunteerID Int? @unique
+  
+  customer Customer? @relation(fields: [customerID], references: [id])
+  customerID Int? @unique
+  
 
-  //date DateTime @db.Date
+  date DateTime @db.Date
   time DateTime @db.Time(4)
   startLocation String
-  //endLocation String
+  endLocation String
   status Status @default(AVAILABLE)
 
 
 
+}
+
+model Admin {
+  AdminID         Int        @id @default(autoincrement())  // Primary Key
+  email           String     @unique
+  firstName       String
+  lastName        String
+  phone           String     @unique
+  employeesHandled Employee[] // Relation to Employee (One Admin to Many Employees)
+
+  @@unique([AdminID, email])
+}
+
+model Employee {
+  EmployeeID    Int        @id @default(autoincrement())  // Primary Key
+  email         String     @unique
+  firstName     String
+  lastName      String
+  phone         String     @unique
+  //admin references employees 
+  employee Admin? @relation(fields: [adminID], references: [AdminID ])
+  adminID Int? @unique
+  volunteers    Volunteer[] // Relation to Volunteer (One Employee to Many Volunteers)
+
+  @@unique([EmployeeID, email])
+}
+
+model Volunteer {
+  VolunteerID   Int        @id @default(autoincrement())  // Primary Key
+  email         String     @unique
+  firstName     String
+  lastName      String
+  phone         String     @unique
+
+  //volunteers is referenced by employee 
+  employee Employee? @relation(fields: [employeeID], references: [EmployeeID ])
+  employeeID Int? @unique
+  rides         Ride[]     // Relation to Ride (One Volunteer to Many Rides)
+
+  @@unique([VolunteerID, email])
 }
 
 enum Status{
@@ -77,4 +125,3 @@ enum Status{
 //   homeAddress String 
 //   @@unique([customerID, homeAddress])
 // }
-
