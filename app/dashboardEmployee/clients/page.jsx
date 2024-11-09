@@ -1,15 +1,41 @@
-import "/app/styles/clientPage.css";
+"use client";
+import React, { useState, useEffect } from 'react';
+import { NextResponse } from 'next/server';
 import ClientInputForm from "/app/components/ClientInputForm.jsx";
-import ListItemContainer from "/app/components/ListItemContainer.jsx";
 
 export default function Page() {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch('/api/customer/getCustomer');
+        if (!response.ok) {
+          throw new Error('Failed to fetch customer data');
+        }
+        const data = await response.json();
+        setCustomers(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+        setError('Failed to load customer data');
+        setLoading(false);
+      }
+    };
+    fetchCustomers();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
     <div className="w-full min-h-screen bg-white flex flex-col">
       <div className="flex flex-row items-center py-8 px-8">
         <div className="text-black text-left font-light text-[30px]">
           <h1>Client Page</h1>
         </div>
-
         <div className="ml-auto pr-6">
           <ClientInputForm />
         </div>
@@ -31,20 +57,15 @@ export default function Page() {
 
       {/* Client List Table */}
       <div className="w-full flex flex-col text-black bg-white border-t border-b border-gray-300">
-        <div className="grid grid-cols-5 py-4 border-b border-gray-300 px-6">
-          <p>Jane Doe</p>
-          <p>123 Address</p>
-          <p>abc@gmail.com</p>
-          <p>123-456-789</p>
-          <p>Jan 15, 1980</p>
-        </div>
-        <div className="grid grid-cols-5 py-4 border-b border-gray-300 px-6">
-          <p>John Smith</p>
-          <p>456 Address</p>
-          <p>def@gmail.com</p>
-          <p>523-456-789</p>
-          <p>Dec 15, 1980</p>
-        </div>
+        {customers.map((customer, index) => (
+          <div key={index} className="grid grid-cols-5 py-4 border-b border-gray-300 px-6">
+            <p>{`${customer.firstName} ${customer.lastName}`}</p>
+            <p>{`${customer.streetAddress}, ${customer.city}, ${customer.state} ${customer.zipcode}`}</p>
+            <p>{customer.customerEmail}</p>
+            <p>{customer.customerPhone}</p>
+            <p>{customer.birthdate ? new Date(customer.birthdate).toLocaleDateString() : 'N/A'}</p>
+            </div>
+        ))}
       </div>
     </div>
   );

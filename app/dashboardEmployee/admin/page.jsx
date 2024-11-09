@@ -1,6 +1,3 @@
-
-import Image from 'next/image';
-
 export default function Page() {
   return (
     <div className="flex items-center justify-center h-[80vh] bg-[#fbfcf8] w-full" >
