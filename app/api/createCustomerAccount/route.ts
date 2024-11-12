@@ -49,6 +49,7 @@ export async function POST(req: Request) {
       streetAddress: 'dummy street address',
       city: 'dummy city',
       state: 'dummy state',
+      zipcode: '75024', 
       birthdate: new Date('2022-09-27T18:00:00.000Z').toISOString(),
     },
   });
