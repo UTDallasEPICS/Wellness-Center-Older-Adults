@@ -26,10 +26,17 @@ export async function POST(req: Request) {
 
   await prisma.ride.create({
     data: {
-      customerName: clientName.valueOf(),
-      time: time,
-      customerPhone: phoneNumber.valueOf(),
-      startLocation: address.valueOf(),
+        "customerName": "Alice Wonderland",
+        "customerPhone": "555-7890",
+        "driverID": 1,
+        "volunteerID": 1,
+        "customerID": 1,
+        "date": "2024-01-15T00:00:00Z",
+        "time": "08:30:00Z",
+        "startLocation": "123 Fantasy Rd",
+        "endLocation": "456 Wonderland Plaza",
+        "status": "COMPLETED"
+      
     },
   });
 
