@@ -35,7 +35,6 @@ model Customer {
   state String? // make optional
   birthdate DateTime? // make optional
   customerPhone String
-  zipcode String 
   rides Ride[]
 
 
