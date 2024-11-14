@@ -27,8 +27,8 @@ export async function POST(req: Request) {
   await prisma.ride.create({
     data: {
       customerName: clientName.valueOf(),
-      startTime:time,
-      endTime:time, 
+      startTime: time,
+      endTime: time,
       driverID: 1,
       volunteerID: 1,
       customerID: 1,
