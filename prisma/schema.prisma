@@ -65,8 +65,6 @@ model Admin {
   firstName       String
   lastName        String
   phone           String     @unique
-  employeesHandled Employee[] // Relation to Employee (One Admin to Many Employees)
-  volunteersHandled Volunteer[]
 
   @@unique([AdminID, email])
 }
@@ -77,11 +75,6 @@ model Employee {
   firstName     String
   lastName      String
   phone         String     @unique
-  //admin references employees 
-  employee Admin? @relation(fields: [adminID], references: [AdminID ])
-  adminID Int? @unique
-  volunteers    Volunteer[] // Relation to Volunteer (One Employee to Many Volunteers)
-
   @@unique([EmployeeID, email])
 }
 
@@ -92,16 +85,7 @@ model Volunteer {
   lastName      String
   phone         String     @unique
 
-  //volunteers is referenced by employee 
-  employee Employee? @relation(fields: [employeeID], references: [EmployeeID ])
-  employeeID Int? @unique
-  rides         Ride[]     // Relation to Ride (One Volunteer to Many Rides)
-
-  //volunteers is referenced by admin 
-  admin Admin? @relation(fields: [adminID], references: [AdminID ])
-  adminID Int? @unique
-  
-
+  rides         Ride[]  
   @@unique([VolunteerID, email])
 }
 
