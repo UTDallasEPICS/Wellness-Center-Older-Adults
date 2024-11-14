@@ -29,7 +29,6 @@ export async function POST(req: Request) {
       customerName: clientName.valueOf(),
       startTime: time,
       endTime: time,
-      driverID: 1,
       volunteerID: 1,
       customerID: 1,
       date: '2024-01-15T00:00:00Z',
