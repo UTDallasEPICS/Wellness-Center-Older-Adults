@@ -36,6 +36,7 @@ model Customer {
   birthdate DateTime? // make optional
   customerPhone String
   rides Ride[]
+  zipcode String
 
 
   @@unique([id, firstName, lastName])
@@ -61,7 +62,8 @@ model Ride {
   
 
   date DateTime @db.Date
-  time DateTime @db.Time(4)
+  startTime DateTime @db.Time(2)
+  endTime DateTime @db.Time(2)
   startLocation String
   endLocation String
   status Status @default(AVAILABLE)
@@ -77,6 +79,7 @@ model Admin {
   lastName        String
   phone           String     @unique
   employeesHandled Employee[] // Relation to Employee (One Admin to Many Employees)
+  volunteersHandled Volunteer[]
 
   @@unique([AdminID, email])
 }
@@ -106,6 +109,11 @@ model Volunteer {
   employee Employee? @relation(fields: [employeeID], references: [EmployeeID ])
   employeeID Int? @unique
   rides         Ride[]     // Relation to Ride (One Volunteer to Many Rides)
+
+  //volunteers is referenced by admin 
+  admin Admin? @relation(fields: [adminID], references: [AdminID ])
+  adminID Int? @unique
+  
 
   @@unique([VolunteerID, email])
 }
