@@ -14,7 +14,7 @@ datasource db {
 
 
 model Customer {
-  id Int @id @default(autoincrement())
+  customerId Int @id @default(autoincrement())
   customerEmail String @unique
   firstName String
   middleName String? // make optional
@@ -28,13 +28,13 @@ model Customer {
   zipcode String
 
 
-  @@unique([id, firstName, lastName])
+  @@unique([customerId, firstName, lastName])
 
 }
 
 
 model Ride {
-  id Int @id @default(autoincrement())
+  rideId Int @id @default(autoincrement())
   //customer Customer @relation(fields: [customerID], references: [id])
   //customerID Int @unique
   customerName String
@@ -44,7 +44,7 @@ model Ride {
   volunteer Volunteer? @relation(fields: [volunteerID], references: [VolunteerID])
   volunteerID Int? @unique
   
-  customer Customer? @relation(fields: [customerID], references: [id])
+  customer Customer? @relation(fields: [customerID], references: [customerId])
   customerID Int? @unique
   
 
