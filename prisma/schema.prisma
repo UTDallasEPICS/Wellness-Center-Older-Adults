@@ -12,17 +12,6 @@ datasource db {
   url      = env("POSTGRES_PRISMA_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  firstName String
-  lastName  String
-  phone     String   @unique
-  rides Ride[]
-
-  @@unique([id, firstName, lastName])
-
-}
 
 model Customer {
   id Int @id @default(autoincrement())
@@ -49,8 +38,6 @@ model Ride {
   //customer Customer @relation(fields: [customerID], references: [id])
   //customerID Int @unique
   customerName String
-  driver User? @relation(fields: [driverID], references: [id])
-  driverID Int? @unique
   
   customerPhone String
   //references employeeID 
