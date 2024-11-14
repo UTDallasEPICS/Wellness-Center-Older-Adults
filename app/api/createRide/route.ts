@@ -27,7 +27,12 @@ export async function POST(req: Request) {
   await prisma.ride.create({
     data: {
       customerName: clientName.valueOf(),
-      time: time,
+      startTime: time,
+      endTime: time,
+      volunteerID: 1,
+      customerID: 1,
+      date: '2024-01-15T00:00:00Z',
+      endLocation: '456 Wonderland Plaza',
       customerPhone: phoneNumber.valueOf(),
       startLocation: address.valueOf(),
     },
