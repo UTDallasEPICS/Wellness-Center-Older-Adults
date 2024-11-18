@@ -1,11 +1,11 @@
 "use client";
 import { useAuth } from "../../providers/Auth";
 import Link from "next/link";
-import { useState } from "react";
+import { useState } from "react"; 
 import { usePathname } from "next/navigation";
 import "/app/globalicons.css";
 
-export default function NavLinks() {
+export default function NavLinks({ isCollapsed }) {
   const [activeLink, setActiveLink] = useState(null);
   const pathname = usePathname();
   const { handleLogout } = useAuth();
@@ -33,7 +33,11 @@ export default function NavLinks() {
           }`}
           onClick={() => handleClick(index)}
         >
-          <p className="p-4 text-lg font-light no-underline hover:bg-gray-100">
+          <p
+            className={`nav-p p-4 text-lg font-light no-underline hover:bg-gray-100 ${
+              isCollapsed ? "hidden" : ""
+            }`}
+          >
             {link.name}
           </p>
         </Link>
@@ -42,10 +46,17 @@ export default function NavLinks() {
         className="flex items-center text-left p-0 no-underline cursor-pointer focus:outline-none"
         onClick={handleLogout}
       >
-        <p className="p-4 text-lg font-light no-underline hover:bg-gray-100">
+        <p
+          className={`nav-p p-4 text-lg font-light no-underline hover:bg-gray-100 ${
+            isCollapsed ? "hidden" : ""
+          }`}
+        >
           Log Out
         </p>
       </button>
     </>
   );
 }
+
+
+

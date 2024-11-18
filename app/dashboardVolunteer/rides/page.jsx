@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
 import DisplayRidesTable from "../../components/DisplayRidesTable";
 import ViewOnlyRow from "../../components/ViewOnlyRow";
-import data from "/app/mockdata/mock-data.json";
+import data from "/app/mockdata/mock-data-new.js";
 
 export default function Page() {
   const [ridesData, setRidesData] = useState(data);
