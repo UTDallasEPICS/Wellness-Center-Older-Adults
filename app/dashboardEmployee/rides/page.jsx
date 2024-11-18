@@ -5,14 +5,14 @@ import AddRidesTable from "/app/components/AddRidesTable.jsx";
 import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
 import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
 import AddRideForm from "/app/components/AddRideForm.jsx";
-import data from "/app/mockdata/mock-data.json";
+import newMockData from "/app/mockdata/mock-data-new"; 
 import AddRidePositive from "/app/components/AddRidePositive.jsx";
 import AddRideNeg from "/app/components/AddRideNeg.jsx";
 import { nanoid } from "nanoid";
 import { add } from "date-fns";
 
 export default function Page() {
-  const [ridesData, setRidesData] = useState(data);
+  const [ridesData, setRidesData] = useState(newMockData);
 
   const [addFormData, setAddFormData] = useState({
     clientName: "",
@@ -46,25 +46,27 @@ export default function Page() {
 
 
   const handleAddFormSubmit = async (event) => {
+
     event.preventDefault();
 
-    // Checks for if any of the inputs are empty
+    
     if (
       addFormData.clientName.trim() === "" ||
       addFormData.phoneNumber.trim() === "" ||
       addFormData.address.trim() === "" ||
       addFormData.startTime.trim() === ""
     ) {
-      // sets the notification to the error notification
-      setNotification(<AddRideNeg />);  
+     
+      setNotification(<AddRideNeg />);
 
-      // Hide error notification after 3 seconds
+     
       setTimeout(() => {
         setNotification(null);
       }, 3000);
 
-      return;  
+      return;
     }
+
 
     
 
@@ -96,7 +98,8 @@ export default function Page() {
        
   
     // else we want to add the new ride if the inputs are filled
-    const newContact = {
+    const newRide = {
+
       id: nanoid(),
       clientName: addFormData.clientName,
       phoneNumber: addFormData.phoneNumber,
@@ -105,12 +108,14 @@ export default function Page() {
       status: "Added",
       volunteerName: "",
       hours: 0,
+      date: new Date().toLocaleDateString(), 
+      time: new Date().toLocaleTimeString(), 
     };
 
-    const newContacts = [...ridesData, newContact];
-    setRidesData(newContacts);
+    const newRidesData = [...ridesData, newRide];
+    setRidesData(newRidesData);
 
-   
+  
     setAddFormData({
       clientName: "",
       phoneNumber: "",
@@ -118,10 +123,9 @@ export default function Page() {
       startTime: "",
     });
 
-    //set notification to successfully added
-    setNotification(<AddRidePositive/>); 
+   
+    setNotification(<AddRidePositive />);
 
-  
     setTimeout(() => {
       setNotification(null);
     }, 3000);
@@ -130,7 +134,7 @@ export default function Page() {
   const tabs = [
     {
       aKey: "added",
-      title: "Added",
+      title: "Added/Unreserved", 
       content: <AddRidesTable initialContacts={ridesData} />,
     },
     {
@@ -147,12 +151,11 @@ export default function Page() {
 
   return (
     <div className="h-full w-full bg-white">
-       {notification && (
+      {notification && (
         <div className="absolute top-4 right-4">
           {notification}
         </div>
       )}
-
 
       <AddRideForm
         addFormData={addFormData}
@@ -169,3 +172,4 @@ export default function Page() {
     </div>
   );
 }
+
