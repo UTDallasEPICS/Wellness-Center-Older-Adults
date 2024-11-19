@@ -1,6 +1,6 @@
 "use client";
 import React, { useState} from "react";
-import data from "/app/mockdata/mock-data.json";
+import data from "/app/mockdata/mock-data-new.js";
 import DisplayReservedRidesTable from "../components/DisplayReservedRidesTable";
 
 export default function Page() {

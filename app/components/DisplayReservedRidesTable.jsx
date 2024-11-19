@@ -1,7 +1,8 @@
 import { useState, Fragment, useEffect } from "react";
-import EditableRow from "/app/components/EditableRow.jsx";
-import ReadOnlyRow from "/app/components/ReadOnlyRow";
-import ReservedRow from "/app/components/ReservedRow";
+
+import CancelRidesModel from "/app/components/CancelRidesModel.jsx"
+import ReservedRides from "/app/components/ReservedRides.jsx"
+
 
 const DisplayReservedRidesTable = ({ initialContacts }) => {
     {
@@ -18,6 +19,11 @@ const DisplayReservedRidesTable = ({ initialContacts }) => {
       setContacts(initialContacts);
     }, [initialContacts]);
 
+    const [isCancelModelOpen, setIsCancelModelOpen] = useState(false);
+
+
+
+
 
     const handleCancelClick = (contactId) => {
       const newContacts = [...contacts];
@@ -26,45 +32,40 @@ const DisplayReservedRidesTable = ({ initialContacts }) => {
       setContacts(newContacts);
     };
 
-    
-  
-  
-  
-  
-  
+
+
     return (
-      <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
-          <table className="border-collapse ml-[0.5%] w-[99%]">
-            {/* Serves as the header of the table */}
-            <thead>
-              <tr>
-                <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Client Name</th>
-                <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
-                <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
-                <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
-                <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
-              </tr>
-            </thead>
-  
-            {/* Stores the data */}
-            <tbody>
-              {/*Pulls element from the data structure to map out information */}
-              {contacts
-                .filter((contact) => contact.status === "Reserved")
-                .map((contact) =>
-                  
-                    <ReservedRow
-                      key={contact.id}
-                      contact={contact}
-                      handleCancelClick={handleCancelClick}
-                    />
-                  )
-                }
-            </tbody>
-          </table>
-          {/* Could prob make this a separate component to make it a prompt to add info */}
+
+      <div className="p-5 md:p-10 mt-10 mx-auto bg-grey-100 w-full max-w-6xl rounded-2xl shadow-md">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full p-2.5">
+          {contacts.filter((contact) => contact.status === "Reserved").length > 0 ?
+            contacts
+              .filter((contact) => contact.status === "Reserved")
+              .map((contact) => (
+                <ReservedRides
+                  contact={contact}
+                  handleCancelClick={handleCancelClick}
+                />
+              )
+          ) : (
+            <li className="col-span-1 md:col-span-2 text-center">No reserved rides</li>
+          )
+
+            
+          }
+
+
+          
+        </ul>
       </div>
+
+      
+
     );
+
+    
+
+
   };
   
   export default DisplayReservedRidesTable;
