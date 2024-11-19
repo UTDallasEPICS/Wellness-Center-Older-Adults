@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 import EditVolunteerModal from "/app/components/EditVolunteerModal.jsx"; 
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
 import AddVolunteerForm from "/app/components/AddVolunteerForm.jsx";
-import MyCalendar from "/app/components/calendar.tsx"; 
+//import MyCalendar from "/app/components/calendar.tsx"; 
 
 export default function Page() {
   
@@ -130,7 +130,7 @@ export default function Page() {
 };
 
   const handleEditClick = (volunteer) => {
-    setEditVolunteerId(volunteer.id);
+    setEditVolunteerId(volunteer.VolunteerID);
     setEditFormData({
       firstName: volunteer.firstName,
       lastName: volunteer.lastName,
@@ -146,16 +146,38 @@ export default function Page() {
     setEditFormData({ ...editFormData, [fieldName]: fieldValue });
   };
 
-  const handleSaveClick = (event) => {
-    event.preventDefault();
-    const updatedVolunteers = volunteersData.map((volunteer) =>
-      volunteer.id === editVolunteerId
-        ? { ...volunteer, ...editFormData }
-        : volunteer
-    );
-    setVolunteersData(updatedVolunteers);
-    setEditVolunteerId(null);
-    setShowEditModal(false);
+  const handleSaveClick = async (event) => {
+    event.preventDefault()
+    try {
+      const response = await fetch('/api/editVolunteer', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: editVolunteerId,
+            ...editFormData
+          }),
+      });
+
+      const result = await response.json();
+
+      if (result.status === 200) {
+        const updatedVolunteers = volunteersData.map((volunteer) =>
+        volunteer.VolunteerID == editVolunteerId
+        ?{...volunteer, ...editFormData}:
+        volunteer);
+
+      setVolunteersData(updatedVolunteers);
+      setEditVolunteerId(null);
+      setShowEditModal(false);
+
+    } else {
+      console.error(result.message);
+    }
+  }catch (error){
+    console.error('Error updating volunteer:', error);
+  }
   };
 
   const handleDeleteClick = (VolunteerID) => {
