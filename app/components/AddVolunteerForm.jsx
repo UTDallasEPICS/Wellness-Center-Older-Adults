@@ -6,9 +6,10 @@ const AddVolunteerForm = ({
   addFormData,
 }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
+    firstName: "",
+    lastName: "",
     email: "",
+    phone: "",
   });
 
   return (
@@ -20,28 +21,28 @@ const AddVolunteerForm = ({
       >
         <div className="w-full lg:w-1/4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Name
+            First Name
           </label>
           <input
             className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
             type="text"
-            name="name"
-            placeholder="Volunteer Name"
-            value={addFormData.name}
+            name="firstName"
+            placeholder="First Name"
+            value={addFormData.firstName}
             onChange={handleAddFormChange}
           />
         </div>
 
         <div className="w-full lg:w-1/4">
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-            Phone
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            Last Name
           </label>
           <input
             className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
             type="text"
-            name="phone"
-            placeholder="Volunteer Phone"
-            value={addFormData.phone}
+            name="lastName"
+            placeholder="Last Name"
+            value={addFormData.lastName}
             onChange={handleAddFormChange}
           />
         </div>
@@ -54,11 +55,27 @@ const AddVolunteerForm = ({
             className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
             type="email"
             name="email"
-            placeholder="Volunteer Email"
+            placeholder="Email"
             value={addFormData.email}
             onChange={handleAddFormChange}
           />
         </div>
+
+        <div className="w-full lg:w-1/4">
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            Phone
+          </label>
+          <input
+            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+            type="text"
+            name="phone"
+            placeholder="Phone"
+            value={addFormData.phone}
+            onChange={handleAddFormChange}
+          />
+        </div>
+
+        
 
         <div className="w-full lg:w-auto flex items-end lg:mt-0 mt-4">
           <button

@@ -7,11 +7,11 @@ export async function GET() {
   try{
     const volunteers = await prisma.volunteer.findMany({ // find our volunteer by unique id
       select: { //what information do we want?
-        volunteerFname: true,
-        volunteerLname: true,
-        volunteerEmail: true,
-        volunteerPhone: true,
-        volunteerStatus: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        status: true,
       },
     });
 

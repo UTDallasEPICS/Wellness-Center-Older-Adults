@@ -11,6 +11,7 @@ export default function test() {
       try {
         const response = await fetch('/api/getAllVolunteers');
         const data = await response.json();
+        console.log(data);
 
         if (response.ok) {
           setVolunteers(data);
@@ -44,11 +45,11 @@ export default function test() {
       <h1>All Volunteer Information</h1>
       {volunteers.map((volunteer, index) => (
         <div key={index}>
-          <p><strong>First Name:</strong> {volunteer.volunteerFname}</p>
-          <p><strong>Last Name:</strong> {volunteer.volunteerLname}</p>
-          <p><strong>Email:</strong> {volunteer.volunteerEmail}</p>
-          <p><strong>Phone Number:</strong> {volunteer.volunteerPhone}</p>
-          <p><strong>Status:</strong> {volunteer.volunteerStatus}</p>
+          <p><strong>First Name:</strong> {volunteer.firstName}</p>
+          <p><strong>Last Name:</strong> {volunteer.lastName}</p>
+          <p><strong>Email:</strong> {volunteer.email}</p>
+          <p><strong>Phone Number:</strong> {volunteer.phone}</p>
+          <p><strong>Status:</strong> {volunteer.status}</p>
           <hr />
         </div>
       ))}

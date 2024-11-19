@@ -16,18 +16,21 @@ const AddVolunteersTable = ({
       <table className="border-collapse w-full">
         <thead>
           <tr>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Name</th>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Phone</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">First Name</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Last Name</th>
             <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Email</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Phone</th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Status</th>
             <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
           </tr>
         </thead>
         <tbody>
+          
           {volunteersData.map((volunteer) => (
             <ReadOnlyVolunteerRow
               key={volunteer.id}
               contact={volunteer}
-              handleEditClick={handleEditClick} // Ensure this is passed
+              handleEditClick={handleEditClick} 
               handleDeleteClick={handleDeleteClick}
             />
           ))}

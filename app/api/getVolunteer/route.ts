@@ -7,14 +7,14 @@ export async function GET() {
   try{
     const volunteer = await prisma.volunteer.findUnique({ // find our volunteer by unique id
       where: { // looking where to find our target based on id
-        id:1, //for now this should change later to just go through all the ids probably
+        VolunteerID:1, //for now this should change later to just go through all the ids probably
       },
       select: { //what information do we want?
-        volunteerFname: true,
-        volunteerLname: true,
-        volunteerEmail: true,
-        volunteerPhone: true,
-        volunteerStatus: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        status: true,
       },
     });
 

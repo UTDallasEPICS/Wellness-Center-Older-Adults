@@ -1,26 +1,36 @@
-const { PrismaClient, VolunteerStatus } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function main() {
-  const volunteer = await prisma.volunteer.create({
-    data: {
-      volunteerFName: 'Jane',
-      volunteerLName: 'Mary',
-      volunteerEmail: 'JaneMary@email.com',
-      volunteerPhone: '123-456-7890',
-      volunteerStatus: VolunteerStatus.OCCUPIED
-    },
-  });
-
-  console.log('Volunteer Added: ', volunteer);
+interface VolunteerRequestBody {
+  firstName: String;
+  lastName: String;
+  email: String;
+  phone: String;
 }
 
-main()
-  .then (async () => {
+
+
+
+async function addVolunteer(volunteerData) {
+  try {
+    const volunteer = await prisma.volunteer.create({
+      data: {
+        firstName: volunteerData.firstName,
+        lastName: volunteerData.lastName,
+        email: volunteerData.email,
+        phone: volunteerData.phone,
+        rides: {
+          create: [], // Empty rides array
+        },
+      },
+    });
+
+    console.log('Volunteer Added: ', volunteer);
+  } catch (error) {
+    console.error('Error adding volunteer:', error);
+  } finally {
     await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+  }
+}
+
+  
+  

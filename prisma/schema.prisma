@@ -28,9 +28,7 @@ model Customer {
   zipcode String
 
 
-
   @@unique([customerId, firstName, lastName])
-
 
 }
 
@@ -82,22 +80,23 @@ model Employee {
 
 model Volunteer {
   VolunteerID   Int        @id @default(autoincrement())  // Primary Key
-  email         String     @unique
-  firstName     String
-  lastName      String
-  phone         String     @unique
-
+  email           String     @unique
+  firstName       String
+  lastName        String
+  phone           String     @unique
+  status Status @default(AVAILABLE)
   rides         Ride[]  
   @@unique([VolunteerID, email])
 }
 
-enum Status{
+enum Status {
 
   COMPLETED
   AVAILABLE
   RESERVED
 
 }
+
 
 // model Customer {  
 //   user User @relation(fields: [customerID], references: [id])
