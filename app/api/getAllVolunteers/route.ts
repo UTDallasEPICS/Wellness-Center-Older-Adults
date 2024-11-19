@@ -7,6 +7,7 @@ export async function GET() {
   try{
     const volunteers = await prisma.volunteer.findMany({ // find our volunteer by unique id
       select: { //what information do we want?
+        VolunteerID: true,
         firstName: true,
         lastName: true,
         email: true,
@@ -19,7 +20,7 @@ export async function GET() {
     if(!volunteers || volunteers.length === 0) { // if volunteer not found return error
       return NextResponse.json({ error: 'No volunteers found' }, { status: 404 });
     }
-
+    
     return NextResponse.json(volunteers); // if found return volunteer model
 
   } catch (error) {

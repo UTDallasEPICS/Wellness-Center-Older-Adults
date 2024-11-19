@@ -33,7 +33,8 @@ const ReadOnlyVolunteerRow = ({ contact, handleEditClick, handleDeleteClick }) =
         <button
           className="text-white bg-green-700 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-800"
           type="button"
-          onClick={() => handleDeleteClick(contact.id)} 
+          
+          onClick={() => handleDeleteClick(contact.VolunteerID)} 
         >
           <span className="material-symbols-rounded">delete</span>
         </button>

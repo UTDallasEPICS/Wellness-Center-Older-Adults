@@ -158,17 +158,44 @@ export default function Page() {
     setShowEditModal(false);
   };
 
-  const handleDeleteClick = (volunteerId) => {
-    const volunteer = volunteersData.find((v) => v.id === volunteerId);
+  const handleDeleteClick = (VolunteerID) => {
+    const volunteer = volunteersData.find((v) => v.VolunteerID === VolunteerID);
     setVolunteerToDelete(volunteer);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    setVolunteersData(volunteersData.filter((volunteer) => volunteer.id !== volunteerToDelete.id));
-    setShowDeleteModal(false);
-    setVolunteerToDelete(null);
-  };
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await fetch('/api/deleteVolunteer', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: volunteerToDelete.VolunteerID
+        }),
+      });
+
+      const data = await response.json();
+
+      if(response.ok) {
+        setVolunteersData(volunteersData.filter(
+          (volunteer) => volunteer.VolunteerID !== volunteerToDelete.VolunteerID
+        ));
+
+      
+        setShowDeleteModal(false);
+        setVolunteerToDelete(null);
+      
+      } else {
+        throw new Error(data.message || 'Failed to delete volunteer');
+      }
+
+      }catch (error) {
+       console.error('Error deleting volunteer:', error);
+      }
+
+    };
 
   const handleCancelDelete = () => {
     setShowDeleteModal(false);

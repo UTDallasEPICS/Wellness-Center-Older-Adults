@@ -28,7 +28,7 @@ const AddVolunteersTable = ({
           
           {volunteersData.map((volunteer) => (
             <ReadOnlyVolunteerRow
-              key={volunteer.id}
+              key={volunteer.VolunteerID}
               contact={volunteer}
               handleEditClick={handleEditClick} 
               handleDeleteClick={handleDeleteClick}
