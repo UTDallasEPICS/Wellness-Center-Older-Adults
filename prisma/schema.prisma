@@ -25,7 +25,7 @@ model Customer {
   birthdate DateTime? // make optional
   customerPhone String
   rides Ride[]
-  zipcode String
+  customerZipCode Int
 
 
   @@unique([customerId, firstName, lastName])
