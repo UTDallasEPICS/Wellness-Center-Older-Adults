@@ -1,4 +1,4 @@
-import { PrismaClient} from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -16,18 +16,13 @@ export async function POST(req: Request) {
       message: 'Method Not Allowed',
     });
   }
-  
 
-
-  try{
-    const {firstName, lastName, email, phone} = (await req.json()) as VolunteerRequestBody;
+  try {
+    const { firstName, lastName, email, phone } = (await req.json()) as VolunteerRequestBody;
 
     const existingVolunteer = await prisma.volunteer.findFirst({
       where: {
-        OR: [
-          { email: email },
-          { phone: phone },
-        ],
+        OR: [{ email: email }, { phone: phone }],
       },
     });
 
@@ -46,8 +41,6 @@ export async function POST(req: Request) {
       }
     }
 
-
-
     const volunteer = await prisma.volunteer.create({
       data: {
         firstName: firstName,
@@ -55,17 +48,15 @@ export async function POST(req: Request) {
         email: email,
         phone: phone,
         rides: {
-          create: [], 
+          create: [],
         },
       },
     });
 
     return Response.json({
       status: 200,
-      message: 'Volunteer created successfully',
+      message: `${volunteer} created successfully!`,
     });
-
-
   } catch (error) {
     console.error('Error creating volunteer:', error);
     return Response.json({
@@ -73,6 +64,4 @@ export async function POST(req: Request) {
       message: 'Internal Server Error',
     });
   }
-  
-
 }

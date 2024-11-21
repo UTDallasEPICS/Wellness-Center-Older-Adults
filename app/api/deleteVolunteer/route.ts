@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -14,17 +14,16 @@ export async function DELETE(req: Request) {
     });
   }
 
-  try{
+  try {
     const { id } = (await req.json()) as DeleteVolunteerParams;
 
     const existingVolunteer = await prisma.volunteer.findUnique({
       where: {
         VolunteerID: id,
       },
-
     });
 
-    if(!existingVolunteer) {
+    if (!existingVolunteer) {
       return Response.json({
         status: 404,
         message: 'Volunteer not found',
@@ -35,16 +34,13 @@ export async function DELETE(req: Request) {
       where: {
         VolunteerID: id,
       },
-    })
+    });
 
     return Response.json({
       status: 200,
       message: 'Volunteer deleted successfully',
     });
-
-
-
-  }catch(error){
+  } catch (error) {
     console.error('Error deleting volunteer:', error);
     return Response.json({
       status: 500,
