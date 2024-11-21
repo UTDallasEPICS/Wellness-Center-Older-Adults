@@ -174,6 +174,10 @@ export default function Page() {
 
     } else {
       console.error(result.message);
+      setNotification(<AddVolunteerNeg errorMessage = {result.message} className = "z-[100]"/>);
+      setTimeout(() => setNotification(null), 3000);
+   
+      
     }
   }catch (error){
     console.error('Error updating volunteer:', error);

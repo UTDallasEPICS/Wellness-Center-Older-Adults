@@ -42,6 +42,35 @@
         });
       }
 
+      
+      const existingEmailVolunteer = await prisma.volunteer.findUnique({
+        where: { 
+          email: email 
+        }
+      });
+
+      if (existingEmailVolunteer && existingEmailVolunteer.VolunteerID !== id) {
+        return Response.json({
+          status: 409,
+          message: 'Email is already in use by another volunteer',
+        });
+      }
+
+      
+      const existingPhoneVolunteer = await prisma.volunteer.findUnique({
+        where: { 
+          phone: phone 
+        }
+      });
+
+      if (existingPhoneVolunteer && existingPhoneVolunteer.VolunteerID !== id) {
+        return Response.json({
+          status: 409,
+          message: 'Phone number is already in use by another volunteer',
+        });
+      }
+
+
       const updatedVolunteer = await prisma.volunteer.update({
         where: {
           VolunteerID: id,
@@ -53,6 +82,7 @@
           phone,
         },
       });
+
 
       return Response.json({
         status: 200,
