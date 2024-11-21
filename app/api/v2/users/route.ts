@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     (await request.json()) as UserRequestBody;
 
   try {
-    await prisma.user.create({
+    await prisma.admin.create({
       data: {
         email: email,
         firstName: firstName,

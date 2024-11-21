@@ -12,20 +12,9 @@ datasource db {
   url      = env("POSTGRES_PRISMA_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  firstName String
-  lastName  String
-  phone     String   @unique
-  rides Ride[]
-
-  @@unique([id, firstName, lastName])
-
-}
 
 model Customer {
-  id Int @id @default(autoincrement())
+  customerId Int @id @default(autoincrement())
   customerEmail String @unique
   firstName String
   middleName String? // make optional
@@ -35,32 +24,69 @@ model Customer {
   state String? // make optional
   birthdate DateTime? // make optional
   customerPhone String
+  rides Ride[]
+  zipcode String
 
 
-  @@unique([id, firstName, lastName])
+  @@unique([customerId, firstName, lastName])
 
 }
 
 
 model Ride {
-  id Int @id @default(autoincrement())
+  rideId Int @id @default(autoincrement())
   //customer Customer @relation(fields: [customerID], references: [id])
   //customerID Int @unique
   customerName String
-  driver User? @relation(fields: [driverID], references: [id])
-  driverID Int? @unique
   
   customerPhone String
- 
+  //references employeeID 
+  volunteer Volunteer? @relation(fields: [volunteerID], references: [VolunteerID])
+  volunteerID Int? @unique
+  
+  customer Customer? @relation(fields: [customerID], references: [customerId])
+  customerID Int? @unique
+  
 
-  //date DateTime @db.Date
-  time DateTime @db.Time(4)
+  date DateTime @db.Date
+  startTime DateTime @db.Time(2)
+  endTime DateTime @db.Time(2)
   startLocation String
-  //endLocation String
+  endLocation String
   status Status @default(AVAILABLE)
 
 
 
+}
+
+model Admin {
+  AdminID         Int        @id @default(autoincrement())  // Primary Key
+  email           String     @unique
+  firstName       String
+  lastName        String
+  phone           String     @unique
+
+  @@unique([AdminID, email])
+}
+
+model Employee {
+  EmployeeID    Int        @id @default(autoincrement())  // Primary Key
+  email         String     @unique
+  firstName     String
+  lastName      String
+  phone         String     @unique
+  @@unique([EmployeeID, email])
+}
+
+model Volunteer {
+  VolunteerID   Int        @id @default(autoincrement())  // Primary Key
+  email         String     @unique
+  firstName     String
+  lastName      String
+  phone         String     @unique
+
+  rides         Ride[]  
+  @@unique([VolunteerID, email])
 }
 
 enum Status{
@@ -77,4 +103,3 @@ enum Status{
 //   homeAddress String 
 //   @@unique([customerID, homeAddress])
 // }
-
