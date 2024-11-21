@@ -14,7 +14,7 @@ datasource db {
 
 
 model Customer {
-  customerId Int @id @default(autoincrement())
+  customerID Int @id @default(autoincrement())
   customerEmail String @unique
   firstName String
   middleName String? // make optional
@@ -28,7 +28,7 @@ model Customer {
   zipcode String
 
 
-  @@unique([customerId, firstName, lastName])
+  @@unique([customerID, firstName, lastName])
 
 }
 

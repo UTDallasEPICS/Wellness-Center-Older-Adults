@@ -6,50 +6,93 @@ interface UserRequestBody {
   customerEmail: string;
   firstName: string;
   lastName: string;
+  middleName?: string;
+  customerPhone?: string;
+  streetAddress?: string;
+  city?: string;
+  state?: string;
+  zipcode?: string;
+  birthdate?: string;
 }
 
 export async function POST(req: Request) {
-  if (req.method !== 'POST') {
-    return Response.json({
-      status: 405,
-      message: 'Method Not Allowed',
+  try {
+    if (req.method !== 'POST') {
+      return new Response(
+        JSON.stringify({
+          status: 405,
+          message: 'Method Not Allowed',
+        }),
+        { status: 405 }
+      );
+    }
+
+    const body = (await req.json()) as UserRequestBody;
+
+    // Validation: Ensure required fields are provided
+    const { customerEmail, firstName, lastName } = body;
+    if (!customerEmail || !firstName || !lastName) {
+      return new Response(
+        JSON.stringify({
+          status: 400,
+          message: 'Missing required fields: customerEmail, firstName, or lastName',
+        }),
+        { status: 400 }
+      );
+    }
+
+    
+    const existingCustomer = await prisma.customer.findUnique({
+      where: {
+        customerEmail,
+      },
     });
-  }
 
-  const { customerEmail, firstName, lastName } = (await req.json()) as UserRequestBody;
+    if (existingCustomer) {
+      return new Response(
+        JSON.stringify({
+          status: 409,
+          message: 'Customer already exists',
+        }),
+        { status: 409 }
+      );
+    }
 
-  const existingCustomer = await prisma.customer.findFirst({
-    where: {
-      customerEmail,
-      firstName,
-      lastName,
-    },
-  });
-
-  if (existingCustomer) {
-    return Response.json({
-      status: 409,
-      message: 'Customer already exists',
+    
+    const newCustomer = await prisma.customer.create({
+      data: {
+        customerEmail,
+        firstName,
+        lastName,
+        middleName: body.middleName || null, 
+        customerPhone: body.customerPhone || '0000000000',
+        streetAddress: body.streetAddress || 'N/A',
+        city: body.city || 'N/A',
+        state: body.state || 'N/A',
+        zipcode: body.zipcode || '00000',
+        birthdate: body.birthdate
+          ? new Date(body.birthdate).toISOString()
+          : null,
+      },
     });
+
+    return new Response(
+      JSON.stringify({
+        status: 201,
+        message: 'Customer created successfully',
+        data: newCustomer,
+      }),
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error creating customer:', error);
+    return new Response(
+      JSON.stringify({
+        status: 500,
+        message: 'Internal Server Error',
+        error: (error as Error).message,
+      }),
+      { status: 500 }
+    );
   }
-
-  await prisma.customer.create({
-    data: {
-      customerEmail: customerEmail, // Ensure `customerEmail` is a string
-      firstName: firstName, // Ensure `firstName` is a string
-      middleName: 'dummy middle name', // Optional, but included here
-      lastName: lastName, // Ensure `lastName` is a string
-      customerPhone: '0000000000', // Ensure it's a string
-      streetAddress: 'dummy street address', // Ensure it's a string
-      city: 'dummy city', // Ensure it's a string
-      state: 'dummy state', // Optional, included here
-      zipcode: '75024',
-      birthdate: new Date('2022-09-27T18:00:00.000Z').toISOString(), // Optional, included here
-    },
-  });
-
-  return Response.json({
-    status: 200,
-    message: 'Customer created successfully',
-  });
 }
