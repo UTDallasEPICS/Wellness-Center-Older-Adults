@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   const time = new Date();
 
   const [hours, minutes] = startTime.split(':').map(Number);
-  time.setHours(hours, minutes, 0, 0); 
+  time.setHours(hours, minutes, 0, 0);
 
   await prisma.ride.create({
     data: {

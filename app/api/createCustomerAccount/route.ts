@@ -41,7 +41,6 @@ export async function POST(req: Request) {
       );
     }
 
-    
     const existingCustomer = await prisma.customer.findUnique({
       where: {
         customerEmail,
@@ -58,21 +57,18 @@ export async function POST(req: Request) {
       );
     }
 
-    
     const newCustomer = await prisma.customer.create({
       data: {
         customerEmail,
         firstName,
         lastName,
-        middleName: body.middleName || null, 
+        middleName: body.middleName || null,
         customerPhone: body.customerPhone || '0000000000',
         streetAddress: body.streetAddress || 'N/A',
         city: body.city || 'N/A',
         state: body.state || 'N/A',
         zipcode: body.zipcode || '00000',
-        birthdate: body.birthdate
-          ? new Date(body.birthdate).toISOString()
-          : null,
+        birthdate: body.birthdate ? new Date(body.birthdate).toISOString() : null,
       },
     });
 
