@@ -67,15 +67,8 @@ export default function Page() {
       return;
     }
 
-
-    
-
-
-
-
-
     try {
-      const reply = await fetch("/api/createRide/", {
+      const reply = await fetch('/api/createRide', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
