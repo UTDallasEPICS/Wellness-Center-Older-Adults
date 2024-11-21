@@ -67,7 +67,7 @@ export async function POST(req: Request) {
         streetAddress: body.streetAddress || 'N/A',
         city: body.city || 'N/A',
         state: body.state || 'N/A',
-        zipcode: body.zipcode || '00000',
+        customerZipCode: body.customerZipCode || 0,
         birthdate: body.birthdate ? new Date(body.birthdate).toISOString() : null,
       },
     });
