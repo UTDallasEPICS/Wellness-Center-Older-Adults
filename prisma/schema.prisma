@@ -42,10 +42,12 @@ model Ride {
   customerPhone String
   //references employeeID 
   volunteer Volunteer? @relation(fields: [volunteerID], references: [VolunteerID])
-  volunteerID Int? @unique
+  volunteerID Int
   
+
   customer Customer? @relation(fields: [customerID], references: [customerID])
-  customerID Int? @unique
+  customerID Int
+
   
 
   date DateTime @db.Date

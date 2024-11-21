@@ -37,9 +37,4 @@ export async function POST(req: Request) {
       startLocation: address.valueOf(),
     },
   });
-
-  return Response.json({
-    status: 200,
-    message: 'Customer created successfully',
-  });
 }
