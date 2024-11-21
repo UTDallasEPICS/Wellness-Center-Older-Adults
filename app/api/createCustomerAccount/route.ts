@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       streetAddress: 'dummy street address', // Ensure it's a string
       city: 'dummy city', // Ensure it's a string
       state: 'dummy state', // Optional, included here
-      zipcode: '75024',
+      customerZipCode: 75024,
       birthdate: new Date('2022-09-27T18:00:00.000Z').toISOString(), // Optional, included here
     },
   });
