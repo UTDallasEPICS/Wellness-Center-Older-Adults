@@ -29,7 +29,7 @@ const handleAddClient = async (event) => {
       zipcode: "75024", 
     };
 
-    console.log("Payload:", payload); 
+     
 
     const reply = await fetch("/api/createCustomerAccount/", {
       method: "POST",
@@ -46,7 +46,6 @@ const handleAddClient = async (event) => {
     }
 
     const data = await reply.json();
-    console.log("Response:", data);
   } catch (error) {
     console.error("Error:", error);
   }
