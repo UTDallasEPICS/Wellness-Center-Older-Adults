@@ -11,7 +11,7 @@ interface UserRequestBody {
   streetAddress?: string;
   city?: string;
   state?: string;
-  zipcode?: string;
+  customerZipCode?: number;
   birthdate?: string;
 }
 

@@ -26,7 +26,7 @@ const handleAddClient = async (event) => {
       city: customerCity,
       state: customerState,
       customerPhone,
-      zipcode: "75024", 
+      customerZipCode: 75024, 
     };
 
      
