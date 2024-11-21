@@ -47,6 +47,7 @@ export async function POST(req: Request) {
       },
     });
 
+
     if (existingCustomer) {
       return new Response(
         JSON.stringify({
@@ -91,4 +92,5 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+
 }
