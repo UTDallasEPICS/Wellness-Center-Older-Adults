@@ -22,11 +22,11 @@ export default function Page() {
           setVolunteersData(data);
         }
         else{
-          setError(data.error);
+          throw new Error(data.message || 'Failed to fetch volunteer');
         }
       } catch (error) {
-        setError('Error fetching volunteers data');
-        console.error(error);
+        
+        console.error('Error fetching volunteers:', error);
       }
     }
 
