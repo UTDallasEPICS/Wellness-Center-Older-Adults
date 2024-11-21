@@ -45,7 +45,7 @@ model Ride {
   volunteerID Int
   
 
-  customer Customer? @relation(fields: [customerID], references: [customerId])
+  customer Customer? @relation(fields: [customerID], references: [customerID])
   customerID Int
 
   
