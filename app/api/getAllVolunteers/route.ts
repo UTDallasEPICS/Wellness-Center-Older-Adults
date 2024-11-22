@@ -18,11 +18,6 @@ export async function GET() {
       },
     });
 
-    if (!volunteers || volunteers.length === 0) {
-      // if volunteer not found return error
-      return NextResponse.json({ error: 'No volunteers found' }, { status: 404 });
-    }
-
     return NextResponse.json(volunteers); // if found return volunteer model
   } catch (error) {
     console.error('Error fetching volunteers:', error);

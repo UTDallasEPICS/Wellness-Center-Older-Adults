@@ -26,14 +26,26 @@ const AddVolunteersTable = ({
         </thead>
         <tbody>
           
-          {volunteersData.map((volunteer) => (
-            <ReadOnlyVolunteerRow
-              key={volunteer.VolunteerID}
-              contact={volunteer}
-              handleEditClick={handleEditClick} 
-              handleDeleteClick={handleDeleteClick}
-            />
-          ))}
+        {volunteersData.length === 0 ? 
+            //If empty then no volunteers
+            (
+              <tr>
+                <td colSpan="6" className="text-center text-lg font-semibold p-4">
+                  No volunteers available.
+                </td>
+              </tr>
+            ) : 
+          (
+            volunteersData.map((volunteer) => (
+              <ReadOnlyVolunteerRow
+                key={volunteer.VolunteerID}
+                contact={volunteer}
+                handleEditClick={handleEditClick} 
+                handleDeleteClick={handleDeleteClick}
+              />
+
+          )))}
+         
         </tbody>
       </table>
     </div>

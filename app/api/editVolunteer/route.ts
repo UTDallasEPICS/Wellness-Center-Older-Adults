@@ -34,9 +34,12 @@ export async function PUT(req: Request) {
       });
     }
 
-    const existingEmailVolunteer = await prisma.volunteer.findUnique({
+    const existingEmailVolunteer = await prisma.volunteer.findFirst({
       where: {
         email: email,
+        NOT: {
+          VolunteerID: id,
+        },
       },
     });
 
@@ -47,9 +50,12 @@ export async function PUT(req: Request) {
       });
     }
 
-    const existingPhoneVolunteer = await prisma.volunteer.findUnique({
+    const existingPhoneVolunteer = await prisma.volunteer.findFirst({
       where: {
         phone: phone,
+        NOT: {
+          VolunteerID: id,
+        },
       },
     });
 

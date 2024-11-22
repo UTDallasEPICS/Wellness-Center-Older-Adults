@@ -24,7 +24,6 @@ export default function Page() {
           throw new Error(data.message || 'Failed to fetch volunteer');
         }
       } catch (error) {
-        
         console.error('Error fetching volunteers:', error);
       }
     }
@@ -112,8 +111,9 @@ export default function Page() {
       // Only execute if we got a successful response
       if (data.status === 200) {
         setVolunteersData((prevData) => [
-          ...prevData,
-          {...newVolunteer, status: "AVAILABLE"},
+          ...prevData,  
+          {...data.volunteer,
+            status: "AVAILABLE"},
         ]);
         
         setAddFormData({ firstName: "", lastName: "", email: "", phone: "" });
@@ -232,6 +232,8 @@ export default function Page() {
     setShowEditModal(false);
   };
 
+
+
   return (
     <div className="h-full w-full bg-white px-6">
       {notification && <div className="absolute top-4 right-4">{notification}</div>}
@@ -277,6 +279,7 @@ export default function Page() {
       )}
 
       {}
+      
       {showDeleteModal && (
         <DeleteConfirmationModal
           volunteerName={`${volunteerToDelete?.firstName} ${volunteerToDelete?.lastName}`}
