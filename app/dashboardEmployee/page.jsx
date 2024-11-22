@@ -37,18 +37,3 @@ export default function Page() {
     </div>
   );
 }
-
-
-    /* 
-    <main className="main-content">
-      <div className="card-header">
-        <div className="title-bar">
-          <div className="title">Dashboard</div>
-        </div>
-      </div>
-
-      <div className="card small"></div>
-      <div className="card medium"></div>
-      <div className="card medium"></div>
-    </main>
-    */

@@ -4,14 +4,24 @@ const ReadOnlyVolunteerRow = ({ contact, handleEditClick, handleDeleteClick }) =
   return (
     <tr>
       <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
-        {contact.name}
+        {contact.firstName}
       </td>
+
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+        {contact.lastName}
+      </td>
+
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+        {contact.email}
+      </td>
+
       <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         {contact.phone}
       </td>
       <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
-        {contact.email}
+        {contact.status}
       </td>
+
       <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         <button
           className="text-white bg-green-700 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-800"
@@ -23,7 +33,8 @@ const ReadOnlyVolunteerRow = ({ contact, handleEditClick, handleDeleteClick }) =
         <button
           className="text-white bg-green-700 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-800"
           type="button"
-          onClick={() => handleDeleteClick(contact.id)} 
+          
+          onClick={() => handleDeleteClick(contact.VolunteerID)} 
         >
           <span className="material-symbols-rounded">delete</span>
         </button>
