@@ -13,33 +13,43 @@ const AddClientForm = () => {
   const [customerPhone, setCustomerPhone] = useState("");
   const [display, setDisplay] = useState(false);
 
-  const handleAddClient = async (event) => {
-    event.preventDefault();
+const handleAddClient = async (event) => {
+  event.preventDefault();
 
-    try {
-      const reply = await fetch("/api/createCustomerAccount/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          customerEmail,
-          customerFname,
-          customerLname,
-        }),
-      });
+  try {
+    const payload = {
+      customerEmail,
+      firstName: customerFname,
+      middleName: customerMname,
+      lastName: customerLname,
+      streetAddress: customerAddress,
+      city: customerCity,
+      state: customerState,
+      customerPhone,
+      customerZipCode: 75024, 
+    };
 
-      if (!reply.ok) {
-        console.log("Customer already exists");
-        return;
-      }
+     
 
-      const data = await reply.json();
-      console.log(data);
-    } catch (error) {
-      console.error(error);
+    const reply = await fetch("/api/createCustomerAccount/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!reply.ok) {
+      const errorResponse = await reply.json();
+      console.error("Error:", errorResponse.message);
+      return;
     }
-  };
+
+    const data = await reply.json();
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
 
   return (
     <div>

@@ -12,21 +12,21 @@ const EditVolunteerModal = ({
         <h2 className="text-lg font-semibold mb-4">Edit Volunteer</h2>
         <form onSubmit={handleSaveClick}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">First Name</label>
             <input
               type="text"
-              name="name"
-              value={editFormData.name}  
+              name="firstName"
+              value={editFormData.firstName}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <label className="block text-sm font-medium text-gray-700">Last Name</label>
             <input
               type="text"
-              name="phone"
-              value={editFormData.phone}  
+              name="lastName"
+              value={editFormData.lastName}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
             />
@@ -37,6 +37,16 @@ const EditVolunteerModal = ({
               type="email"
               name="email"
               value={editFormData.email} 
+              onChange={handleEditFormChange}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <input
+              type="text"
+              name="phone"
+              value={editFormData.phone}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
             />

@@ -6,12 +6,12 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { jwtVerify, importX509 } from 'jose';
 
-const localDatabasePort = 6432;
+const localDatabasePort = process.env.WEBSOCKET_PORT || 6432;
 const localDatabaseHost = 'localhost';
 neonConfig.fetchEndpoint = `http://${localDatabaseHost}:${localDatabasePort}`;
 neonConfig.useSecureWebSocket = false; // SET TO TRUE IN PROD
 neonConfig.pipelineConnect = false;
-neonConfig.wsProxy = 'localhost:6432';
+neonConfig.wsProxy = `localhost:${localDatabasePort}`;
 const neon = new Pool({ connectionString: process.env.POSTGRES_PRISMA_URL });
 const adapter = new PrismaNeon(neon);
 const client = new PrismaClient({ adapter });
@@ -41,17 +41,17 @@ export async function middleware(request: NextRequest) {
         // Token verification
         const decoded = await jwtVerify(cvtoken, key);
         const email = decoded.payload.email as string;
-        const user = await client.user.findUnique({
+        const admin = await client.admin.findUnique({
           where: { email },
         });
-        if (!user) {
+        if (!admin) {
           // If a user that is not found in the db tries to sign in
           // and take action, redirect to login
           response.cookies.set('cvtoken', '');
           response.cookies.set('cvuser', '');
           return NextResponse.redirect(logoutRedirectUrl(cvtoken), { status: 302 });
         }
-        response.cookies.set('cvuser', `${user.id}`);
+        response.cookies.set('cvuser', `${admin.AdminID}`);
         return NextResponse.next();
       } catch (err) {
         console.error(err);
