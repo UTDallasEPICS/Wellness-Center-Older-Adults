@@ -1,28 +1,50 @@
 "use client";
-import React, { useState } from "react";
-import AddVolunteerPositive from "/app/components/AddVolunteerPositive.jsx";
+import React, { useEffect, useState } from "react";
+import AddVolunteerPositive from "/app/components/AddVolunteerPositive.jsx"; //Notification Pos / Neg
 import AddVolunteerNeg from "/app/components/AddVolunteerNeg.jsx";
-import AddVolunteersTable from "/app/components/AddVolunteersTable.jsx";
-import volunteersMockData from "/app/mockdata/volunteersMockData";
-import { nanoid } from "nanoid";
-import EditVolunteerModal from "/app/components/EditVolunteerModal.jsx";
+import AddVolunteersTable from "/app/components/AddVolunteersTable.jsx"; // Volunteer Table
+import EditVolunteerModal from "/app/components/EditVolunteerModal.jsx"; 
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
 import AddVolunteerForm from "/app/components/AddVolunteerForm.jsx";
-import MyCalendar from "/app/components/calendar.tsx"; 
+//import MyCalendar from "/app/components/calendar.tsx"; 
 
 export default function Page() {
-  const [volunteersData, setVolunteersData] = useState(volunteersMockData || []);
+  
+
+  const [volunteersData, setVolunteersData] = useState([]);
+  useEffect(() => {
+    async function fetchVolunteers() {
+      try {
+        const response = await fetch('/api/getAllVolunteers');
+        const data = await response.json();
+        if (response.ok) {
+          setVolunteersData(data);
+        }
+        else{
+          throw new Error(data.message || 'Failed to fetch volunteer');
+        }
+      } catch (error) {
+        console.error('Error fetching volunteers:', error);
+      }
+    }
+
+    fetchVolunteers();
+  }, []);
+
   const [addFormData, setAddFormData] = useState({
-    name: "",
-    phone: "",
+    firstName: "",
+    lastName: "",
     email: "",
+    phone: "",
   });
 
   const [editVolunteerId, setEditVolunteerId] = useState(null);
   const [editFormData, setEditFormData] = useState({
-    name: "",
-    phone: "",
+    firstName: "",
+    lastName: "",
     email: "",
+    phone: "",
+
   });
 
   const [notification, setNotification] = useState(null);
@@ -30,7 +52,7 @@ export default function Page() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [volunteerToDelete, setVolunteerToDelete] = useState(null);
 
-  const [events, setEvents] = useState([
+  {/*const [events, setEvents] = useState([
     {
       title: 'Meeting with Jane',
       start: new Date(2024, 6, 22, 10, 0),
@@ -43,7 +65,7 @@ export default function Page() {
       end: new Date(2024, 6, 23, 13, 0),
       allDay: false,
     },
-  ]);
+  ]); */} 
 
   const handleAddFormChange = (event) => {
     const fieldName = event.target.getAttribute("name");
@@ -51,34 +73,68 @@ export default function Page() {
     setAddFormData({ ...addFormData, [fieldName]: fieldValue });
   };
 
-  const handleAddFormSubmit = (event) => {
+  const handleAddFormSubmit = async (event) => {
     event.preventDefault();
 
-    if (!addFormData.name.trim() || !addFormData.phone.trim() || !addFormData.email.trim()) {
-      setNotification(<AddVolunteerNeg />);
+    if (!addFormData.firstName.trim() || 
+        !addFormData.lastName.trim() || 
+        !addFormData.email.trim() ||
+        !addFormData.phone.trim()) {
+         
+      setNotification(<AddVolunteerNeg errorMessage="Volunteer not added! Empty Field(s)!"/>);
       setTimeout(() => setNotification(null), 3000);
       return;
     }
 
     const newVolunteer = {
-      id: nanoid(),
-      name: addFormData.name,
-      phone: addFormData.phone,
+      firstName: addFormData.firstName,
+      lastName: addFormData.lastName,
       email: addFormData.email,
+      phone: addFormData.phone,
     };
 
-    setVolunteersData([...volunteersData, newVolunteer]);
-    setAddFormData({ name: "", phone: "", email: "" });
-    setNotification(<AddVolunteerPositive />);
-    setTimeout(() => setNotification(null), 3000);
-  };
+    try {
+      const response = await fetch('/api/addVolunteer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newVolunteer),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.status === 400 || data.status === 500) {
+        throw new Error(data.message || 'Failed to add volunteer');
+      }
+
+      // Only execute if we got a successful response
+      if (data.status === 200) {
+        setVolunteersData((prevData) => [
+          ...prevData,  
+          {...data.volunteer,
+            status: "AVAILABLE"},
+        ]);
+        
+        setAddFormData({ firstName: "", lastName: "", email: "", phone: "" });
+        setNotification(<AddVolunteerPositive />);
+        setTimeout(() => setNotification(null), 3000);
+      }
+      
+    } catch (error) {
+      console.error('Error adding volunteer:', error);
+      setNotification(<AddVolunteerNeg errorMessage = {error.message}/>);
+      setTimeout(() => setNotification(null), 3000);
+    }
+};
 
   const handleEditClick = (volunteer) => {
-    setEditVolunteerId(volunteer.id);
+    setEditVolunteerId(volunteer.VolunteerID);
     setEditFormData({
-      name: volunteer.name,
-      phone: volunteer.phone,
+      firstName: volunteer.firstName,
+      lastName: volunteer.lastName,
       email: volunteer.email,
+      phone: volunteer.phone,
     });
     setShowEditModal(true); 
   };
@@ -89,29 +145,82 @@ export default function Page() {
     setEditFormData({ ...editFormData, [fieldName]: fieldValue });
   };
 
-  const handleSaveClick = (event) => {
-    event.preventDefault();
-    const updatedVolunteers = volunteersData.map((volunteer) =>
-      volunteer.id === editVolunteerId
-        ? { ...volunteer, ...editFormData }
-        : volunteer
-    );
-    setVolunteersData(updatedVolunteers);
-    setEditVolunteerId(null);
-    setShowEditModal(false);
+  const handleSaveClick = async (event) => {
+    event.preventDefault()
+    try {
+      const response = await fetch('/api/editVolunteer', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: editVolunteerId,
+            ...editFormData
+          }),
+      });
+
+      const result = await response.json();
+
+      if (result.status === 200) {
+        const updatedVolunteers = volunteersData.map((volunteer) =>
+        volunteer.VolunteerID == editVolunteerId
+        ?{...volunteer, ...editFormData}:
+        volunteer);
+
+      setVolunteersData(updatedVolunteers);
+      setEditVolunteerId(null);
+      setShowEditModal(false);
+
+    } else {
+      console.error(result.message);
+      setNotification(<AddVolunteerNeg errorMessage = {result.message} className = "z-[100]"/>);
+      setTimeout(() => setNotification(null), 3000);
+   
+      
+    }
+  }catch (error){
+    console.error('Error updating volunteer:', error);
+  }
   };
 
-  const handleDeleteClick = (volunteerId) => {
-    const volunteer = volunteersData.find((v) => v.id === volunteerId);
+  const handleDeleteClick = (VolunteerID) => {
+    const volunteer = volunteersData.find((v) => v.VolunteerID === VolunteerID);
     setVolunteerToDelete(volunteer);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    setVolunteersData(volunteersData.filter((volunteer) => volunteer.id !== volunteerToDelete.id));
-    setShowDeleteModal(false);
-    setVolunteerToDelete(null);
-  };
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await fetch('/api/deleteVolunteer', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: volunteerToDelete.VolunteerID
+        }),
+      });
+
+      const data = await response.json();
+
+      if(response.ok) {
+        setVolunteersData(volunteersData.filter(
+          (volunteer) => volunteer.VolunteerID !== volunteerToDelete.VolunteerID
+        ));
+
+      
+        setShowDeleteModal(false);
+        setVolunteerToDelete(null);
+      
+      } else {
+        throw new Error(data.message || 'Failed to delete volunteer');
+      }
+
+      }catch (error) {
+       console.error('Error deleting volunteer:', error);
+      }
+
+    };
 
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
@@ -122,6 +231,8 @@ export default function Page() {
     setEditVolunteerId(null);
     setShowEditModal(false);
   };
+
+
 
   return (
     <div className="h-full w-full bg-white px-6">
@@ -135,7 +246,7 @@ export default function Page() {
           handleAddFormChange={handleAddFormChange}
         />
       </div>
-
+      
       {}
       <div className="mt-8">
         <AddVolunteersTable
@@ -149,13 +260,14 @@ export default function Page() {
           editFormData={editFormData}
         />
       </div>
-
-      {}
+      {/*{}
+      
+      
       <div className="mt-8 mb-4 px-8">
         <h2 className="text-lg font-semibold text-center">Schedule Availability</h2>
         <MyCalendar events={events} />
       </div>
-
+      */}
       {}
       {showEditModal && (
         <EditVolunteerModal
@@ -167,9 +279,10 @@ export default function Page() {
       )}
 
       {}
+      
       {showDeleteModal && (
         <DeleteConfirmationModal
-          volunteerName={volunteerToDelete?.name}
+          volunteerName={`${volunteerToDelete?.firstName} ${volunteerToDelete?.lastName}`}
           handleConfirmDelete={handleConfirmDelete}
           handleCancelDelete={handleCancelDelete}
         />

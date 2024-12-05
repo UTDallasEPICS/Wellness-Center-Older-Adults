@@ -41,17 +41,17 @@ export async function middleware(request: NextRequest) {
         // Token verification
         const decoded = await jwtVerify(cvtoken, key);
         const email = decoded.payload.email as string;
-        const user = await client.user.findUnique({
+        const admin = await client.admin.findUnique({
           where: { email },
         });
-        if (!user) {
+        if (!admin) {
           // If a user that is not found in the db tries to sign in
           // and take action, redirect to login
           response.cookies.set('cvtoken', '');
           response.cookies.set('cvuser', '');
           return NextResponse.redirect(logoutRedirectUrl(cvtoken), { status: 302 });
         }
-        response.cookies.set('cvuser', `${user.id}`);
+        response.cookies.set('cvuser', `${admin.AdminID}`);
         return NextResponse.next();
       } catch (err) {
         console.error(err);
