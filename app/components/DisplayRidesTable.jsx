@@ -12,9 +12,7 @@ const DisplayRidesTable = ({ initialContacts }) => {
 
 
   
-  const unreservedContacts = contacts.filter(
-    (contact) => contact.status === "Unreserved"
-  );
+ 
 
   return (
     <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
@@ -28,10 +26,19 @@ const DisplayRidesTable = ({ initialContacts }) => {
               Contact Number
             </th>
             <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-              Address
+              Pick-up Address
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Drop-off Address
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Pick-up Date
             </th>
             <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
               Pick-up Time
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Drop-off Time
             </th>
             <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
               Actions
@@ -39,18 +46,17 @@ const DisplayRidesTable = ({ initialContacts }) => {
           </tr>
         </thead>
         <tbody>
-          {unreservedContacts.length > 0 ? (
-            unreservedContacts.map((contact) => (
+          {initialContacts.length > 0 ? (
+            initialContacts.map((contact) => (
               <ViewOnlyRow
                 key={contact.id}
                 contact={contact}
-                status={contact.status}
               />
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center p-4">
-                No unreserved rides available
+              <td colSpan="8" className="text-center p-4">
+                No rides available
               </td>
             </tr>
           )}
