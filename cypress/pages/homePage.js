@@ -1,20 +1,17 @@
-class HomePage {
-    visit() {
-      cy.visit("/");
-    }
-  
-    verifyTitle() {
-      cy.title().should("include", "WCOA Rides");
-    }
-
-    clickLogin() {
-      cy.contains('button', "Log In").click();
-    }
-
-    clickLogout() {
-      cy.contains('button', "Log Out").click();
-    }
+export class HomePage {
+  static visit() {
+    cy.visit('/');
   }
-  
-  export default new HomePage();
-  
+
+  static verifyTitle() {
+    cy.title().should('include', 'WCOA Rides');
+  }
+
+  static clickLogin() {
+    cy.contains('button', 'Log In').click();
+  }
+
+  static clickLogout() {
+    cy.contains('button', 'Log Out').click();
+  }
+}

@@ -6,7 +6,7 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { jwtVerify, importX509 } from 'jose';
 
-const localDatabasePort = process.env.WEBSOCKET_PORT || 6432;;
+const localDatabasePort = process.env.WEBSOCKET_PORT || 6432;
 const localDatabaseHost = 'localhost';
 neonConfig.fetchEndpoint = `http://${localDatabaseHost}:${localDatabasePort}`;
 neonConfig.useSecureWebSocket = false; // SET TO TRUE IN PROD
