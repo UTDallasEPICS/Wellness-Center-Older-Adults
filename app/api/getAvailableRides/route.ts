@@ -14,11 +14,11 @@ export async function GET(req: Request) {
   try {
     const rides = await prisma.ride.findMany({
       where: {
-        status: "AVAILABLE"
-        //NOTE: EVENTUALLY YOU SHOULD ALSO LOOK FOR RIDES THAT ARE CONNECTED TO THE ID OF 
-        //THE VOLUNTEER SHOULD ALSO BE ABLE TO  SEE WHAT RIDES THEY HAVE RESERVED 
+        status: 'AVAILABLE',
+        //NOTE: EVENTUALLY YOU SHOULD ALSO LOOK FOR RIDES THAT ARE CONNECTED TO THE ID OF
+        //THE VOLUNTEER SHOULD ALSO BE ABLE TO  SEE WHAT RIDES THEY HAVE RESERVED
       },
-      
+
       select: {
         customerName: true,
         customerPhone: true,
@@ -27,15 +27,12 @@ export async function GET(req: Request) {
         date: true,
         startTime: true,
         endTime: true,
-        
       },
     });
-
-
 
     return NextResponse.json(rides);
   } catch (error) {
     console.error('Error fetching rides:', error);
-    return NextResponse.json({ error: 'Internal server error' }, {status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
