@@ -198,5 +198,8 @@ To learn more about Prisma, take a look at the following resources:
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Learn Prisma](https://www.prisma.io/learn)
 - [Official Prisma Examples](https://github.com/prisma/prisma-examples)
+## Migration Scripts
+
+Currently the partner uses Salesforce to store information about WCOA Members. They mentioned that there is currently need to migrate that information over but maybe required in the future. 
 
 ## Deploying This Project
