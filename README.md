@@ -237,33 +237,45 @@ Currently, the Wellness Center relies on a manual system involving phone calls a
 
 **Key Features and Functionality**
 
-1. **For Transport Volunteers**
-   - View and select available rides
-   - Access client pick-up and drop-off information
-   - Mark rides as completed, including one-way or round-trip status
-   - Track personal volunteer hours automatically
+1. **Landing Page**
+  -	Implements a login button that redirects users to login to their account
+  Login Page
+  -	After filling out user credentials, should validate that they match in an account in the system which will be handled by Auth0
+  -	After logging in, should redirect users to the appropriate dashboard given their account permissions.
 
-2. **For Employees**
-   - Input new rides into the system
-   - Assign clients to rides when necessary
-   - Manage volunteer information and schedules
-   - Access comprehensive reports on ride completion and volunteer hours
+2. **Registration Page**
+-	Include a registration form that is used for creating user volunteer accounts
+Employee Dashboard
+-	Display relevant information that admins would like to see at a glance such as recently booked or completed rides
 
-3. **For Administrators**
-   - Oversee employee accounts and permissions
-   - Monitor overall system performance
-   - Generate high-level reports on program effectiveness
+3. **Employee Rides Page**
+-	Functionality to add in available rides for reservation that will be added to the database 
+-	Include table display that filters rides based on the ride’s status (available, reserved, and completed)
 
-4. **For Clients (Indirect Users)**
-   - While not directly using the app, client information and ride requests will be managed within the system
+4. **Employee Volunteers Page**
+-	Functionality to register volunteer accounts into the system
+-	Table Display that shows the status of volunteers such as if they are available to reserve a ride or occupied with a ride
 
-**Benefits of the New System**
+5. **Employee Clients Page**
+-	Functionality to register clients that regularly book rides with the organization
+-	Table display that shows the clients that are registered with the organization
 
-1. **Improved Efficiency**: Reduces time spent on manual coordination and data entry
-2. **Enhanced Volunteer Experience**: Allows volunteers to easily select and manage their own rides
-3. **Better Data Management**: Centralizes all information in a single, accessible database
-4. **Accurate Reporting**: Provides real-time data on volunteer hours and ride completions
-5. **Scalability**: Supports the growth of the volunteer program and ride services
+6. **Employee Admin Page**
+-	Implements button that redirects user to the registration page
+
+7. **Volunteer Dashboard**
+-	Display rides that users may have reserved. If no rides are reserved, indicate that the user has no ride reserved.
+
+8. **Volunteer Rides Page**
+-	Table display that shows all of the available rides that can be reserved by the volunteers (Includes functionality to also cancel rides that the user may have reserved)
+
+9. **Volunteer Hours Page**
+-	Table display that includes the rides completed by the volunteer and the hours volunteered
+
+10. **Volunteer Settings Page**
+-	Functionality to allow users to change any settings deemed necessary such as how often users may want to be notified about new rides being added such as daily or immediately.
+-	Update password / information functionality
+
 
 ## Migration Scripts
 
