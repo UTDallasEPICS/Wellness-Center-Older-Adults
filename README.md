@@ -17,6 +17,7 @@ This project is based off the template used for all EPICS CS projects. The core 
   - [Installing Docker](#installing-docker)
   - [Installing pnpm (recommended/optional)](#installing-pnpm-recommendedoptional)
 - [Running This Project](#running-this-project)
+- [Running End to End Tests](#running-end-to-end-tests)
 - [Learn More](#learn-more)
   - [Learn HTML, CSS, JavaScript, and TypeScript](#learn-html-css-javascript-and-typescript)
     - [HTML](#html)
@@ -115,6 +116,12 @@ docker compose up
 docker compose up -d
 ```
 
+Then, you must run the prisma push command:
+
+```bash
+npx prisma db push
+``` 
+
 Now, in order for logging in to work, you must seed your account information into the local database, AND add your credentials to Auth0
 Edit the seed.js file to match your credentials, and then run this command:
 
@@ -122,13 +129,6 @@ Edit the seed.js file to match your credentials, and then run this command:
 npx prisma db seed
 ```
 
-Then, you must run the prisma push command:
-
-```bash
-npx prisma db push
-``` 
-
-Make sure you have created a user in the Auth0 application dashboard as well!
 If you dont already have your .env files setup, make sure to do this as well. you may have to restart your
 docker containers for new env file changes to take effect:
 
@@ -139,12 +139,6 @@ docker compose up
 # or
 docker compose up -d
 ```
-
-Also, make sure to run:
-```bash
-npx husky init
-```
-In order to setup the pre-commit hooks.
 
 Finally, run this:
 
@@ -158,11 +152,41 @@ pnpm dev
 bun dev
 ```
 
+Make sure you have created a user in the Auth0 application dashboard as well! After one user has been created through the Auth0 dashboard, additional users can be created using the same method, or directly through our website by navigating to the admin page on the employee dashboard, and clicking the 'Register' button.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+
+## Running End to End Tests
+
+Our codebase uses Cypress with Gherkin syntax to write and run end to end tests. Running E2E tests is simple. First, make sure you have the `cypress.env.json` and the `.env.test` files in your root project directory with the proper variables (these files should be provided to you).
+
+In order to run the E2E testing suite, you can run the following command:
+
+```bash
+npm run test:e2e
+```
+
+This will run a series of commands:
+- Creates a new database for the testing enviornment
+- Runs the website locally
+- Opens the Cypress testing panel
+
+If you see patch notes, simply click next.
+
+When prompted, you can then choose the End to End Testing option. From here, choose Chrome and click the launch button.
+
+After you are in the E2E testing menu, you can choose a .feature file to test the specific feature. More information about how to write tests properly can be found in a seperate README file located under the `cypress` directory in the project.
+
+Once you are finished testing, you can simply exit out of all Cypress related windows. Once all Cypress windows are closed, the cleanup command will automatically execute. This command will:
+- Stop running the website
+- Kill and destroy the testing database
+- Cleanup all docker containers associated with testing
+
+IMPORTANT: DO NOT RUN E2E TESTS USING ANY OTHER COMMAND OTHER THAN THE ONE GIVEN HERE (SUCH AS `npx cypress open` OR `npx cypress test`), UNLESS YOU KNOW EXACTLY WHAT YOU ARE DOING.
 
 ## Learn More
 
