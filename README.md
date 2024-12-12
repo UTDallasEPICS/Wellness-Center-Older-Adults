@@ -267,6 +267,6 @@ Currently, the Wellness Center relies on a manual system involving phone calls a
 
 ## Migration Scripts
 
-Currently the partner uses Salesforce to store information about WCOA Members. They mentioned that there is currently need to migrate that information over but maybe required in the future. 
+Currently the partner uses Salesforce to store information about WCOA Members. They mentioned that there is currently no need to migrate that information over but maybe required in the future. 
 
 ## Deploying This Project
