@@ -17,6 +17,7 @@ This project is based off the template used for all EPICS CS projects. The core 
   - [Installing Docker](#installing-docker)
   - [Installing pnpm (recommended/optional)](#installing-pnpm-recommendedoptional)
 - [Running This Project](#running-this-project)
+- [Running End to End Tests](#running-end-to-end-tests)
 - [Learn More](#learn-more)
   - [Learn HTML, CSS, JavaScript, and TypeScript](#learn-html-css-javascript-and-typescript)
     - [HTML](#html)
@@ -115,6 +116,12 @@ docker compose up
 docker compose up -d
 ```
 
+Then, you must run the prisma push command:
+
+```bash
+npx prisma db push
+``` 
+
 Now, in order for logging in to work, you must seed your account information into the local database, AND add your credentials to Auth0
 Edit the seed.js file to match your credentials, and then run this command:
 
@@ -122,13 +129,6 @@ Edit the seed.js file to match your credentials, and then run this command:
 npx prisma db seed
 ```
 
-Then, you must run the prisma push command:
-
-```bash
-npx prisma db push
-``` 
-
-Make sure you have created a user in the Auth0 application dashboard as well!
 If you dont already have your .env files setup, make sure to do this as well. you may have to restart your
 docker containers for new env file changes to take effect:
 
@@ -139,12 +139,6 @@ docker compose up
 # or
 docker compose up -d
 ```
-
-Also, make sure to run:
-```bash
-npx husky init
-```
-In order to setup the pre-commit hooks.
 
 Finally, run this:
 
@@ -158,11 +152,41 @@ pnpm dev
 bun dev
 ```
 
+Make sure you have created a user in the Auth0 application dashboard as well! After one user has been created through the Auth0 dashboard, additional users can be created using the same method, or directly through our website by navigating to the admin page on the employee dashboard, and clicking the 'Register' button.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+
+## Running End to End Tests
+
+Our codebase uses Cypress with Gherkin syntax to write and run end to end tests. Running E2E tests is simple. First, make sure you have the `cypress.env.json` and the `.env.test` files in your root project directory with the proper variables (these files should be provided to you).
+
+In order to run the E2E testing suite, you can run the following command:
+
+```bash
+npm run test:e2e
+```
+
+This will run a series of commands:
+- Creates a new database for the testing enviornment
+- Runs the website locally
+- Opens the Cypress testing panel
+
+If you see patch notes, simply click next.
+
+When prompted, you can then choose the End to End Testing option. From here, choose Chrome and click the launch button.
+
+After you are in the E2E testing menu, you can choose a .feature file to test the specific feature. More information about how to write tests properly can be found in a seperate README file located under the `cypress` directory in the project.
+
+Once you are finished testing, you can simply exit out of all Cypress related windows. Once all Cypress windows are closed, the cleanup command will automatically execute. This command will:
+- Stop running the website
+- Kill and destroy the testing database
+- Cleanup all docker containers associated with testing
+
+IMPORTANT: DO NOT RUN E2E TESTS USING ANY OTHER COMMAND OTHER THAN THE ONE GIVEN HERE (SUCH AS `npx cypress open` OR `npx cypress test`), UNLESS YOU KNOW EXACTLY WHAT YOU ARE DOING.
 
 ## Learn More
 
@@ -195,8 +219,66 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 To learn more about Prisma, take a look at the following resources:
 
+
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Learn Prisma](https://www.prisma.io/learn)
 - [Official Prisma Examples](https://github.com/prisma/prisma-examples)
+
+### Conceptual Overview: 
+
+**Current Situation and Proposed Solution**
+
+Currently, the Wellness Center relies on a manual system involving phone calls and Google Sheets to coordinate rides and track volunteer hours. The proposed web application will significantly improve this process by:
+
+1. Automating ride selection for volunteers
+2. Reducing administrative workload
+3. Providing real-time tracking of rides and volunteer hours
+4. Centralizing all data in an easily accessible database
+
+**Key Features and Functionality**
+
+1. **Landing Page**
+  -	Implements a login button that redirects users to login to their account
+  Login Page
+  -	After filling out user credentials, should validate that they match in an account in the system which will be handled by Auth0
+  -	After logging in, should redirect users to the appropriate dashboard given their account permissions.
+
+2. **Registration Page**
+-	Include a registration form that is used for creating user volunteer accounts
+Employee Dashboard
+-	Display relevant information that admins would like to see at a glance such as recently booked or completed rides
+
+3. **Employee Rides Page**
+-	Functionality to add in available rides for reservation that will be added to the database 
+-	Include table display that filters rides based on the ride’s status (available, reserved, and completed)
+
+4. **Employee Volunteers Page**
+-	Functionality to register volunteer accounts into the system
+-	Table Display that shows the status of volunteers such as if they are available to reserve a ride or occupied with a ride
+
+5. **Employee Clients Page**
+-	Functionality to register clients that regularly book rides with the organization
+-	Table display that shows the clients that are registered with the organization
+
+6. **Employee Admin Page**
+-	Implements button that redirects user to the registration page
+
+7. **Volunteer Dashboard**
+-	Display rides that users may have reserved. If no rides are reserved, indicate that the user has no ride reserved.
+
+8. **Volunteer Rides Page**
+-	Table display that shows all of the available rides that can be reserved by the volunteers (Includes functionality to also cancel rides that the user may have reserved)
+
+9. **Volunteer Hours Page**
+-	Table display that includes the rides completed by the volunteer and the hours volunteered
+
+10. **Volunteer Settings Page**
+-	Functionality to allow users to change any settings deemed necessary such as how often users may want to be notified about new rides being added such as daily or immediately.
+-	Update password / information functionality
+
+
+## Migration Scripts
+
+Currently the partner uses Salesforce to store information about WCOA Members. They mentioned that there is currently no need to migrate that information over but maybe required in the future. 
 
 ## Deploying This Project
