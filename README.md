@@ -265,6 +265,8 @@ Currently, the Wellness Center relies on a manual system involving phone calls a
 4. **Accurate Reporting**: Provides real-time data on volunteer hours and ride completions
 5. **Scalability**: Supports the growth of the volunteer program and ride services
 
+## Migration Scripts
 
+Currently the partner uses Salesforce to store information about WCOA Members. They mentioned that there is currently need to migrate that information over but maybe required in the future. 
 
 ## Deploying This Project
