@@ -195,9 +195,51 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 To learn more about Prisma, take a look at the following resources:
 
+
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Learn Prisma](https://www.prisma.io/learn)
 - [Official Prisma Examples](https://github.com/prisma/prisma-examples)
+
+### Conceptual Overview: 
+
+**Current Situation and Proposed Solution**
+
+Currently, the Wellness Center relies on a manual system involving phone calls and Google Sheets to coordinate rides and track volunteer hours. The proposed web application will significantly improve this process by:
+
+1. Automating ride selection for volunteers
+2. Reducing administrative workload
+3. Providing real-time tracking of rides and volunteer hours
+4. Centralizing all data in an easily accessible database
+
+**Key Features and Functionality**
+
+1. **For Transport Volunteers**
+   - View and select available rides
+   - Access client pick-up and drop-off information
+   - Mark rides as completed, including one-way or round-trip status
+   - Track personal volunteer hours automatically
+
+2. **For Employees**
+   - Input new rides into the system
+   - Assign clients to rides when necessary
+   - Manage volunteer information and schedules
+   - Access comprehensive reports on ride completion and volunteer hours
+
+3. **For Administrators**
+   - Oversee employee accounts and permissions
+   - Monitor overall system performance
+   - Generate high-level reports on program effectiveness
+
+4. **For Clients (Indirect Users)**
+   - While not directly using the app, client information and ride requests will be managed within the system
+
+**Benefits of the New System**
+
+1. **Improved Efficiency**: Reduces time spent on manual coordination and data entry
+2. **Enhanced Volunteer Experience**: Allows volunteers to easily select and manage their own rides
+3. **Better Data Management**: Centralizes all information in a single, accessible database
+4. **Accurate Reporting**: Provides real-time data on volunteer hours and ride completions
+5. **Scalability**: Supports the growth of the volunteer program and ride services
 
 ## Migration Scripts
 
