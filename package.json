@@ -52,7 +52,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^21.0.2",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.3",
     "@eslint/compat": "^1.2.0",
-    "@types/node": "^20.11.30",
+    "@types/node": "^22.10.7",
     "@types/react": "^18.2.73",
     "@types/react-big-calendar": "^1.8.9",
     "@types/ws": "^8.5.10",
