@@ -32,7 +32,7 @@
 .confirmEditButton,
 .cancelEditButton{
   color:white;
-  background-color:#419902;
+  background-color:#48B012;
   border: none;
   margin:2px;
   padding:10px;
@@ -44,5 +44,5 @@
 /* Change button color on hover */
 .confirmEditButton:hover,
 .cancelEditButton:hover {
-  background-color: #2b6701; /* Darker green */
+  background-color: #48B012; /* Darker green */
 }

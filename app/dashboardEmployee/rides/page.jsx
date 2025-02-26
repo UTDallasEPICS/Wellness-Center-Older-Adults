@@ -16,7 +16,6 @@ export default function Page() {
 
   const [addFormData, setAddFormData] = useState({
     clientName: "",
-    phoneNumber: "",
     address: "",
     startTime: "",
   });
@@ -52,7 +51,6 @@ export default function Page() {
     
     if (
       addFormData.clientName.trim() === "" ||
-      addFormData.phoneNumber.trim() === "" ||
       addFormData.address.trim() === "" ||
       addFormData.startTime.trim() === ""
     ) {
@@ -75,7 +73,6 @@ export default function Page() {
         },
         body: JSON.stringify({
           clientName: addFormData.clientName,   
-          phoneNumber: addFormData.phoneNumber,     
           address: addFormData.address,
           startTime: addFormData.startTime,
         }),
@@ -93,9 +90,7 @@ export default function Page() {
     // else we want to add the new ride if the inputs are filled
     const newRide = {
 
-      id: nanoid(),
       clientName: addFormData.clientName,
-      phoneNumber: addFormData.phoneNumber,
       address: addFormData.address,
       startTime: addFormData.startTime,
       status: "Added",
@@ -111,7 +106,6 @@ export default function Page() {
   
     setAddFormData({
       clientName: "",
-      phoneNumber: "",
       address: "",
       startTime: "",
     });

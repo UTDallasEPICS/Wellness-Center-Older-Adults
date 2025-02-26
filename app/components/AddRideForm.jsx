@@ -1,16 +1,30 @@
 import { useState } from "react";
 
-const AddRideForm = ({
-  handleAddFormSubmit,
-  handleAddFormChange,
-  addFormData,
-}) => {
+const AddRideForm = ({ handleAddFormSubmit }) => {
   const [formData, setFormData] = useState({
     clientName: "",
-    phoneNumber: "",
-    address: "",
-    startTime: "",
+    pickupAddress: "",
+    desinationAddress: "",
+    pickUpTime: "",
+    date: "",
+    ways: "",
+    extraInfo: "",
   });
+
+  const [isTwoWayChecked, setIsTwoWayChecked] = useState(false);
+  const [isExtraOptionChecked, setIsExtraOptionChecked] = useState(false);
+
+  const handleCheckboxChange = (e, setStateFunction) => {
+    setStateFunction(e.target.checked);
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   return (
     <div className="max-w-[70%] mx-auto">
@@ -23,57 +37,119 @@ const AddRideForm = ({
           <label htmlFor="clientName" className="block text-sm font-medium text-gray-700">
             Client Name
           </label>
-          <input
+          <select
             className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
             name="clientName"
-            placeholder="Client Name"
-            value={addFormData.clientName}
-            onChange={handleAddFormChange}
-          />
+            value={formData.clientName}
+            onChange={handleFormChange}
+          >
+            <option value="">Select a Client</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
         </div>
 
         <div className="w-full lg:w-1/4">
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-            Phone Number
+          <label htmlFor="destinationAddress" className="block text-sm font-medium text-gray-700">
+            Destination
           </label>
           <input
             className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
             type="text"
-            name="phoneNumber"
-            placeholder="Client Phone"
-            value={addFormData.phoneNumber}
-            onChange={handleAddFormChange}
+            name="desinationAddress"
+            placeholder="Address"
+            value={formData.desinationAddress}
+            onChange={handleFormChange}
           />
         </div>
 
         <div className="w-full lg:w-1/4">
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-            Client Address
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
-            name="address"
-            placeholder="Client Address"
-            value={addFormData.address}
-            onChange={handleAddFormChange}
-          />
-        </div>
-
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="pickUpTime" className="block text-sm font-medium text-gray-700">
             Pick-Up Time
           </label>
           <input
             className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
             type="time"
-            name="startTime"
-            id="startTime"
-            value={addFormData.startTime}
-            onChange={handleAddFormChange}
+            name="pickUpTime"
+            value={formData.pickUpTime}
+            onChange={handleFormChange}
           />
         </div>
+
+        <div className="w-full lg:w-1/4">
+          <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+            Date
+          </label>
+          <input
+            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={handleFormChange}
+          />
+        </div>
+
+        <div className="w-full lg:w-1/4 flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="twoWay"
+            name="twoWay"
+            checked={isTwoWayChecked}
+            onChange={(e) => handleCheckboxChange(e, setIsTwoWayChecked)}
+            className="w-5 h-5"
+          />
+          <label htmlFor="twoWay" className="text-sm font-medium text-gray-700">
+            Two way?
+          </label>
+        </div>
+
+        {/* Conditionally Rendered Input Field for One Way */}
+        {isTwoWayChecked && (
+          <div className="w-full lg:w-1/4">
+            <label htmlFor="ways" className="block text-sm font-medium text-gray-700">
+              Wait Time
+            </label>
+            <input
+              className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+              type="text"
+              name="ways"
+              placeholder="Minutes"
+              value={formData.ways}
+              onChange={handleFormChange}
+            />
+          </div>
+        )}
+
+        <div className="w-full lg:w-1/4 flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="extraOption"
+            name="extraOption"
+            checked={isExtraOptionChecked}
+            onChange={(e) => handleCheckboxChange(e, setIsExtraOptionChecked)}
+            className="w-5 h-5"
+          />
+          <label htmlFor="extraOption" className="text-sm font-medium text-gray-700">
+            Other Pickup?
+          </label>
+        </div>
+
+        {/* Conditionally Rendered Input Field for Other Pickup */}
+        {isExtraOptionChecked && (
+          <div className="w-full lg:w-1/4">
+            <label htmlFor="extraInfo" className="block text-sm font-medium text-gray-700">
+              Extra Pickup Address
+            </label>
+            <input
+              className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+              type="text"
+              name="extraInfo"
+              placeholder="Enter address"
+              value={formData.extraInfo}
+              onChange={handleFormChange}
+            />
+          </div>
+        )}
 
         <div className="w-full lg:w-auto flex items-end lg:mt-0 mt-4">
           <button
@@ -83,7 +159,6 @@ const AddRideForm = ({
             Add
           </button>
         </div>
-        
       </form>
     </div>
   );
