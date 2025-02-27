@@ -42,9 +42,7 @@ model Address {
 
 model Ride {
   id Int @id @default(autoincrement())
-  customerName String
-  customerPhone String
-  customerEmail String?
+  customerID  Int
   date DateTime @db.Date
   startTime DateTime @db.Time(2)
   endTime DateTime @db.Time(2)
@@ -56,6 +54,7 @@ model Ride {
   volunteer VolunteerInfo? @relation(fields: [volunteerID], references: [id])
   addrStart Address @relation("StartAddress", fields: [startAddressID], references: [id])
   addrEnd   Address @relation("EndAddress", fields: [endAddressID], references: [id])
+  customer Customer @relation(fields: [customerID], references: [id])
 }
 
 model User {
@@ -63,7 +62,7 @@ model User {
   email     String   @unique
   firstName String
   lastName  String
-  phone     String   @unique
+  phone     String?   @unique
   role      Role
   isArchived Boolean @default(false)
   volunteer VolunteerInfo?
@@ -76,6 +75,7 @@ model Customer {
   lastName String
   addressID Int
   customerPhone String
+  rides Ride[]
   address Address @relation(fields: [addressID], references: [id])
 }
 
