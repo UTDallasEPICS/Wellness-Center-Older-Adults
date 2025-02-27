@@ -4,7 +4,6 @@
 generator client {
   provider = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-
 }
 
 datasource db {
@@ -38,7 +37,6 @@ model Address {
   endRides Ride[] @relation("EndAddress")
   customers Customer[]
 }
-
 
 model Ride {
   id Int @id @default(autoincrement())
@@ -83,7 +81,5 @@ model VolunteerInfo {
   id  Int   @id
   status  VolunteerStatus @default(AVAILABLE)
   rides   Ride[]
-  
-  // Link back to the User model using the same id
-  user    User  @relation(fields: [id], references: [id])
+  user    User  @relation(fields: [id], references: [id]) // Link back to the User model using the same id
 }
