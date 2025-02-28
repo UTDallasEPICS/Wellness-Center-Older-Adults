@@ -3,83 +3,66 @@
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
-}
-
-enum Role {
-  ADMIN
-  VOLUNTEER
-}
-
-enum VolunteerStatus {
-  AVAILABLE
-  UNAVAILABLE
-}
-
-enum RideStatus {
-  COMPLETED
-  AVAILABLE
-  RESERVED
+  provider = "sqlite"
+  url		= "file:./dev.db"
 }
 
 model Address {
-  id Int @id @default(autoincrement())
-  street String
-  city String
-  state String
+  id			Int		 @id @default(autoincrement())
+  street	  String
+  city		 String
+  state		String
   postalCode String
-  startRides Ride[] @relation("StartAddress")
-  endRides Ride[] @relation("EndAddress")
-  customers Customer[]
+  startRides Ride[]	  @relation("StartAddress")
+  endRides	Ride[]	  @relation("EndAddress")
+  customers  Customer[]
 }
 
 model Ride {
-  id Int @id @default(autoincrement())
-  customerID  Int
-  date DateTime @db.Date
-  startTime DateTime @db.Time(2)
-  endTime DateTime @db.Time(2)
-  startAddressID  Int
-  endAddressID  Int
-  specialNote String?
-  status RideStatus @default(AVAILABLE)
-  volunteerID Int?
-  volunteer VolunteerInfo? @relation(fields: [volunteerID], references: [id])
-  addrStart Address @relation("StartAddress", fields: [startAddressID], references: [id])
-  addrEnd   Address @relation("EndAddress", fields: [endAddressID], references: [id])
-  customer Customer @relation(fields: [customerID], references: [id])
+  id				 Int			  @id @default(autoincrement())
+  customerID	  Int
+  date			  DateTime
+  pickupTime	  DateTime
+  endTime		  DateTime
+  startAddressID Int
+  endAddressID	Int
+  specialNote	 String?
+  status			String			@default("AVAILABLE") // AVAILABLE, COMPLETED, or RESERVED
+  volunteerID	 Int?
+  volunteer		VolunteerInfo? @relation(fields: [volunteerID], references: [userID])
+  addrStart		Address		  @relation("StartAddress", fields: [startAddressID], references: [id])
+  addrEnd		  Address		  @relation("EndAddress", fields: [endAddressID], references: [id])
+  customer		 Customer		 @relation(fields: [customerID], references: [id])
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  firstName String
-  lastName  String
-  phone     String?   @unique
-  role      Role
-  isArchived Boolean @default(false)
-  volunteer VolunteerInfo?
+  id			Int				@id @default(autoincrement())
+  email		String			@unique
+  firstName  String
+  lastName	String
+  phone		String?		  @unique
+  role		 String // ADMIN, VOLUNTEER
+  isArchived Boolean		  @default(false)
+  volunteer  VolunteerInfo?
 }
 
 model Customer {
-  id Int @id @default(autoincrement())
-  firstName String
-  middleName String? // make optional
-  lastName String
-  addressID Int
+  id				Int	  @id @default(autoincrement())
+  firstName	  String
+  middleName	 String? // Optional
+  lastName		String
+  addressID	  Int
   customerPhone String
-  rides Ride[]
-  address Address @relation(fields: [addressID], references: [id])
+  rides			Ride[]
+  address		 Address @relation(fields: [addressID], references: [id])
 }
 
 model VolunteerInfo {
-  id  Int   @id
-  status  VolunteerStatus @default(AVAILABLE)
-  rides   Ride[]
-  user    User  @relation(fields: [id], references: [id]) // Link back to the User model using the same id
+  userID Int	 @id
+  status String @default("AVAILABLE") // AVAILABLE, UNAVAILABLE
+  rides  Ride[]
+  user	User	@relation(fields: [userID], references: [id])
 }
