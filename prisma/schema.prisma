@@ -26,7 +26,6 @@ model Ride {
   customerID	  Int
   date			  DateTime
   pickupTime	  DateTime
-  endTime		  DateTime
   startAddressID Int
   endAddressID	Int
   specialNote	 String?
