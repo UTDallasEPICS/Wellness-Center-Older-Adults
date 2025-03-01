@@ -19,13 +19,13 @@
     ]
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.e2e.js"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
     "@neondatabase/serverless": "^0.9.0",
     "@prisma/adapter-neon": "^5.11.0",
-    "@prisma/client": "^5.15.0",
+    "@prisma/client": "^6.4.1",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/react-dom": "18.2.7",
     "cookies": "^0.9.1",
@@ -75,7 +75,7 @@
     "lint-staged": "^15.2.10",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
-    "prisma": "^5.15.0",
+    "prisma": "^6.4.1",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3",
     "wait-on": "^8.0.1"

@@ -2,12 +2,13 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.admin.create({
+  await prisma.user.create({
     data: {
-        email: "e2ewcoatestuser@utdallas.edu",
-        firstName: "E2E",
-        lastName: "TEST",
-        phone: "0000000000",
+      email: "e2ewcoatestuser@utdallas.edu",
+      firstName: "E2E",
+      lastName: "TEST",
+      phone: "0000000000",
+      role: "ADMIN",
     },
   });
 
