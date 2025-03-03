@@ -49,7 +49,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@badeball/cypress-cucumber-preprocessor": "^21.0.2",
+    "@badeball/cypress-cucumber-preprocessor": "^22.0.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.3",
     "@eslint/compat": "^1.2.0",
     "@types/node": "^20.11.30",
