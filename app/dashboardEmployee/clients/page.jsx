@@ -33,7 +33,7 @@ export default function Page() {
   return (
     <div className="w-full min-h-screen bg-white flex flex-col">
       <div className="flex flex-row items-center py-8 px-8">
-        <div className="text-black text-left font-light text-[30px]">
+        <div className="text-black text-left font-light text-[]">
           <h1>Client Page</h1>
         </div>
         <div className="ml-auto pr-6">

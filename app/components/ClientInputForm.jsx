@@ -57,7 +57,7 @@ const handleAddClient = async (event) => {
         className="h-[45px] w-[45px] rounded-full text-white bg-black border-none cursor-pointer text-center text-[35px]"
         onClick={() => setDisplay((prevDisplay) => !prevDisplay)}
       >
-        <span className="material-symbols-rounded">add</span>
+        <span className="material-symbols-rounded">addjjjjj</span>
       </button>
 
       <div
