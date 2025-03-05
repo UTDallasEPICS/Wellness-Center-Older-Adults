@@ -1,69 +1,66 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model Address {
-  id          Int      @id @default(autoincrement())
-  street      String
-  city        String
-  state       String
-  postalCode  String
-  startRides  Ride[]   @relation("StartAddress")
-  endRides    Ride[]   @relation("EndAddress")
-  customers   Customer[]
+  id         Int        @id @default(autoincrement())
+  street     String
+  city       String
+  state      String
+  postalCode String
+  customers  Customer[]
+  endRides   Ride[]     @relation("EndAddress")
+  startRides Ride[]     @relation("StartAddress")
 }
 
 model Ride {
-  id            Int            @id @default(autoincrement())
-  customerID    Int
-  date          DateTime
-  pickupTime    DateTime
+  id             Int            @id @default(autoincrement())
+  customerID     Int
+  date           DateTime
+  pickupTime     DateTime
   startAddressID Int
-  endAddressID  Int
-  specialNote   String?
-  status        String         @default("AVAILABLE") // AVAILABLE, COMPLETED, or RESERVED
-  volunteerID   Int?
-  volunteer     VolunteerInfo? @relation(fields: [volunteerID], references: [id])
-  addrStart     Address        @relation("StartAddress", fields: [startAddressID], references: [id])
-  addrEnd       Address        @relation("EndAddress", fields: [endAddressID], references: [id])
-  customer      Customer       @relation(fields: [customerID], references: [id])
+  endAddressID   Int
+  specialNote    String?
+  status         String         @default("AVAILABLE")
+  volunteerID    Int?
+  customer       Customer       @relation(fields: [customerID], references: [id])
+  addrEnd        Address        @relation("EndAddress", fields: [endAddressID], references: [id])
+  addrStart      Address        @relation("StartAddress", fields: [startAddressID], references: [id])
+  volunteer      VolunteerInfo? @relation(fields: [volunteerID], references: [id])
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  firstName   String
-  lastName    String
-  phone       String?   @unique
-  role        String    // ADMIN, VOLUNTEER
-  isArchived  Boolean   @default(false)
-  volunteer   VolunteerInfo?
+  id         Int            @id @default(autoincrement())
+  email      String         @unique
+  firstName  String
+  lastName   String
+  phone      String?        @unique
+  role       String
+  isArchived Boolean        @default(false)
+  volunteer  VolunteerInfo?
 }
 
 model Customer {
-  id            Int      @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   firstName     String
-  middleName    String?  // Optional
+  middleName    String?
   lastName      String
   addressID     Int
   customerPhone String
+  address       Address @relation(fields: [addressID], references: [id])
   rides         Ride[]
-  address       Address  @relation(fields: [addressID], references: [id])
 }
 
 model VolunteerInfo {
-  id      Int     @id @default(autoincrement())
-  userID  Int     @unique
-  status  String  @default("AVAILABLE") // AVAILABLE, UNAVAILABLE
-  rides   Ride[]
-  user    User    @relation(fields: [userID], references: [id])
+  id     Int    @id @default(autoincrement())
+  userID Int    @unique
+  status String @default("AVAILABLE")
+  rides  Ride[]
+  user   User   @relation(fields: [userID], references: [id])
 }
