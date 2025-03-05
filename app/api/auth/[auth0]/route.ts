@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { loginRedirectUrl, logoutRedirectUrl } from '../auth0';
 import { cookies } from 'next/headers';
+import prisma from '../../../../util/prisma-client';
+import { jwtVerify, importX509 } from 'jose';
 
 // NOTE: this route is dynamic, and the value of 'auth0' is inferred
 // from the URL which makes the request
@@ -50,6 +52,30 @@ export async function POST(request: Request, { params }: { params: { auth0: stri
       const formData = new URLSearchParams(requestBody);
       const id_token = formData.get('id_token');
       const maxAge = 60 * 60 * 24;
+
+      // Verify user in the database
+      if (!id_token) {
+        throw new Error('id_token is null');
+      }
+      const certPem = process.env.CERT_PEM;
+      if (!certPem) {
+        throw new Error('Certificate not found in environment variables or code');
+      }
+      const key = await importX509(certPem, 'RS256');
+      const decoded = await jwtVerify(id_token, key);
+      const email = decoded.payload.email as string;
+      const admin = await prisma.user.findUnique({
+        where: { email },
+      });
+      if (!admin) {
+        // If a user that is not found in the db tries to sign in
+        // and take action, redirect to login
+        const ret = NextResponse.redirect(logoutRedirectUrl(id_token as string), { status: 302 });
+        ret.cookies.set('cvtoken', '');
+        ret.cookies.set('cvuser', '');
+        return ret;
+      }
+
       const ret = NextResponse.redirect('http://localhost:3000/dashboardEmployee', { status: 302 });
       ret.cookies.set({
         name: 'cvtoken',
@@ -59,10 +85,11 @@ export async function POST(request: Request, { params }: { params: { auth0: stri
         maxAge: maxAge,
         secure: false, // CHANGE TO TRUE IN PROD
       });
+      ret.cookies.set('cvuser', `${admin.id}`);
       return ret;
     } catch (error) {
       console.error('Error parsing Request:', error);
-      return Response.json({
+      return NextResponse.json({
         error: 'Invalid Request',
         status: 400,
       });
