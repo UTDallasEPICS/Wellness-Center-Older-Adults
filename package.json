@@ -8,7 +8,7 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "eslint .",
-    "prisma:seede2e": "node prisma/seed.e2e.js",
+    "prisma:seed": "node prisma/seed.js",
     "dev:test": "env-cmd -f .env.test next dev",
     "post-e2e": "docker compose -f docker-compose.e2e.yml down -v",
     "test:e2e": "docker compose -f docker-compose.e2e.yml down -v && docker compose -f docker-compose.e2e.yml up -d e2e_postgres && cross-env node wait.mjs && env-cmd -f .env.test npx prisma db push && env-cmd -f .env.test npm run prisma:seede2e && concurrently --kill-others --success first \"npm run dev:test\" \"wait-on http://localhost:3000 && npx cypress open\" && npm run post-e2e"
@@ -25,7 +25,7 @@
     "@auth0/nextjs-auth0": "^3.5.0",
     "@neondatabase/serverless": "^0.9.0",
     "@prisma/adapter-neon": "^5.11.0",
-    "@prisma/client": "^5.15.0",
+    "@prisma/client": "^6.4.1",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/react-dom": "18.2.7",
     "cookies": "^0.9.1",
@@ -75,7 +75,7 @@
     "lint-staged": "^15.2.10",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
-    "prisma": "^5.15.0",
+    "prisma": "^6.4.1",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3",
     "wait-on": "^8.0.1"
