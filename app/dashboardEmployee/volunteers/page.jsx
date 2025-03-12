@@ -21,7 +21,7 @@ export default function Page() {
           setVolunteersData(data);
         }
         else{
-          throw new Error(data.message || 'Failed to fetch volunteer');
+          throw new Error(data.message || 'Failed to fetch volunteers');
         }
       } catch (error) {
         console.error('Error fetching volunteers:', error);
