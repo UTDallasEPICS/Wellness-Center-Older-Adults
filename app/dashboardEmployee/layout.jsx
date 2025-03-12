@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import SideNav from "@/app/ui/dashboardEmployee/sidenav"; 
+import SideNav from "@/app/components/Sidebar/sidenav"; 
 
 export default function DashboardLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);

@@ -1,38 +1,26 @@
-.footer-component {
-  align-items: center;
-  background-color: lightgray;
-  height: 150px;
-  width: 100%;
-  margin: 0;
-  margin-bottom: 0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.footer-container {
-  background-color: #f8f9fa; /* Soft white background */
-  color: #35424a; /* Dark blue-gray text */
-  padding: 10px;
-  text-align: center;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
-  border-top: 1px solid #eaeaea; /* Adds a light line at the top of the footer */
-  margin-bottom: 0;
-}
+@layer components {
+  .footer-component {
+    @apply flex items-center bg-gray-300 h-[150px] w-full m-0 mb-0;
+  }
 
-.footer-container h2 {
-  font-weight: 60px;
-  margin-bottom: 0px;
-  color: #090a0b; /* Adds a touch of color */
-}
+  .footer-container {
+    @apply bg-gray-50 text-gray-800 p-2.5 text-center font-sans shadow-[0_-2px_5px_rgba(0,0,0,0.1)] border-t border-gray-200 mb-0;
+  }
 
-.address,
-.contact {
-  margin: 10px 0;
-  font-size: 1em; /* Ensures the font size is consistent */
-}
+  .footer-container h2 {
+    @apply font-normal text-4xl mb-0 text-gray-900;
+  }
 
-.disclaimer {
-  margin-top: 20px;
-  font-size: 0.85em;
-  color: #7c7c7c; /* Soft gray text */
-  font-style: italic;
+  .address,
+  .contact {
+    @apply my-2.5 text-base;
+  }
+
+  .disclaimer {
+    @apply mt-5 text-sm text-gray-500 italic;
+  }
 }

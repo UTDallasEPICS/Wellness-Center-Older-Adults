@@ -1,23 +1,13 @@
-button{
-cursor: pointer;
-border: none;
-color: #ffffff;
-padding: 15px 32px;
-text-align: center;
-vertical-align: middle;
-text-decoration: none;
-display: inline-block;
-font-size: 25px;
-background-color: #419902;
-position: absolute;
-top: 60%;
-left: 50%;
--ms-transform: translate(-50%, -50%);
-transform: translate(-50%, -50%);
-border-radius: 30px;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-}
+@layer components {
+  button {
+    @apply cursor-pointer border-none text-white py-4 px-8 text-center align-middle no-underline inline-block text-2xl bg-green-600 absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-3xl;
+  }
 
-button:hover{
-  opacity: 0.9;
+  button:hover {
+    @apply opacity-90;
+  }
 }

@@ -1,24 +1,21 @@
-.listContainer {
-  width: 100%;
-  height: 80px;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  display: flex;
-  flex-direction: row;
-}
+@layer components {
+  .listContainer {
+    @apply w-full h-[80px] flex flex-row;
+  }
 
-.listContainer p {
-  padding: 5px 68px;
-  text-align: left;
-  font-family: "Open Sans", sans-serif;
-  font-weight: lighter;
-  font-size: 15px;
-  background-color: white;
-  margin: 0;
-}
+  .listContainer p {
+    @apply p-[5px_68px] text-left font-sans font-light text-sm bg-white m-0;
+  }
 
-.listContainer:nth-child(odd) {
-  color: white;
-}
-.listContainer:nth-child(even) {
-  color: gray;
+  .listContainer:nth-child(odd) {
+    @apply text-white;
+  }
+
+  .listContainer:nth-child(even) {
+    @apply text-gray-500;
+  }
 }

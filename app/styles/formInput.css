@@ -1,32 +1,29 @@
-.formInput{
-  display: flex;
-  flex-direction: column;
-  width: 280px;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-input{
-  padding: 15px;
-  margin: 10px 0;
-}
+@layer components {
+  .formInput {
+    @apply flex flex-col w-[280px];
+  }
 
-label{
-  font-weight: bold;
-  font-size: 14px;
-  color:darkgreen;
-}
+  input {
+    @apply p-3.5 my-2.5;
+  }
 
-span{
-  font-weight: bold;
-  font-size: 12px;
-  padding:3px;
-  color: red;
-  display:none;
-}
+  label {
+    @apply font-bold text-sm text-green-800;
+  }
 
-input:invalid[focused="true"]:not(:placeholder-shown) {
-  border: 1px solid red;
-}
+  span {
+    @apply font-bold text-xs p-0.5 text-red-600 hidden;
+  }
 
-input:invalid[focused="true"]:not(:placeholder-shown) ~ span {
-  display: block;
+  input:invalid[focused="true"]:not(:placeholder-shown) {
+    @apply border border-red-500;
+  }
+
+  input:invalid[focused="true"]:not(:placeholder-shown) ~ span {
+    @apply block;
+  }
 }

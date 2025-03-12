@@ -1,5 +1,9 @@
-.ridesPageContainer {
-  height: 100%;
-  width: 100%;
-  background-color: white;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .ridesPageContainer {
+    @apply h-full w-full bg-white;
+  }
 }

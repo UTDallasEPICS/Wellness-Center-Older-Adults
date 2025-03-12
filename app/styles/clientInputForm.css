@@ -1,143 +1,71 @@
-.openButton {
-  height: 45px;
-  width: 45px;
-  border-radius: 50%;
-  color: white;
-  background-color: black;
-  border: none;
-  cursor: pointer;
-  text-align: center;
-  font-size: 35px;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.popUpBox {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  height: 100%;
-  width: 100%;
-}
+@layer components {
+  .openButton {
+    @apply h-[45px] w-[45px] rounded-full text-white bg-black border-none cursor-pointer text-center text-4xl;
+  }
 
-.overlayContainer {
-  display: none;
-  position: fixed;
-  justify-content: center;
-  align-items: center;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  background: red;
-}
-
-.formContainer {
-  position: fixed;
-  height: 85%;
-  width: 90%;
-  left: 5%;
-
-  list-style-type: none;
-  border-radius: 35px;
-
-  background-color: #f2f2f2;
-  overflow-y: scroll;
-}
-
-fieldset {
-  border: 0;
-}
-
-h1 {
-  font-family: "Open Sans", sans-serif;
-  font-weight: lighter;
-  font-size: 40px;
-  text-align: center;
-}
-
-label {
-  color: black;
-  font-family: "Open Sans", sans-serif;
-  font-size: 15px;
-  padding: 25px 0;
-}
-
-legend {
-  color: black;
-  font-family: "Open Sans", sans-serif;
-  font-size: 20px;
-  padding: 25px 0;
-  border: none;
-}
-
-input {
-  width: 150px;
-  padding: 12px 20px;
-}
-
-input[type="text"] {
-  width: 350px;
-  padding: 12px 20px;
-  margin: 8px 0;
-  box-sizing: border-box;
-}
-
-input[type="text"]:focus {
-  background-color: rgb(180, 208, 218);
-}
-
-input[type="submit"] {
-  background-color: black;
-  border: none;
-  color: white;
-  padding: 17px 32px;
-  text-decoration: none;
-  margin: 20px 2px;
-  border-radius: 15px;
-  cursor: pointer;
-}
-
-label + input {
-  padding-top: 20px;
-}
-
-.cancelButton {
-  background-color: white;
-  border: none;
-  color: gray;
-  border-style: solid;
-  border-width: 3px;
-  padding: 16px 32px;
-  text-decoration: none;
-  margin: 20px 2px;
-  border-radius: 15px;
-  cursor: pointer;
-}
-
-/*For devices 769px and greater */
-@media only screen and (min-width: 1200px) {
   .popUpBox {
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    height: 85%;
-    width: 85%;
+    @apply flex flex-col bg-white h-full w-full;
+  }
+
+  .overlayContainer {
+    @apply hidden fixed justify-center items-center top-0 left-0 w-full h-full bg-red-600;
   }
 
   .formContainer {
-    position: fixed;
-    height: 75%;
-    width: 45%;
+    @apply fixed h-[85%] w-[90%] left-[5%] list-none rounded-[35px] bg-gray-100 overflow-y-scroll;
+  }
 
-    justify-content: center;
-    align-items: center;
+  fieldset {
+    @apply border-0;
+  }
 
-    list-style-type: none;
-    border-radius: 5px;
+  h1 {
+    @apply font-sans font-light text-4xl text-center;
+  }
 
-    background-color: #f2f2f2;
-    padding: 20px;
-    top: 10%;
-    left: 27.5%;
+  label {
+    @apply text-black font-sans text-sm py-[25px];
+  }
+
+  legend {
+    @apply text-black font-sans text-xl py-[25px] border-none;
+  }
+
+  input {
+    @apply w-[150px] p-3;
+  }
+
+  input[type="text"] {
+    @apply w-[350px] p-3 my-2 box-border;
+  }
+
+  input[type="text"]:focus {
+    @apply bg-blue-100;
+  }
+
+  input[type="submit"] {
+    @apply bg-black border-none text-white px-8 py-4 no-underline my-5 mx-0.5 rounded-lg cursor-pointer;
+  }
+
+  label + input {
+    @apply pt-5;
+  }
+
+  .cancelButton {
+    @apply bg-white border-none text-gray-500 border-solid border-3 px-8 py-4 no-underline my-5 mx-0.5 rounded-lg cursor-pointer;
+  }
+
+  @media (min-width: 1200px) {
+    .popUpBox {
+      @apply h-[85%] w-[85%];
+    }
+
+    .formContainer {
+      @apply h-[75%] w-[45%] justify-center items-center rounded-sm p-5 top-[10%] left-[27.5%];
+    }
   }
 }

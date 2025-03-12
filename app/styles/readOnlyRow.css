@@ -1,32 +1,19 @@
-.rideTableContent {
-  border: none;
-  text-align: center;
-  padding: 8px;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.rideTableContent {
-  background-color: white;
-  font-size:20px;
-  padding: 15px 5px;
-  font-family: "Open Sans", sans-serif;
-  font-weight: lighter;
-  
-}
+@layer components {
+  .rideTableContent {
+    @apply border-none text-center p-2 bg-white text-xl py-3.5 px-1.25 font-sans font-light;
+  }
 
-.rideEditButton,
-.rideDeleteButton {
-  color: white;
-  cursor:pointer;
-  background-color: #419902;
-  border: none;
-  margin:2px;
-  padding:10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease; /* Add transition effect */
-}
+  .rideEditButton,
+  .rideDeleteButton {
+    @apply text-white cursor-pointer bg-green-600 border-none m-0.5 p-2.5 rounded-md transition-colors duration-300;
+  }
 
-/* Change button color on hover */
-.rideEditButton:hover,
-.rideDeleteButton:hover {
-  background-color: #2b6701; /* Darker green */
+  .rideEditButton:hover,
+  .rideDeleteButton:hover {
+    @apply bg-green-700; /* Darker green on hover */
+  }
 }

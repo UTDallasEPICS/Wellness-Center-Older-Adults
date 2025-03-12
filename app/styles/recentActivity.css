@@ -1,34 +1,17 @@
-/* recentActivity.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.recent-activity-container {
-    padding: 20px 40px;
-    margin: 40px auto 0; 
-    background-color: #f9f9f9;
-    width: 100%;
-    max-width: 1200px; 
-    border-radius: 15px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+@layer components {
+  .recent-activity-container {
+    @apply p-5 px-10 my-10 mx-auto bg-gray-50 w-full max-w-[1200px] rounded-xl shadow-md;
   }
-  
+
   .activity-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    width: 100%;
-    padding: 10px;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-5 w-full p-2.5;
   }
-  
-  .activity-item {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 15px;
-    background-color: #fff;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
 
+  .activity-item {
+    @apply border border-gray-300 p-3.5 mb-3.5 rounded-xl bg-white grid grid-cols-1 md:grid-cols-[1fr_auto] items-start gap-2.5 shadow-md;
+  }
+}

@@ -1,15 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.success-message {
-    background-color: #4caf50; /* Green background color */
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+@layer components {
+  .success-message {
+    @apply bg-green-500 text-white px-2.5 py-2.5 rounded-md flex items-center justify-center;
   }
-  
+
   .checkmark {
-    margin-left: 5px;
+    @apply ml-1.5;
   }
+}
   

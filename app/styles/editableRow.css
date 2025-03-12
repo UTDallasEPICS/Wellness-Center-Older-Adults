@@ -1,48 +1,31 @@
-/* editableRow.css */
-.editableRow {
-  background-color: #f2f2f2; /* Light gray background */
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.editableRowInput {
-  padding: 8px; /* Add padding to table cells */
-}
+@layer components {
+  .editableRow {
+    @apply bg-gray-100; /* Light gray background */
+  }
 
-.editRowInput {
-  width: calc(100% - 8px); /* Adjusted width */
-  padding: 2px; /* Modified padding */
-  height:20%;
-  border: 1px solid #ccc; /* Add a subtle border */
-  border-radius: 3px; /* Add some rounded corners */
-  box-sizing: border-box; /* Include padding and border in the total width */
-  resize: vertical; /* Allow vertical resizing */
-  display: block; /* Ensure inputs are block elements */
-  margin: 0 auto; /* Center the inputs */
-  text-align: center; /* Center text within inputs */
-  
-  overflow-y: auto; /* Add vertical scrollbar if content overflows */
-  font-family: "Open Sans", sans-serif;
-}
+  .editableRowInput {
+    @apply p-2; /* Add padding to table cells */
+  }
 
-.editRideButtonContainer{
-  margin: 2px;
-  border-radius: 3px;
-  text-align: center; 
-}
+  .editRowInput {
+    @apply w-[calc(100%-8px)] p-0.5 h-[20%] border border-gray-300 rounded-sm box-border resize-y block mx-auto text-center overflow-y-auto font-sans;
+  }
 
-.confirmEditButton,
-.cancelEditButton{
-  color:white;
-  background-color:#419902;
-  border: none;
-  margin:2px;
-  padding:10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease; /* Add transition effect */
-}
+  .editRideButtonContainer {
+    @apply m-0.5 rounded-sm text-center;
+  }
 
-/* Change button color on hover */
-.confirmEditButton:hover,
-.cancelEditButton:hover {
-  background-color: #2b6701; /* Darker green */
+  .confirmEditButton,
+  .cancelEditButton {
+    @apply text-white bg-green-600 border-none m-0.5 p-2.5 rounded-md cursor-pointer transition-colors duration-300;
+  }
+
+  .confirmEditButton:hover,
+  .cancelEditButton:hover {
+    @apply bg-green-700; /* Darker green on hover */
+  }
 }

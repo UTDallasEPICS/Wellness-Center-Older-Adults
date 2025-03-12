@@ -1,20 +1,22 @@
-.tile {
-    width: 100%;
-    max-width: 800px;
-    margin: auto;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .tile {
+    @apply w-full max-w-[800px] mx-auto;
   }
-  
+
   .summary-table {
-    width: 100%;
-    border-collapse: collapse;
+    @apply w-full border-collapse;
   }
-  
+
   .summary-table th,
   .summary-table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    @apply p-2.5 border-b border-gray-300;
   }
-  
+
   .detail-info {
-    margin-top: 20px;
+    @apply mt-5;
   }
+}

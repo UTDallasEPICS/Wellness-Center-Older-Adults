@@ -1,27 +1,23 @@
-.dashContainer {
-  height: 90%;
-  width: 100%;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.dashTitle {
-  color: black;
+@layer components {
+  .dashContainer {
+    @apply h-[90%] w-full;
+  }
 
-  text-align: left;
-  font-family: "Open Sans", sans-serif;
-  font-weight: lighter;
-  font-size: 40px;
-  margin-left: 5%;
-}
+  .dashTitle {
+    @apply text-black text-left font-sans font-light text-4xl ml-[5%];
+  }
 
-.dashBoxes {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-@media only screen and (min-width: 1000px) {
   .dashBoxes {
-    display: flex;
-    flex-direction: row;
+    @apply flex flex-col gap-5;
+  }
+
+  @media (min-width: 1000px) {
+    .dashBoxes {
+      @apply flex-row;
+    }
   }
 }

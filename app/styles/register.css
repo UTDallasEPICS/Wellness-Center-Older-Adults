@@ -1,33 +1,21 @@
-.register{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 80vh;
-  background: #fbfcf8;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+@layer components {
+  .register {
+    @apply flex items-center justify-center h-[80vh] bg-[#fbfcf8];
+  }
 
-form{
-  background-color:lightgray;
-  padding: 0px 60px;
-  border-radius: 10px;
-}
+  form {
+    @apply bg-gray-300 px-[60px] rounded-lg;
+  }
 
-h1{
-  text-align: center;
-}
+  h1 {
+    @apply text-center;
+  }
 
-button{
-  width: 100%;
-  height: 50px;
-  padding: 10px;
-  border:none;
-  background-color: #419902;
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
-  cursor: pointer;
-  margin-top: 15px;
-  margin-bottom: 30px;
-  border-radius: 30px;
+  button {
+    @apply w-full h-[50px] p-2.5 border-none bg-green-600 text-white font-bold text-lg cursor-pointer mt-3.5 mb-7.5 rounded-full;
+  }
 }

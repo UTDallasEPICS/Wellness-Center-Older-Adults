@@ -1,97 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.dashboard-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    font-family: 'Arial', sans-serif;
+@layer components {
+  .dashboard-container {
+    @apply flex flex-col h-screen font-sans;
   }
-  
+
   .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #e1e1e1;
+    @apply flex justify-between p-5 bg-gray-100 border-b border-gray-300;
   }
-  
-  .dashboard-title, .header-settings {
-    font-size: 20px;
-  }
-  
+
+  .dashboard-title,
   .header-settings {
-    cursor: pointer;
+    @apply text-xl;
   }
-  
+
+  .header-settings {
+    @apply cursor-pointer;
+  }
+
   .dashboard-body {
-    display: flex;
-    height: calc(100% - 60px);
+    @apply flex h-[calc(100%-60px)];
   }
-  
+
   .sidebar {
-    min-width: 200px;
-    background-color: #333;
-    color: white;
-    padding: 20px;
+    @apply min-w-[200px] bg-gray-800 text-white p-5;
   }
-  
+
   .sidebar-item {
-    font-size: 22px;
-    margin: 20px 0;
-    cursor: pointer;
+    @apply text-2xl my-5 cursor-pointer;
   }
-  
+
   .sidebar-item.active {
-    font-weight: bold;
+    @apply font-bold;
   }
-  
+
   .main-content {
-    flex-grow: 1;
-    background-color: #ffffff;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: 1fr 300px; /* Large card and small card */
-    grid-template-rows: auto 1fr 1fr; /* Header, medium cards */
-    grid-gap: 20px;
-    height:100%;
+    @apply flex-1 bg-white p-5 grid grid-cols-[1fr_300px] grid-rows-[auto_1fr_1fr] gap-5 h-full;
   }
-  
+
   .card-header {
-    grid-column: 1 / -1; /* Span full width */
-    margin-bottom: 20px;
+    @apply col-span-full mb-5;
   }
-  
+
   .title-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    @apply flex justify-between items-center;
   }
-  
+
   .title {
-    font-size: 24px;
+    @apply text-2xl;
   }
-  
+
   .toggle {
-    width: 40px;
-    height: 20px;
-    background-color: #e1e1e1;
-    border-radius: 10px;
+    @apply w-10 h-5 bg-gray-300 rounded-full;
   }
-  
+
   .card {
-    background-color: #e8e8e8;
-    border-radius: 6px;
-    padding: 20px;
+    @apply bg-gray-200 rounded-lg p-5;
   }
-  
+
   .card.large {
-    grid-row: 2 / 4; /* Span two rows */
-    height: 100%;
+    @apply row-span-2 h-full;
   }
-  
+
   .card.small {
-    height: 100px; /* Fixed height */
+    @apply h-[100px];
   }
-  
+
   .card.medium {
-    height: 200px; /* Fixed height */
+    @apply h-[200px];
   }
+}

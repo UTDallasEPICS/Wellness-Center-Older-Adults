@@ -1,73 +1,37 @@
-.page-container {
-  /* width: 58%; */
-  height: 100%;
-  width: 100%;
-  background: #fbfcf8;
-  display: flex;
-  flex-direction: column;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.main-container {
-  width: 95%;
-  height: calc(100% - 280px);
-  display: flex;
-  flex-direction: row;
-}
+@layer components {
+  .page-container {
+    @apply h-full w-full bg-[#fbfcf8] flex flex-col;
+  }
 
-.buttonAndText {
-  display: flex;
-  flex-direction: column;
+  .main-container {
+    @apply w-[95%] h-[calc(100%-280px)] flex flex-row;
+  }
 
-  margin-top: 10%;
-  margin-left: 7%;
-  margin-bottom: 5%;
-}
+  .buttonAndText {
+    @apply flex flex-col mt-[10%] ml-[7%] mb-[5%];
+  }
 
-.carImage {
-  width: 50%;
-  margin-top: 50px;
-}
+  .carImage {
+    @apply w-1/2 mt-[50px];
+  }
 
-.title {
-  font-family: "Montserrat", sans-serif;
-  font-weight: lighter;
-  font-size: 75px;
-  text-align: left;
-}
+  .title {
+    @apply font-montserrat font-light text-[75px] text-left;
+  }
 
-.body {
-  font-family: "Montserrat", sans-serif;
-  font-weight: lighter;
-  color: gray;
-  font-size: 35px;
-  text-align: left;
-}
+  .body {
+    @apply font-montserrat font-light text-gray-500 text-[35px] text-left;
+  }
 
-.button {
-  margin: 0px;
-  height: 50px;
-  width: 200px;
+  .button {
+    @apply m-0 h-[50px] w-[200px] border-none text-white no-underline text-[25px] bg-green-600 cursor-pointer rounded-lg;
+  }
 
-  border: none;
-  color: white;
-
-  text-decoration: none;
-  font-size: 25px;
-  background-color: #419902;
-
-  cursor: pointer;
-  border-radius: 10px;
-
-  /*To center:*/
-  /* 
-  text-align: center;             
-  margin-left: calc(50% - 100px);
-*/
-}
-
-.footer-space {
-  width: 100%;
-  height: 150px;
-  margin-top: auto;
-  margin-bottom: 0;
+  .footer-space {
+    @apply w-full h-[150px] mt-auto mb-0;
+  }
 }

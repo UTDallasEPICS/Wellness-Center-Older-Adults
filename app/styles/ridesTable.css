@@ -1,48 +1,33 @@
-.ridesTableContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 1rem;
-  font-family: "Open Sans", sans-serif;
-  overflow-x:auto;
-  max-height: 400px; /* Set a max height for the table container */
-  overflow-y: auto; /* Enable vertical scrolling when content overflows */
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.ridesTable {
-  border-collapse: collapse;
-  margin-left: 0.5%;
-  width: 99%;
-}
+@layer components {
+  .ridesTableContainer {
+    @apply flex flex-col gap-2.5 p-4 font-sans overflow-x-auto max-h-[400px] overflow-y-auto;
+  }
 
-.rideTableHeader{
-  border: none;
-  text-align: center;
-  padding: 8px;
-}
+  .ridesTable {
+    @apply border-collapse ml-0.5 w-[99%];
+  }
 
-.rideTableHeader {
-  background-color: white;
-  border-bottom: 0.5px solid #555555;
-  font-family: "Open Sans", sans-serif;
-  font-weight: normal;
-  font-size: 20px;
-}
+  .rideTableHeader {
+    @apply border-none text-center p-2 bg-white border-b border-gray-500 font-sans font-normal text-xl;
+  }
 
+  .rideTableForm {
+    @apply flex gap-1.25;
+  }
 
-.rideTableForm {
-  display: flex;
-  gap: 5px;
-}
+  .rideTableForm * {
+    @apply text-xl;
+  }
 
-.rideTableForm * {
-  font-size: 20px;
-}
+  .addRideTitle {
+    @apply m-5;
+  }
 
-.addRideTitle {
-  margin: 5%;
-}
-
-.addRideForm {
-  margin: 5%;
+  .addRideForm {
+    @apply m-5;
+  }
 }
