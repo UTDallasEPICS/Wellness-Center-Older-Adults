@@ -1,23 +1,7 @@
-button{
-cursor: pointer;
-border: none;
-color: #ffffff;
-padding: 15px 32px;
-text-align: center;
-vertical-align: middle;
-text-decoration: none;
-display: inline-block;
-font-size: 25px;
-background-color: #419902;
-position: absolute;
-top: 60%;
-left: 50%;
--ms-transform: translate(-50%, -50%);
-transform: translate(-50%, -50%);
-border-radius: 30px;
+@import "tailwindcss";
 
-}
-
-button:hover{
-  opacity: 0.9;
+button {
+  @apply cursor-pointer text-white text-center no-underline inline-block text-[25px] bg-[#419902] 
+         absolute left-2/4 top-[60%] -translate-x-2/4 -translate-y-2/4 px-8 py-[15px] 
+         rounded-[30px] border-0 hover:opacity-90;
 }

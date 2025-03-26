@@ -2,8 +2,8 @@
   height: 45px;
   width: 45px;
   border-radius: 50%;
-  color: white;
-  background-color: black;
+  color: rgb(209, 43, 43);
+  background-color: rgb(197, 32, 32);
   border: none;
   cursor: pointer;
   text-align: center;
@@ -56,14 +56,14 @@ h1 {
 }
 
 label {
-  color: black;
+  color: rgb(160, 12, 12);
   font-family: "Open Sans", sans-serif;
   font-size: 15px;
   padding: 25px 0;
 }
 
 legend {
-  color: black;
+  color: rgb(201, 34, 34);
   font-family: "Open Sans", sans-serif;
   font-size: 20px;
   padding: 25px 0;
