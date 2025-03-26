@@ -36,7 +36,27 @@ export const logoutRedirectUrl = (id_token: string) => {
   // eslint-disable-next-line max-len
   return `${ISSUER_BASEURL}oidc/logout?id_token_hint=${id_token}&post_logout_redirect_uri=${encodeURIComponent(BASEURL! + 'api/auth/logout-complete')}&nonce=${genState()}`;
 };
+/**
+ * Checks if the logged-in user is an admin
+ * @param id_token The ID token of the logged-in user
+ * @returns Boolean indicating if the user is an admin
+ */
+export const isAdmin = async (id_token: string): Promise<boolean> => {
+  const ISSUER_BASEURL = process.env.AUTH0_ISSUER_BASE_URL;
 
+  // Decode the ID token to extract user information
+  const response = await fetch(`${ISSUER_BASEURL}userinfo`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${id_token}`,
+    },
+  });
+
+  const userInfo = await response.json();
+
+  // Check if the user has an "admin" role
+  return userInfo.roles && userInfo.roles.includes('admin');
+};
 export async function getManagementApiToken() {
   const ISSUER_BASEURL = process.env.AUTH0_ISSUER_BASE_URL;
   const CLIENT_SECRET = process.env.AUTH0_CLIENT_SECRET;

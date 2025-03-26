@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import SideNav from "@/app/components/Sidebar/sidenav"; 
 
 export default function DashboardLayout({ children }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const handleResize = () => {
     if (typeof window !== "undefined" && window.innerWidth <= 768) {
       setIsCollapsed(true); 
     } else {
-      setIsCollapsed(false); 
+      setIsCollapsed(true); 
     }
   };
 

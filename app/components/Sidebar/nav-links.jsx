@@ -13,31 +13,28 @@ export default function NavLinks({ isCollapsed }) {
   const handleClick = (index) => {
     setActiveLink(index);
   };
-  const { user } = useAuth();
+  //const { user } = POST();
 
   // Check if the user is an admin or volunteer
-  const isAdmin = user && user.role === "admin";
-  const isVolunteer = user && user.role === "volunteer";
-
   let links = [];
   // Render additional links based on the user's role
-  if (isAdmin) {
-    const links = [
-      { name: "Dashboard", href: "/dashboardEmployee" },
-      { name: "Rides", href: "/dashboardEmployee/rides" },
-      { name: "Volunteers", href: "/dashboardEmployee/volunteers" },
-      { name: "Clients", href: "/dashboardEmployee/clients" },
-      { name: "Admin", href: "/dashboardEmployee/admin" },
-    ];
-  }
-  if (isVolunteer) {
-    const links = [
-      { name: "Dashboard", href: "/dashboardVolunteer" },
-      { name: "Rides", href: "/dashboardVolunteer/rides" },
-      { name: "Hours", href: "/dashboardVolunteer/hours" },
-      { name: "Settings", href: "/dashboardVolunteer/settings" },
-    ];
-  }
+  // if (user.admin) {
+  //   links = [
+  //     { name: "Dashboard", href: "/dashboardEmployee" },
+  //     { name: "Rides", href: "/dashboardEmployee/rides" },
+  //     { name: "Volunteers", href: "/dashboardEmployee/volunteers" },
+  //     { name: "Clients", href: "/dashboardEmployee/clients" },
+  //     { name: "Admin", href: "/dashboardEmployee/admin" },
+  //   ];
+  // }
+  // else{
+  //   links = [
+  //     { name: "Dashboard", href: "/dashboardVolunteer" },
+  //     { name: "Rides", href: "/dashboardVolunteer/rides" },
+  //     { name: "Hours", href: "/dashboardVolunteer/hours" },
+  //     { name: "Settings", href: "/dashboardVolunteer/settings" },
+  //   ];
+  // }
   
   return (
     <>
