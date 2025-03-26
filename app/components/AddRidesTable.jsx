@@ -1,13 +1,16 @@
-import { useState, Fragment, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
 import EditableRow from "/app/components/EditableRow.jsx";
 
 const AddRidesTable = ({ initialContacts }) => {
-  
   const [contacts, setContacts] = useState(initialContacts);
-
-  
   const [editContactId, setEditContactId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    clientName: "",
+    phoneNumber: "",
+    address: "",
+    startTime: "",
+  });
 
   useEffect(() => {
     setContacts(initialContacts);
@@ -24,13 +27,6 @@ const AddRidesTable = ({ initialContacts }) => {
     };
     setEditFormData(formValues);
   };
-
-  const [editFormData, setEditFormData] = useState({
-    clientName: "",
-    phoneNumber: "",
-    address: "",
-    startTime: "",
-  });
 
   const handleEditFormChange = (event) => {
     event.preventDefault();
@@ -50,8 +46,7 @@ const AddRidesTable = ({ initialContacts }) => {
       phoneNumber: editFormData.phoneNumber,
       address: editFormData.address,
       startTime: editFormData.startTime,
-      volunteerName: contacts.find((contact) => contact.id === editContactId)
-        .volunteerName,
+      volunteerName: contacts.find((contact) => contact.id === editContactId).volunteerName,
       status: contacts.find((contact) => contact.id === editContactId).status,
       hours: contacts.find((contact) => contact.id === editContactId).hours,
     };
@@ -77,7 +72,6 @@ const AddRidesTable = ({ initialContacts }) => {
     <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
       <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
         <table className="border-collapse ml-[0.5%] w-[99%]">
-          {}
           <thead>
             <tr>
               <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
@@ -97,10 +91,7 @@ const AddRidesTable = ({ initialContacts }) => {
               </th>
             </tr>
           </thead>
-
-          {}
           <tbody>
-            {}
             {contacts
               .filter(
                 (contact) => contact.status === "Added" || contact.status === "Unreserved"
@@ -124,11 +115,9 @@ const AddRidesTable = ({ initialContacts }) => {
               )}
           </tbody>
         </table>
-        {}
       </form>
     </div>
   );
 };
 
 export default AddRidesTable;
-
