@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import "/app/styles/dashboardPage.css";
 import TextContainer from "/app/components/TextContainer.jsx";
 import RecentActivity from "/app/components/RecentActivity"; 
 

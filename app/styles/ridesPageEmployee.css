@@ -1,9 +1,0 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer components {
-  .ridesPageContainer {
-    @apply h-full w-full bg-white;
-  }
-}
