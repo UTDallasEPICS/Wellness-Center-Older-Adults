@@ -1,94 +1,91 @@
+// addRideForm.jsx
 import { useState } from "react";
+import newMockData from "/app/mockdata/mock-data-new";
 
-const AddRideForm = ({
-  handleAddFormSubmit,
-  handleAddFormChange,
-  addFormData,
-}) => {
+const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
   const [formData, setFormData] = useState({
     clientName: "",
-    phoneNumber: "",
-    address: "",
-    startTime: "",
+    pickupStreet: "",
+    pickupCity: "",
+    pickupState: "",
+    pickupZip: "",
+    destinationStreet: "",
+    destinationCity: "",
+    destinationState: "",
+    destinationZip: "",
+    pickUpTime: "",
+    date: "",
+    ways: "",
+    extraInfo: "",
   });
 
+  const [isTwoWayChecked, setIsTwoWayChecked] = useState(false);
+  const [isExtraOptionChecked, setIsExtraOptionChecked] = useState(false);
+
+  const handleCheckboxChange = (e, setStateFunction) => {
+    setStateFunction(e.target.checked);
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "clientName") {
+      const selectedClient = newMockData.find(
+        (client) => client.clientName === value
+      );
+
+      if (selectedClient) {
+        const addressParts = selectedClient.address.split(", ");
+        const street = addressParts[0];
+        const city = addressParts[1];
+        const stateZip = addressParts[2].split(" ");
+        const state = stateZip[0];
+        const zip = stateZip[1];
+
+        setFormData((prevData) => ({
+          ...prevData,
+          clientName: value,
+          pickupStreet: street,
+          pickupCity: city,
+          pickupState: state,
+          pickupZip: zip,
+        }));
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          clientName: value,
+          pickupStreet: "",
+          pickupCity: "",
+          pickupState: "",
+          pickupZip: "",
+        }));
+      }
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+
+  if (!isOpen) return null;
+
+  const clientNames = [...new Set(newMockData.map((ride) => ride.clientName))];
+
   return (
-    <div className="max-w-[70%] mx-auto">
-      <h2 className="text-left font-light text-2xl mb-5">Add a Ride</h2>
-      <form
-        className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0"
-        onSubmit={handleAddFormSubmit}
-      >
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="clientName" className="block text-sm font-medium text-gray-700">
-            Client Name
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
-            name="clientName"
-            placeholder="Client Name"
-            value={addFormData.clientName}
-            onChange={handleAddFormChange}
-          />
-        </div>
-
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-            Phone Number
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
-            name="phoneNumber"
-            placeholder="Client Phone"
-            value={addFormData.phoneNumber}
-            onChange={handleAddFormChange}
-          />
-        </div>
-
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-            Client Address
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
-            name="address"
-            placeholder="Client Address"
-            value={addFormData.address}
-            onChange={handleAddFormChange}
-          />
-        </div>
-
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">
-            Pick-Up Time
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="time"
-            name="startTime"
-            id="startTime"
-            value={addFormData.startTime}
-            onChange={handleAddFormChange}
-          />
-        </div>
-
-        <div className="w-full lg:w-auto flex items-end lg:mt-0 mt-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-8 rounded-lg w-full max-w-2xl relative">
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-left font-light text-2xl">Add a Ride</h2>
           <button
+            onClick={() => handleAddFormSubmit(formData)}
             className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
-            type="submit"
           >
             Add
           </button>
         </div>
-<<<<<<< Updated upstream
-        
-      </form>
-=======
 
-        <form className="flex flex-col space-y-4 max-h-[70vh] overflow-y-auto pr-4">
+        <form className="flex flex-col space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="clientName" className="block text-sm font-medium text-gray-700">
@@ -276,7 +273,7 @@ const AddRideForm = ({
                 />
               </div>
             )}
-
+             
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -317,7 +314,6 @@ const AddRideForm = ({
           </div>
         </form>
       </div>
->>>>>>> Stashed changes
     </div>
   );
 };

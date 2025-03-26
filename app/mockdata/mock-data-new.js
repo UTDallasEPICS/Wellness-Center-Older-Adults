@@ -1,15 +1,43 @@
-
-const newMockData = [
+// app/mockdata/mock-data-new.js
+const mockData = [
   {
     id: 1,
-    customerID: 1, 
-    date: new Date('2024-09-25T10:30:00Z'), 
-    pickupTime: new Date('2024-09-25T09:00:00Z'), 
-    startAddressID: 1, 
-    endAddressID: 2, 
+    customerID: 1,
+    date: new Date('2024-09-25T10:30:00Z'),
+    pickupTime: new Date('2024-09-25T09:00:00Z'),
+    startAddressID: 1,
+    endAddressID: 2,
     specialNote: null,
     status: 'Completed',
-    volunteerID: 1, 
+    volunteerID: 1,
+    customer: {
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+      addressID: 1,
+      customerPhone: '123-456-7890',
+      address: {
+        id: 1,
+        street: '123 Main St',
+        city: 'Anytown',
+        state: 'CA',
+        postalCode: '12345',
+      },
+    },
+    addrStart: {
+      id: 1,
+      street: '123 Main St',
+      city: 'Anytown',
+      state: 'CA',
+      postalCode: '12345',
+    },
+    addrEnd: {
+      id: 2,
+      street: '456 Oak Ave',
+      city: 'Anytown',
+      state: 'CA',
+      postalCode: '54321',
+    },
   },
   {
     id: 2,
@@ -21,6 +49,34 @@ const newMockData = [
     specialNote: null,
     status: 'Reserved',
     volunteerID: 2,
+    customer: {
+      id: 2,
+      firstName: 'Jane',
+      lastName: 'Smith',
+      addressID: 3,
+      customerPhone: '987-654-3210',
+      address: {
+        id: 3,
+        street: '789 Pine Ln',
+        city: 'Somewhere',
+        state: 'NY',
+        postalCode: '67890',
+      },
+    },
+    addrStart: {
+      id: 3,
+      street: '789 Pine Ln',
+      city: 'Somewhere',
+      state: 'NY',
+      postalCode: '67890',
+    },
+    addrEnd: {
+      id: 4,
+      street: '101 Elm Rd',
+      city: 'Somewhere',
+      state: 'NY',
+      postalCode: '09876',
+    },
   },
   {
     id: 3,
@@ -32,6 +88,34 @@ const newMockData = [
     specialNote: null,
     status: 'Completed',
     volunteerID: 3,
+    customer: {
+      id: 3,
+      firstName: 'Alice',
+      lastName: 'Johnson',
+      addressID: 5,
+      customerPhone: '555-123-4567',
+      address: {
+        id: 5,
+        street: '42 Wallaby Way',
+        city: 'Sydney',
+        state: 'NSW',
+        postalCode: '2000',
+      },
+    },
+    addrStart: {
+      id: 5,
+      street: '42 Wallaby Way',
+      city: 'Sydney',
+      state: 'NSW',
+      postalCode: '2000',
+    },
+    addrEnd: {
+      id: 6,
+      street: '10 Downing St',
+      city: 'London',
+      state: 'UK',
+      postalCode: 'SW1A 2AA',
+    },
   },
   {
     id: 4,
@@ -43,6 +127,34 @@ const newMockData = [
     specialNote: null,
     status: 'Reserved',
     volunteerID: 4,
+    customer: {
+      id: 4,
+      firstName: 'Bob',
+      lastName: 'Williams',
+      addressID: 7,
+      customerPhone: '123-987-4560',
+      address: {
+        id: 7,
+        street: '1 Infinite Loop',
+        city: 'Cupertino',
+        state: 'CA',
+        postalCode: '95014',
+      },
+    },
+    addrStart: {
+      id: 7,
+      street: '1 Infinite Loop',
+      city: 'Cupertino',
+      state: 'CA',
+      postalCode: '95014',
+    },
+    addrEnd: {
+      id: 8,
+      street: '1600 Amphitheatre Parkway',
+      city: 'Mountain View',
+      state: 'CA',
+      postalCode: '94043',
+    },
   },
   {
     id: 5,
@@ -54,8 +166,35 @@ const newMockData = [
     specialNote: null,
     status: 'Completed',
     volunteerID: 5,
+    customer: {
+      id: 5,
+      firstName: 'Charlie',
+      lastName: 'Brown',
+      addressID: 9,
+      customerPhone: '555-456-7890',
+      address: {
+        id: 9,
+        street: '221B Baker Street',
+        city: 'London',
+        state: 'UK',
+        postalCode: 'NW1 6XE',
+      },
+    },
+    addrStart: {
+      id: 9,
+      street: '221B Baker Street',
+      city: 'London',
+      state: 'UK',
+      postalCode: 'NW1 6XE',
+    },
+    addrEnd: {
+      id: 10,
+      street: '11 Wall St',
+      city: 'New York',
+      state: 'NY',
+      postalCode: '10005',
+    },
   },
-  // Added Unreserved Rides
   {
     id: 6,
     customerID: 6,
@@ -65,7 +204,35 @@ const newMockData = [
     endAddressID: 12,
     specialNote: null,
     status: 'Unreserved',
-    volunteerID: null, 
+    volunteerID: null,
+    customer: {
+      id: 6,
+      firstName: 'Test',
+      lastName: 'User',
+      addressID: 11,
+      customerPhone: '111-222-3333',
+      address: {
+        id: 11,
+        street: '111 First St',
+        city: 'Anywhere',
+        state: 'TX',
+        postalCode: '75000',
+      },
+    },
+    addrStart: {
+      id: 11,
+      street: '111 First St',
+      city: 'Anywhere',
+      state: 'TX',
+      postalCode: '75000',
+    },
+    addrEnd: {
+      id: 12,
+      street: '222 Second Ave',
+      city: 'Anywhere',
+      state: 'TX',
+      postalCode: '75001',
+    },
   },
   {
     id: 7,
@@ -77,7 +244,10 @@ const newMockData = [
     specialNote: null,
     status: 'Unreserved',
     volunteerID: null,
+    customer: null, // Placeholder null
+    addrStart: null, // Placeholder null
+    addrEnd: null, // Placeholder null
   },
 ];
 
-export default newMockData;
+export default mockData;

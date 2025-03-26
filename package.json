@@ -31,6 +31,7 @@
     "cookies": "^0.9.1",
     "cookies-next": "^4.1.1",
     "date-fns": "^3.6.0",
+    "google-map-react": "^2.2.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
