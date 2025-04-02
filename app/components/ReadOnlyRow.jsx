@@ -5,7 +5,7 @@ const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) =>
   const router = useRouter();
 
   const handleRowClick = () => {
-    router.push(`rides/ride?id=${contact.id}`);
+    router.push(`rides/ride/${contact.id}`);
   };
 
   return (

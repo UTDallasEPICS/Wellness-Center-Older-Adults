@@ -1,63 +1,68 @@
-import React from 'react';
-import GoogleMapReact from 'google-map-react';
+"use client";
+import React, { useMemo, useEffect, useState, useRef } from 'react';
+import { GoogleMap, useLoadScript, DirectionsRenderer } from '@react-google-maps/api';
 
-const RideMap = ({ pickupAddress, dropoffAddress, finalAddress }) => {
-  const defaultProps = {
-    center: {
-      lat: 33.1984, // McKinney, TX latitude
-      lng: -96.6156, // McKinney, TX longitude
-    },
-    zoom: 11,
-  };
+const RideMap = ({ pickupAddress, dropoffAddress }) => {
+    const [directions, setDirections] = useState(null);
+    const mapRef = useRef(null);
 
-  // Function to geocode addresses (you'll need to implement this)
-  const geocodeAddress = async (address) => {
-    // Replace with your geocoding logic (using Google Maps API or another service)
-    // For now, return a placeholder
-    return { lat: 33.1984, lng: -96.6156 }; // Placeholder: McKinney, TX coordinates
-  };
+    const center = useMemo(() => ({ lat: 33.1984, lng: -96.6156 }), []); // McKinney, TX
 
-  const renderMarkers = async ({ map, maps }) => {
-    if (!maps) return; // Ensure maps object is available
+    const { isLoaded, loadError } = useLoadScript({
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+        libraries: ['places', 'routes'],
+    });
 
-    try {
-      // Geocode addresses to get coordinates
-      const pickupCoords = await geocodeAddress(pickupAddress);
-      const dropoffCoords = await geocodeAddress(dropoffAddress);
-      const finalCoords = await geocodeAddress(finalAddress);
+    useEffect(() => {
+        if (isLoaded && pickupAddress && dropoffAddress) {
+            const directionsService = new window.google.maps.DirectionsService();
+            const request = {
+                origin: pickupAddress,
+                destination: dropoffAddress,
+                travelMode: window.google.maps.TravelMode.DRIVING,
+            };
 
-      // Create markers
-      new maps.Marker({
-        position: pickupCoords,
-        map,
-        title: 'Pickup',
-      });
-      new maps.Marker({
-        position: dropoffCoords,
-        map,
-        title: 'Dropoff',
-      });
-      new maps.Marker({
-        position: finalCoords,
-        map,
-        title: 'Final Destination',
-      });
-    } catch (error) {
-      console.error('Error geocoding or rendering markers:', error);
-    }
-  };
+            directionsService.route(request, (result, status) => {
+                if (status === window.google.maps.DirectionsStatus.OK) {
+                    setDirections(result);
+                } else {
+                    console.error(`Directions request failed due to ${status}`);
+                }
+            });
+        }
+    }, [isLoaded, pickupAddress, dropoffAddress]);
 
-  return (
-    <div style={{ height: '100%', width: '100%' }}>
-      <GoogleMapReact
-        bootstrapURLKeys={{ key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
-        defaultCenter={defaultProps.center}
-        defaultZoom={defaultProps.zoom}
-        yesIHaveAccessToGoogleMaps
-        onGoogleApiLoaded={renderMarkers}
-      />
-    </div>
-  );
+    const options = useMemo(
+        () => ({
+            zoom: 11,
+            center: center,
+        }),
+        [center]
+    );
+
+    if (loadError) return <div>Error loading maps!</div>;
+    if (!isLoaded) return <div>Loading...</div>;
+
+    return (
+        <div style={{ height: '100%', width: '100%' }}>
+            <GoogleMap
+                mapContainerStyle={{ height: '100%', width: '100%' }}
+                options={options}
+                onLoad={(map) => {
+                    mapRef.current = map;
+                }}
+            >
+                {directions && (
+                    <DirectionsRenderer
+                        directions={directions}
+                        options={{
+                            polylineOptions: { strokeColor: '#FF0000' },
+                        }}
+                    />
+                )}
+            </GoogleMap>
+        </div>
+    );
 };
 
 export default RideMap;

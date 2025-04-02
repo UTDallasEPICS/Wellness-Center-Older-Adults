@@ -43,13 +43,13 @@ export async function GET(
           origins: [`${ride.addrStart?.street}, ${ride.addrStart?.city}, ${ride.addrStart?.state}`],
           destinations: [`${ride.addrEnd?.street}, ${ride.addrEnd?.city}, ${ride.addrEnd?.state}`],
           key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+          units: 'imperial',
       },
       timeout: 1000,
   });
-
     const driveTimeAB = distanceMatrixAB.data.rows[0].elements[0].duration?.text || 'N/A';
-    const mileage = distanceMatrixAB.data.rows[0].elements[0].distance?.text || 'N/A';
-
+    const mileageText = distanceMatrixAB.data.rows[0].elements[0].distance?.text || 'N/A';
+    const mileage = mileageText.includes('mi') ? mileageText : mileageText + " mi"; //add mi if it does not exist.
     // Format the ride data as needed
     const formattedRide = {
       id: ride.id,

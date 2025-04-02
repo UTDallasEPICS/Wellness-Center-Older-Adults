@@ -1,27 +1,29 @@
 "use client";
-import RideMap from '../../../components/RideMap';
+import RideMap from '../../../../components/RideMap';
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation'; // Import useParams
 
 export default function Ride() {
-  const [rideDetails, setRideDetails] = useState(null);
-  const [error, setError] = useState(null);
+    const { id } = useParams(); // Get the ride ID from the URL
+    const [rideDetails, setRideDetails] = useState(null);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchRideDetails = async () => {
-      try {
-        const response = await fetch(`/api/ride/get/1`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ride details: ${response.status}`);
-        }
-        const data = await response.json();
-        setRideDetails(data);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
+    useEffect(() => {
+        const fetchRideDetails = async () => {
+            try {
+                const response = await fetch(`/api/ride/get/${id}`); // Use dynamic ID
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ride details: ${response.status}`);
+                }
+                const data = await response.json();
+                setRideDetails(data);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
 
-    fetchRideDetails();
-  }, []);
+        fetchRideDetails();
+    }, [id])
 
   if (error) return <div className="error">Error: {error}</div>;
   if (!rideDetails) return <div className="loading">Loading...</div>;
@@ -39,7 +41,6 @@ export default function Ride() {
             <p style={{ margin: '5px 0' }}><strong>Trip</strong></p>
             <p style={{ margin: '5px 0' }}>A: {rideDetails.pickupAddress}</p>
             <p style={{ margin: '5px 0' }}>B: {rideDetails.dropoffAddress}</p>
-            <p style={{ margin: '5px 0' }}>C: {rideDetails.dropoffAddress}</p>
           </div>
           <p style={{ margin: '0' }}><strong>Pick-up Time</strong><br />{rideDetails.pickupTime}</p>
         </div>
