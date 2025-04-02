@@ -97,47 +97,47 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     e.preventDefault();
 
     try {
-      const customer = customers.find((c) => c.firstName === formData.customerName);
-      if (!customer) {
-        console.error("Customer not found.");
-        return;
-      }
-      const startAddress = await prisma.address.create({
-        data: {
-          street: formData.pickupStreet,
-          city: formData.pickupCity,
-          state: formData.pickupState,
-          postalCode: formData.pickupZip,
-        },
-      });
+        const customer = customers.find((c) => c.firstName === formData.customerName);
+        if (!customer) {
+            console.error("Customer not found.");
+            return;
+        }
+        const startAddress = await prisma.address.create({
+            data: {
+                street: formData.pickupStreet,
+                city: formData.pickupCity,
+                state: formData.pickupState,
+                postalCode: formData.pickupZip,
+            },
+        });
 
-      const endAddress = await prisma.address.create({
-        data: {
-          street: formData.destinationStreet,
-          city: formData.destinationCity,
-          state: formData.destinationState,
-          postalCode: formData.destinationZip,
-        },
-      });
+        const endAddress = await prisma.address.create({
+            data: {
+                street: formData.destinationStreet,
+                city: formData.destinationCity,
+                state: formData.destinationState,
+                postalCode: formData.destinationZip,
+            },
+        });
 
-      await prisma.ride.create({
-        data: {
-          customerID: customer.id,
-          date: new Date(formData.date),
-          pickupTime: new Date(`1970-01-01T${formData.pickUpTime}:00.000Z`),
-          startAddressID: startAddress.id,
-          endAddressID: endAddress.id,
-          specialNote: formData.extraInfo,
-        },
-      });
+        const newRide = await prisma.ride.create({
+            data: {
+                customerID: customer.id,
+                date: new Date(formData.date),
+                pickupTime: new Date(`1970-01-01T${formData.pickUpTime}:00.000Z`),
+                startAddressID: startAddress.id,
+                endAddressID: endAddress.id,
+                specialNote: formData.extraInfo,
+            },
+        });
 
-      console.log("Ride added successfully!");
-      onClose();
-      handleAddFormSubmit(formData);
+        console.log("Ride added successfully!");
+        onClose();
+        handleAddFormSubmit({ ...formData, id: newRide.id }); // Send the new ride data with the new ride id to parent
     } catch (error) {
-      console.error("Error adding ride:", error);
+        console.error("Error adding ride:", error);
     }
-  };
+};
 
   if (!isOpen) return null;
 
