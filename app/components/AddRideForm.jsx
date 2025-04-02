@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
   const [formData, setFormData] = useState({
-    customerName: "", // Consistent naming as "customerName"
+    customerName: "",
     pickupStreet: "",
     pickupCity: "",
     pickupState: "",
@@ -20,27 +20,29 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
   const [isTwoWayChecked, setIsTwoWayChecked] = useState(false);
   const [isExtraOptionChecked, setIsExtraOptionChecked] = useState(false);
   const [customerNames, setCustomerNames] = useState([]);
+  const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
-    async function fetchCustomerNames() {
+    async function fetchCustomers() {
       try {
-        const response = await fetch("/api/customer/getCustomer"); // Corrected path
+        const response = await fetch("/api/customer/getCustomer");
         if (!response.ok) {
           throw new Error("Failed to fetch customers");
         }
-        
-        const names = await response.json();
+
+        const data = await response.json();
+        setCustomers(data);
+        const names = data.map((customer) => customer.firstName);
         setCustomerNames(names);
-        console.log("Fetched Customer Names:", names); // Check state
+        console.log("Fetched Customers:", data);
       } catch (error) {
-        console.error("Error fetching customer names:", error);
+        console.error("Error fetching customers:", error);
       }
     }
 
-    fetchCustomerNames();
+    fetchCustomers();
   }, []);
 
-  
   const handleCheckboxChange = (e, setStateFunction) => {
     setStateFunction(e.target.checked);
   };
@@ -49,15 +51,37 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     const { name, value } = e.target;
 
     if (name === "customerName") {
-      // No need to fetch address from mock data anymore.
-      setFormData((prevData) => ({
-        ...prevData,
-        customerName: value,
-        pickupStreet: "", // Reset these, as they are now independent.
-        pickupCity: "",
-        pickupState: "",
-        pickupZip: "",
-      }));
+      const selectedCustomer = customers.find(
+        (customer) => customer.firstName === value
+      );
+
+      if (selectedCustomer) {
+        setFormData((prevData) => ({
+          ...prevData,
+          customerName: value,
+          pickupStreet: selectedCustomer.address?.street || "",
+          pickupCity: selectedCustomer.address?.city || "",
+          pickupState: selectedCustomer.address?.state || "",
+          pickupZip: selectedCustomer.address?.postalCode || "",
+          destinationStreet: selectedCustomer.address?.street || "",
+          destinationCity: selectedCustomer.address?.city || "",
+          destinationState: selectedCustomer.address?.state || "",
+          destinationZip: selectedCustomer.address?.postalCode || "",
+        }));
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          customerName: value,
+          pickupStreet: "",
+          pickupCity: "",
+          pickupState: "",
+          pickupZip: "",
+          destinationStreet: "",
+          destinationCity: "",
+          destinationState: "",
+          destinationZip: "",
+        }));
+      }
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -70,17 +94,11 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     e.preventDefault();
 
     try {
-      const customer = await prisma.customer.findFirst({
-        where: {
-          firstName: formData.customerName,
-        },
-      });
-
+      const customer = customers.find((c) => c.firstName === formData.customerName);
       if (!customer) {
         console.error("Customer not found.");
         return;
       }
-
       const startAddress = await prisma.address.create({
         data: {
           street: formData.pickupStreet,
@@ -135,6 +153,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
 
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[70vh]">
+            {/* ... Pickup Address Fields ... */}
             <div>
               <label htmlFor="customerName" className="block text-sm font-medium text-gray-700">
                 Customer Name
@@ -210,6 +229,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
               />
             </div>
 
+            {/* ... Destination Address Fields ... */}
             <div>
               <label htmlFor="destinationStreet" className="block text-sm font-medium text-gray-700">
                 Destination Street
@@ -266,6 +286,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
               />
             </div>
 
+            {/* ... Time, Date, Checkboxes, and Notes ... */}
             <div>
               <label htmlFor="pickUpTime" className="block text-sm font-medium text-gray-700">
                 Pick-Up Time
@@ -278,6 +299,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 onChange={handleFormChange}
               />
             </div>
+
             <div>
               <label htmlFor="date" className="block text-sm font-medium text-gray-700">
                 Date
@@ -364,6 +386,5 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     </div>
   );
 };
-
 
 export default AddRideForm;

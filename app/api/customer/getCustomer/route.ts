@@ -7,12 +7,11 @@ const prisma = new PrismaClient();
 export async function GET() {
   try {
     const customers = await prisma.customer.findMany({
-      select: {
-        firstName: true,
+      include: {
+        address: true, // Include the address relationship
       },
     });
-    const names = customers.map((customer) => customer.firstName);
-    return NextResponse.json(names);
+    return NextResponse.json(customers);
   } catch (error) {
     console.error('Error fetching customers:', error);
     return NextResponse.json(
