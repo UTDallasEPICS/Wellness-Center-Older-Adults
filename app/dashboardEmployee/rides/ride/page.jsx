@@ -1,6 +1,6 @@
 "use client";
+import RideMap from '../../../components/RideMap';
 import React, { useState, useEffect } from 'react';
-import RideMap from '../../../components/RideMap'; // Corrected import path
 
 export default function Ride() {
   const [rideDetails, setRideDetails] = useState(null);
@@ -9,7 +9,7 @@ export default function Ride() {
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch('/api/ride/get/6');
+        const response = await fetch(`/api/ride/get/1`);
         if (!response.ok) {
           throw new Error(`Failed to fetch ride details: ${response.status}`);
         }
@@ -31,7 +31,7 @@ export default function Ride() {
       <div style={{ width: '50%', padding: '20px', backgroundColor: '#f9f9f9', fontFamily: 'Arial, sans-serif' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
           <h2 style={{ fontSize: '2em', fontWeight: 'bold', margin: '0' }}>Ride #{rideDetails.id}</h2>
-          <p style={{ margin: '0' }}>Date: {new Date().toLocaleDateString()}</p> 
+          <p style={{ margin: '0' }}>Date: {new Date().toLocaleDateString()}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -39,19 +39,19 @@ export default function Ride() {
             <p style={{ margin: '5px 0' }}><strong>Trip</strong></p>
             <p style={{ margin: '5px 0' }}>A: {rideDetails.pickupAddress}</p>
             <p style={{ margin: '5px 0' }}>B: {rideDetails.dropoffAddress}</p>
-            <p style={{ margin: '5px 0' }}>C: {rideDetails.dropoffAddress} </p> {/* Assuming final is same as dropoff */}
+            <p style={{ margin: '5px 0' }}>C: {rideDetails.dropoffAddress}</p>
           </div>
-          <p style={{ margin: '0' }}><strong>Pick-up Time</strong><br />{rideDetails.pickuplime}</p>
+          <p style={{ margin: '0' }}><strong>Pick-up Time</strong><br />{rideDetails.pickupTime}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
           <p style={{ margin: '0' }}><strong>Client</strong><br />{rideDetails.customer?.name}</p>
-          <p style={{ margin: '0' }}><strong>Drive Time</strong><br />A-B: {rideDetails.drivelineAll}<br />B-C: {rideDetails.drivetimeBC}</p>
+          <p style={{ margin: '0' }}><strong>Drive Time</strong><br />A-B: {rideDetails.driveTimeAB}<br />B-C: {rideDetails.driveTimeBC || 'N/A'}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
           <p style={{ margin: '0' }}><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
-          <p style={{ margin: '0' }}><strong>Wait Time</strong><br />{rideDetails.waitline}</p>
+          <p style={{ margin: '0' }}><strong>Wait Time</strong><br />{rideDetails.waitTime || 'N/A'}</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
