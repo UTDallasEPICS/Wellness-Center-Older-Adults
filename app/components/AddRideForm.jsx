@@ -68,6 +68,11 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleAddFormSubmit(formData);
+  };
+
   if (!isOpen) return null;
 
   const clientNames = [...new Set(newMockData.map((ride) => ride.clientName))];
@@ -78,15 +83,15 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-left font-light text-2xl">Add a Ride</h2>
           <button
-            onClick={() => handleAddFormSubmit(formData)}
+            onClick={() => handleSubmit(formData)}
             className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
           >
             Add
           </button>
         </div>
 
-        <form className="flex flex-col space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[70vh]">
             <div>
               <label htmlFor="clientName" className="block text-sm font-medium text-gray-700">
                 Client Name
@@ -230,7 +235,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 onChange={handleFormChange}
               />
             </div>
-
             <div>
               <label htmlFor="date" className="block text-sm font-medium text-gray-700">
                 Date
@@ -273,7 +277,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 />
               </div>
             )}
-             
+
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"

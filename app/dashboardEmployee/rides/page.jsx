@@ -1,3 +1,4 @@
+// page.jsx
 "use client";
 import React, { useState } from "react";
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
@@ -8,48 +9,19 @@ import AddRideForm from "/app/components/AddRideForm.jsx";
 import newMockData from "/app/mockdata/mock-data-new";
 import AddRidePositive from "/app/components/AddRidePositive.jsx";
 import AddRideNeg from "/app/components/AddRideNeg.jsx";
-import { nanoid } from "nanoid";
 
 export default function Page() {
   const [ridesData, setRidesData] = useState(newMockData);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [addFormData, setAddFormData] = useState({
-    clientName: "",
-    phoneNumber: "",
-    address: "",
-    startTime: "",
-  });
   const [notification, setNotification] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddFormChange = (event) => {
-    if (event.preventDefault) {
-      event.preventDefault();
-      const fieldName = event.target.getAttribute("name");
-      const fieldValue = event.target.value;
-
-      const newFormData = { ...addFormData };
-      newFormData[fieldName] = fieldValue;
-
-      setAddFormData(newFormData);
-    } else {
-      const fieldName = "startTime";
-      const fieldValue = event;
-
-      const newFormData = { ...addFormData };
-      newFormData[fieldName] = fieldValue;
-
-      setAddFormData(newFormData);
-    }
-  };
-
-  const handleAddFormSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleAddFormSubmit = async (formData) => {
     if (
-      addFormData.clientName.trim() === "" ||
-      addFormData.phoneNumber.trim() === "" ||
-      addFormData.address.trim() === "" ||
-      addFormData.startTime.trim() === ""
+      formData.clientName.trim() === "" ||
+      formData.pickupAddress.trim() === "" ||
+      formData.desinationAddress.trim() === "" ||
+      formData.pickUpTime.trim() === "" ||
+      formData.date.trim() === ""
     ) {
       setNotification(<AddRideNeg />);
       setTimeout(() => {
@@ -65,10 +37,9 @@ export default function Page() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          clientName: addFormData.clientName,
-          phoneNumber: addFormData.phoneNumber,
-          address: addFormData.address,
-          startTime: addFormData.startTime,
+          clientName: formData.clientName,
+          address: formData.pickupAddress,
+          startTime: convertTo12Hour(formData.pickUpTime),
         }),
       });
 
@@ -79,11 +50,9 @@ export default function Page() {
     }
 
     const newRide = {
-      id: nanoid(),
-      clientName: addFormData.clientName,
-      phoneNumber: addFormData.phoneNumber,
-      address: addFormData.address,
-      startTime: addFormData.startTime,
+      clientName: formData.clientName,
+      address: formData.pickupAddress,
+      startTime: convertTo12Hour(formData.pickUpTime),
       status: "Added",
       volunteerName: "",
       hours: 0,
@@ -94,37 +63,44 @@ export default function Page() {
     const newRidesData = [...ridesData, newRide];
     setRidesData(newRidesData);
 
-    setAddFormData({
-      clientName: "",
-      phoneNumber: "",
-      address: "",
-      startTime: "",
-    });
-
     setNotification(<AddRidePositive />);
-
     setTimeout(() => {
       setNotification(null);
     }, 3000);
-
     setIsModalOpen(false);
+  };
+
+  const convertTo12Hour = (time24) => {
+    if (!time24) return "";
+
+    const [hours, minutes] = time24.split(":");
+    let hours12 = parseInt(hours, 10);
+    const ampm = hours12 >= 12 ? "PM" : "AM";
+
+    if (hours12 > 12) {
+      hours12 -= 12;
+    } else if (hours12 === 0) {
+      hours12 = 12;
+    }
+
+    return `${hours12}:${minutes} ${ampm}`;
   };
 
   const tabs = [
     {
       aKey: "added",
       title: "Added/Unreserved",
-      content: <AddRidesTable initialContacts={ridesData} />,
+      content: <AddRidesTable initialContacts={ridesData} convertTime={convertTo12Hour} />,
     },
     {
       aKey: "reserved",
       title: "Reserved",
-      content: <ReservedRidesTable initialContacts={ridesData} />,
+      content: <ReservedRidesTable initialContacts={ridesData} convertTime={convertTo12Hour} />,
     },
     {
       aKey: "completed",
       title: "Completed",
-      content: <CompletedRidesTable initialContacts={ridesData} />,
+      content: <CompletedRidesTable initialContacts={ridesData} convertTime={convertTo12Hour} />,
     },
   ];
 
@@ -143,17 +119,15 @@ export default function Page() {
       </button>
 
       <AddRideForm
-        addFormData={addFormData}
-        handleAddFormSubmit={handleAddFormSubmit}
-        handleAddFormChange={handleAddFormChange}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        handleAddFormSubmit={handleAddFormSubmit}
       />
 
       <SimpleTab activeKey="added">
         {tabs.map((item) => (
           <Tab key={item.aKey} aKey={item.aKey} title={item.title}>
-            {React.cloneElement(item.content, { initialContacts: ridesData })}
+            {item.content}
           </Tab>
         ))}
       </SimpleTab>
