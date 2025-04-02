@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { PrismaClient } from '@prisma/client'; // Import PrismaClient
+
+const prisma = new PrismaClient(); // Initialize Prisma client
 
 const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
   const [formData, setFormData] = useState({
