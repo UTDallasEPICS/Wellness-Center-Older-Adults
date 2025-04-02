@@ -1,10 +1,8 @@
-// addRideForm.jsx
-import { useState } from "react";
-import newMockData from "/app/mockdata/mock-data-new";
+import { useState, useEffect } from "react";
 
 const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
   const [formData, setFormData] = useState({
-    clientName: "",
+    customerName: "", // Consistent naming as "customerName"
     pickupStreet: "",
     pickupCity: "",
     pickupState: "",
@@ -21,7 +19,28 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
 
   const [isTwoWayChecked, setIsTwoWayChecked] = useState(false);
   const [isExtraOptionChecked, setIsExtraOptionChecked] = useState(false);
+  const [customerNames, setCustomerNames] = useState([]);
 
+  useEffect(() => {
+    async function fetchCustomerNames() {
+      try {
+        const response = await fetch("/api/customer/getCustomer"); // Corrected path
+        if (!response.ok) {
+          throw new Error("Failed to fetch customers");
+        }
+        
+        const names = await response.json();
+        setCustomerNames(names);
+        console.log("Fetched Customer Names:", names); // Check state
+      } catch (error) {
+        console.error("Error fetching customer names:", error);
+      }
+    }
+
+    fetchCustomerNames();
+  }, []);
+
+  
   const handleCheckboxChange = (e, setStateFunction) => {
     setStateFunction(e.target.checked);
   };
@@ -29,37 +48,16 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
   const handleFormChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "clientName") {
-      const selectedClient = newMockData.find(
-        (client) => client.clientName === value
-      );
-
-      if (selectedClient) {
-        const addressParts = selectedClient.address.split(", ");
-        const street = addressParts[0];
-        const city = addressParts[1];
-        const stateZip = addressParts[2].split(" ");
-        const state = stateZip[0];
-        const zip = stateZip[1];
-
-        setFormData((prevData) => ({
-          ...prevData,
-          clientName: value,
-          pickupStreet: street,
-          pickupCity: city,
-          pickupState: state,
-          pickupZip: zip,
-        }));
-      } else {
-        setFormData((prevData) => ({
-          ...prevData,
-          clientName: value,
-          pickupStreet: "",
-          pickupCity: "",
-          pickupState: "",
-          pickupZip: "",
-        }));
-      }
+    if (name === "customerName") {
+      // No need to fetch address from mock data anymore.
+      setFormData((prevData) => ({
+        ...prevData,
+        customerName: value,
+        pickupStreet: "", // Reset these, as they are now independent.
+        pickupCity: "",
+        pickupState: "",
+        pickupZip: "",
+      }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -68,14 +66,59 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    handleAddFormSubmit(formData);
+
+    try {
+      const customer = await prisma.customer.findFirst({
+        where: {
+          firstName: formData.customerName,
+        },
+      });
+
+      if (!customer) {
+        console.error("Customer not found.");
+        return;
+      }
+
+      const startAddress = await prisma.address.create({
+        data: {
+          street: formData.pickupStreet,
+          city: formData.pickupCity,
+          state: formData.pickupState,
+          postalCode: formData.pickupZip,
+        },
+      });
+
+      const endAddress = await prisma.address.create({
+        data: {
+          street: formData.destinationStreet,
+          city: formData.destinationCity,
+          state: formData.destinationState,
+          postalCode: formData.destinationZip,
+        },
+      });
+
+      await prisma.ride.create({
+        data: {
+          customerID: customer.id,
+          date: new Date(formData.date),
+          pickupTime: new Date(`1970-01-01T${formData.pickUpTime}:00.000Z`),
+          startAddressID: startAddress.id,
+          endAddressID: endAddress.id,
+          specialNote: formData.extraInfo,
+        },
+      });
+
+      console.log("Ride added successfully!");
+      onClose();
+      handleAddFormSubmit(formData);
+    } catch (error) {
+      console.error("Error adding ride:", error);
+    }
   };
 
   if (!isOpen) return null;
-
-  const clientNames = [...new Set(newMockData.map((ride) => ride.clientName))];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -83,7 +126,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-left font-light text-2xl">Add a Ride</h2>
           <button
-            onClick={() => handleSubmit(formData)}
+            onClick={handleSubmit}
             className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
           >
             Add
@@ -93,17 +136,17 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[70vh]">
             <div>
-              <label htmlFor="clientName" className="block text-sm font-medium text-gray-700">
-                Client Name
+              <label htmlFor="customerName" className="block text-sm font-medium text-gray-700">
+                Customer Name
               </label>
               <select
                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-                name="clientName"
-                value={formData.clientName}
+                name="customerName"
+                value={formData.customerName}
                 onChange={handleFormChange}
               >
-                <option value="">Select a Client</option>
-                {clientNames.map((name) => (
+                <option value="">Select a Customer</option>
+                {customerNames.map((name) => (
                   <option key={name} value={name}>
                     {name}
                   </option>
@@ -321,5 +364,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     </div>
   );
 };
+
 
 export default AddRideForm;

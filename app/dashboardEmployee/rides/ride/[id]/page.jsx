@@ -61,11 +61,11 @@ export default function Ride() {
         </div>
       </div>
       <div style={{ width: '50%', height: '100vh' }}>
-        <RideMap
-          pickupAddress={rideDetails.pickupAddress}
-          dropoffAddress={rideDetails.dropoffAddress}
-          finalAddress={rideDetails.dropoffAddress}
-        />
+      <RideMap
+        pickupAddress={rideDetails.pickupAddress}
+        dropoffAddress={rideDetails.dropoffAddress}
+        finalAddress={rideDetails.dropoffAddress}
+      />
       </div>
     </div>
   );
