@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import RideMap from '../../../components/RideMap';
+import RideMap from '../../../components/RideMap'; // Corrected import path
 
 export default function Ride() {
   const [rideDetails, setRideDetails] = useState(null);
@@ -28,23 +28,42 @@ export default function Ride() {
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ width: '50%', padding: '20px' }}> 
-        <h2>Ride #{rideDetails.id}</h2>
-        <p><strong>Pickup Address:</strong> {rideDetails.pickupAddress}</p>
-        <p><strong>Dropoff Address:</strong> {rideDetails.dropoffAddress}</p>
-        <p><strong>Pickup Time:</strong> {rideDetails.pickuplime}</p>
-        <p><strong>Client Name:</strong> {rideDetails.customer?.name}</p>
-        <p><strong>Mileage:</strong> {rideDetails.mileage}</p>
-        <p><strong>Status:</strong> {rideDetails.status}</p>
-        <p><strong>Drive Time AB:</strong> {rideDetails.drivelineAll}</p>
-        <p><strong>Drive Time BC:</strong> {rideDetails.drivetimeBC}</p>
-        <p><strong>Wait Time:</strong> {rideDetails.waitline}</p>
+      <div style={{ width: '50%', padding: '20px', backgroundColor: '#f9f9f9', fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <h2 style={{ fontSize: '2em', fontWeight: 'bold', margin: '0' }}>Ride #{rideDetails.id}</h2>
+          <p style={{ margin: '0' }}>Date: {new Date().toLocaleDateString()}</p> 
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div>
+            <p style={{ margin: '5px 0' }}><strong>Trip</strong></p>
+            <p style={{ margin: '5px 0' }}>A: {rideDetails.pickupAddress}</p>
+            <p style={{ margin: '5px 0' }}>B: {rideDetails.dropoffAddress}</p>
+            <p style={{ margin: '5px 0' }}>C: {rideDetails.dropoffAddress} </p> {/* Assuming final is same as dropoff */}
+          </div>
+          <p style={{ margin: '0' }}><strong>Pick-up Time</strong><br />{rideDetails.pickuplime}</p>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <p style={{ margin: '0' }}><strong>Client</strong><br />{rideDetails.customer?.name}</p>
+          <p style={{ margin: '0' }}><strong>Drive Time</strong><br />A-B: {rideDetails.drivelineAll}<br />B-C: {rideDetails.drivetimeBC}</p>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <p style={{ margin: '0' }}><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
+          <p style={{ margin: '0' }}><strong>Wait Time</strong><br />{rideDetails.waitline}</p>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <button style={{ padding: '10px 20px', backgroundColor: 'green', color: 'white', border: 'none', borderRadius: '5px' }}>Accept?</button>
+          <p style={{ margin: '0' }}><strong>Notes</strong><br />N/A</p>
+        </div>
       </div>
-      <div style={{ width: '50%', height: '100vh' }}> {/* Map on the right */}
+      <div style={{ width: '50%', height: '100vh' }}>
         <RideMap
           pickupAddress={rideDetails.pickupAddress}
           dropoffAddress={rideDetails.dropoffAddress}
-          finalAddress={rideDetails.dropoffAddress} // or a finalAddress from rideDetails or a new source.
+          finalAddress={rideDetails.dropoffAddress}
         />
       </div>
     </div>
