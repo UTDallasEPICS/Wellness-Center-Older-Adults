@@ -17,11 +17,11 @@ export default function Page() {
 
     const handleAddFormSubmit = async (formData) => {
         if (
-            formData.customerName.trim() === "" ||
-            formData.pickupStreet.trim() === "" ||
-            formData.destinationStreet.trim() === "" ||
-            formData.pickUpTime.trim() === "" ||
-            formData.date.trim() === ""
+            !formData.customerName?.trim() ||
+            !formData.pickupStreet?.trim() ||
+            !formData.destinationStreet?.trim() ||
+            !formData.pickUpTime?.trim() ||
+            !formData.date?.trim()
         ) {
             setNotification(<AddRideNeg />);
             setTimeout(() => {
