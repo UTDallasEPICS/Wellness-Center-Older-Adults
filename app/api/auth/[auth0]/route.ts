@@ -76,7 +76,7 @@ export async function POST(request: Request, { params }: { params: { auth0: stri
         return ret;
       }
 
-      const ret = NextResponse.redirect('http://localhost:3000/dashboardEmployee', { status: 302 });
+      const ret = NextResponse.redirect('http://localhost:3000/Dashboard', { status: 302 });
       ret.cookies.set({
         name: 'cvtoken',
         value: `${id_token}`,

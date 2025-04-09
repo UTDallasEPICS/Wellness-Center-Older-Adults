@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <div className="bg-white py-4 shadow-md">
       <div className="flex justify-center">
-        <a href="/dashboardEmployee">
+        <a href="/Dashboard">
           <Image 
             className="w-40 h-auto" 
             src="/logo.png" 

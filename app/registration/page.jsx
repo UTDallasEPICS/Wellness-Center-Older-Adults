@@ -6,7 +6,7 @@ import "/app/styles/register.css";
 import FormInput from "/app/components/FormInput.jsx";
 import Header from "/app/components/Header.jsx";
 const handleRedirect = () => {
-  window.location.href = '/dashboardEmployee/admin';
+  window.location.href = '/Dashboard/admin';
 }
 
 const Register = () => {

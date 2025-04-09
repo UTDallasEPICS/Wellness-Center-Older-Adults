@@ -48,7 +48,7 @@ Then('the user should be logged out and see the login button', () => {
 });
 
 Then('the user should not be able to access the dashboard', () => {
-  cy.visit('/dashboardEmployee');
+  cy.visit('/Dashboard');
   cy.origin('https://dev-5qwmxmrqa1bl88h4.us.auth0.com', () => {
     cy.url().should('include', 'auth0');
   });
