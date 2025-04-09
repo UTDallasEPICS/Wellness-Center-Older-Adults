@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="flex flex-col w-full min-h-screen">
       <div className="w-full h-[70px] border-b border-gray-300">
-        <a href="/dashboardEmployee">
+        <a href="/Dashboard">
           <p className="p-5 text-lg font-light text-left text-gray-900 w-1/2">WCOA</p>
         </a>
       </div>
