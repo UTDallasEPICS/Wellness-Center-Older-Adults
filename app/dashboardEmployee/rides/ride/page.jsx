@@ -31,7 +31,6 @@ export default function Page() {
         }
 
         try {
-            // Send the new ride data to your API to save to the database
             const reply = await fetch("/api/createRide", {
                 method: "POST",
                 headers: {
@@ -53,9 +52,15 @@ export default function Page() {
                     extraInfo: formData.extraInfo,
                 }),
             });
-
             if (!reply.ok) {
-                throw new Error(`HTTP error! status: ${reply.status}`);
+                const errorMessage = `HTTP error! status: ${reply.status}`;
+                console.error(errorMessage);
+                // Optionally set an error notification here if the API call failed
+                setNotification(<AddRideNeg message={errorMessage} />);
+                setTimeout(() => {
+                    setNotification(null);
+                }, 3000);
+                return;
             }
 
             const data = await reply.json();
@@ -88,10 +93,14 @@ export default function Page() {
             setTimeout(() => {
                 setNotification(null);
             }, 3000);
-            setIsModalOpen(false); // Close the modal
+            setIsModalOpen(false);
         } catch (error) {
             console.error("Error adding ride:", error);
-            // Handle error, e.g., show an error notification
+            // Handle other potential errors during the fetch or JSON parsing
+            setNotification(<AddRideNeg message="Failed to add ride due to a client-side error." />);
+            setTimeout(() => {
+                setNotification(null);
+            }, 3000);
         }
     };
 

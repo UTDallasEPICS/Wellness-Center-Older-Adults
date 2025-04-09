@@ -10,6 +10,13 @@ async function main() {
       phone: "1234567890",
       role: "ADMIN",
     },
+    data: {
+      email: "volunteer@volunteer.org",
+      firstName: "Volly",
+      lastName: "Ball",
+      phone: "2345678901",
+      role: "VOLUNTEER",
+    },
   });
 
   // Other Seed Data goes here

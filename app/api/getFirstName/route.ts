@@ -46,11 +46,11 @@ export async function GET() {
       where: { email },
       select: { firstName: true },
     });
-
+    console.log("Admin found:", admin); // Add this log
     if (!admin) {
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 });
     }
-
+  
     return NextResponse.json({ message: `Welcome, ${admin.firstName}!` });
   } catch (error) {
     console.error('Error fetching user:', error);

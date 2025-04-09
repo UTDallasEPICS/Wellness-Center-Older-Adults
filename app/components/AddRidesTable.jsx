@@ -1,13 +1,16 @@
-import { useState, Fragment, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
 import EditableRow from "/app/components/EditableRow.jsx";
 
-const AddRidesTable = ({ initialContacts }) => {
-  
+const AddRidesTable = ({ initialContacts, convertTime }) => {
   const [contacts, setContacts] = useState(initialContacts);
-
-  
   const [editContactId, setEditContactId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    customerID: "",
+    date: "",
+    startAddressID: "",
+    pickupTime: "",
+  });
 
   useEffect(() => {
     setContacts(initialContacts);
@@ -17,20 +20,13 @@ const AddRidesTable = ({ initialContacts }) => {
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
-      clientName: contact.clientName,
-      phoneNumber: contact.phoneNumber,
-      address: contact.address,
-      startTime: contact.startTime,
+      customerID: contact.customerID,
+      date: contact.date,
+      startAddressID: contact.startAddressID,
+      pickupTime: contact.pickupTime,
     };
     setEditFormData(formValues);
   };
-
-  const [editFormData, setEditFormData] = useState({
-    clientName: "",
-    phoneNumber: "",
-    address: "",
-    startTime: "",
-  });
 
   const handleEditFormChange = (event) => {
     event.preventDefault();
@@ -46,14 +42,11 @@ const AddRidesTable = ({ initialContacts }) => {
     event.preventDefault();
     const editedContact = {
       id: editContactId,
-      clientName: editFormData.clientName,
-      phoneNumber: editFormData.phoneNumber,
-      address: editFormData.address,
-      startTime: editFormData.startTime,
-      volunteerName: contacts.find((contact) => contact.id === editContactId)
-        .volunteerName,
+      customerID: editFormData.customerID,
+      date: editFormData.date,
+      startAddressID: editFormData.startAddressID,
+      pickupTime: editFormData.pickupTime,
       status: contacts.find((contact) => contact.id === editContactId).status,
-      hours: contacts.find((contact) => contact.id === editContactId).hours,
     };
     const newContacts = [...contacts];
     const index = contacts.findIndex((contact) => contact.id === editContactId);
@@ -77,34 +70,18 @@ const AddRidesTable = ({ initialContacts }) => {
     <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
       <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
         <table className="border-collapse ml-[0.5%] w-[99%]">
-          {}
           <thead>
             <tr>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Client Name
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Contact Number
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Address
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Pick-up Time
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Actions
-              </th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Client Name</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
             </tr>
           </thead>
-
-          {}
           <tbody>
-            {}
             {contacts
-              .filter(
-                (contact) => contact.status === "Added" || contact.status === "Unreserved"
-              )
+              .filter((contact) => contact.status === "Unreserved")
               .map((contact) =>
                 editContactId === contact.id ? (
                   <EditableRow
@@ -112,6 +89,7 @@ const AddRidesTable = ({ initialContacts }) => {
                     editFormData={editFormData}
                     handleEditFormChange={handleEditFormChange}
                     handleCancelClick={handleCancelClick}
+                    convertTime={convertTime}
                   />
                 ) : (
                   <ReadOnlyRow
@@ -119,16 +97,15 @@ const AddRidesTable = ({ initialContacts }) => {
                     contact={contact}
                     handleEditClick={handleEditClick}
                     handleDeleteClick={handleDeleteClick}
+                    convertTime={convertTime}
                   />
                 )
               )}
           </tbody>
         </table>
-        {}
       </form>
     </div>
   );
 };
 
 export default AddRidesTable;
-
