@@ -94,7 +94,9 @@ export async function POST(req: Request) {
             },
         });
 
-        return Response.json({ status: 201, message: 'Ride created successfully', data: createdRide });
+        const successResponse = { status: 201, message: 'Ride created successfully', data: createdRide };
+        console.log("API Success Response:", successResponse);
+        return Response.json(successResponse);
 
     } catch (error) {
         console.error('Error creating ride:', error);
