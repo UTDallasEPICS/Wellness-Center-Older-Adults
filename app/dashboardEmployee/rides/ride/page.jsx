@@ -7,12 +7,11 @@ import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
 import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
 import AddRideForm from "/app/components/AddRideForm.jsx";
 import newMockData from "/app/mockdata/mock-data-new";
-import AddRidePositive from "/app/components/AddRidePositive.jsx";
-import AddRideNeg from "/app/components/AddRideNeg.jsx";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Page() {
     const [ridesData, setRidesData] = useState(newMockData);
-    const [notification, setNotification] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleAddFormSubmit = async (formData) => {
@@ -23,10 +22,7 @@ export default function Page() {
             !formData.pickUpTime?.trim() ||
             !formData.date?.trim()
         ) {
-            setNotification(<AddRideNeg />);
-            setTimeout(() => {
-                setNotification(null);
-            }, 3000);
+            toast.error("Please fill in all required fields.");
             return;
         }
 
@@ -52,15 +48,9 @@ export default function Page() {
                     extraInfo: formData.extraInfo,
                 }),
             });
+
             if (!reply.ok) {
-                const errorMessage = `HTTP error! status: ${reply.status}`;
-                console.error(errorMessage);
-                // Optionally set an error notification here if the API call failed
-                setNotification(<AddRideNeg message={errorMessage} />);
-                setTimeout(() => {
-                    setNotification(null);
-                }, 3000);
-                return;
+                throw new Error(`HTTP error! status: ${reply.status}`);
             }
 
             const data = await reply.json();
@@ -89,18 +79,11 @@ export default function Page() {
 
             setRidesData([...ridesData, newRide]);
 
-            setNotification(<AddRidePositive />);
-            setTimeout(() => {
-                setNotification(null);
-            }, 3000);
-            setIsModalOpen(false);
+            toast.success("Ride added successfully!");
+            setIsModalOpen(false); // Close the modal
         } catch (error) {
             console.error("Error adding ride:", error);
-            // Handle other potential errors during the fetch or JSON parsing
-            setNotification(<AddRideNeg message="Failed to add ride due to a client-side error." />);
-            setTimeout(() => {
-                setNotification(null);
-            }, 3000);
+            toast.error("Failed to add ride. Please try again.");
         }
     };
 
@@ -140,10 +123,6 @@ export default function Page() {
 
     return (
         <div className="h-full w-full bg-white relative">
-            {notification && (
-                <div className="absolute top-4 right-4 z-50">{notification}</div>
-            )}
-
             <button
                 type="button"
                 className="h-[45px] w-[45px] rounded-full text-white bg-black border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"

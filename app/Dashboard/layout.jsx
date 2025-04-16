@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
-import SideNav from "@/app/components/Sidebar/sidenav"; 
+import SideNav from "@/app/components/Sidebar/sidenav";
+import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function DashboardLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -43,6 +46,9 @@ export default function DashboardLayout({ children }) {
           {children}
         </div>
       </div>
+
+      {/* ToastContainer is already placed here */}
+      <ToastContainer />
     </div>
   );
 }

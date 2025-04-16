@@ -1,17 +1,31 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import AddVolunteerPositive from "/app/components/AddVolunteerPositive.jsx"; //Notification Pos / Neg
-import AddVolunteerNeg from "/app/components/AddVolunteerNeg.jsx";
 import AddVolunteersTable from "/app/components/AddVolunteersTable.jsx"; // Volunteer Table
-import EditVolunteerModal from "/app/components/EditVolunteerModal.jsx"; 
+import EditVolunteerModal from "/app/components/EditVolunteerModal.jsx";
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
 import AddVolunteerForm from "/app/components/AddVolunteerForm.jsx";
-//import MyCalendar from "/app/components/calendar.tsx"; 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Page() {
-  
-
   const [volunteersData, setVolunteersData] = useState([]);
+  const [addFormData, setAddFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+  const [editVolunteerId, setEditVolunteerId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [volunteerToDelete, setVolunteerToDelete] = useState(null);
+
   useEffect(() => {
     async function fetchVolunteers() {
       try {
@@ -19,53 +33,16 @@ export default function Page() {
         const data = await response.json();
         if (response.ok) {
           setVolunteersData(data);
-        }
-        else{
+        } else {
           throw new Error(data.message || 'Failed to fetch volunteers');
         }
       } catch (error) {
         console.error('Error fetching volunteers:', error);
+        toast.error('Error fetching volunteers.');
       }
     }
-
     fetchVolunteers();
   }, []);
-
-  const [addFormData, setAddFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
-
-  const [editVolunteerId, setEditVolunteerId] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-
-  });
-
-  const [notification, setNotification] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [volunteerToDelete, setVolunteerToDelete] = useState(null);
-
-  {/*const [events, setEvents] = useState([
-    {
-      title: 'Meeting with Jane',
-      start: new Date(2024, 6, 22, 10, 0),
-      end: new Date(2024, 6, 22, 11, 0),
-      allDay: false,
-    },
-    {
-      title: 'Lunch with John',
-      start: new Date(2024, 6, 23, 12, 0),
-      end: new Date(2024, 6, 23, 13, 0),
-      allDay: false,
-    },
-  ]); */} 
 
   const handleAddFormChange = (event) => {
     const fieldName = event.target.getAttribute("name");
@@ -80,9 +57,7 @@ export default function Page() {
         !addFormData.lastName.trim() || 
         !addFormData.email.trim() ||
         !addFormData.phone.trim()) {
-         
-      setNotification(<AddVolunteerNeg errorMessage="Volunteer not added! Empty Field(s)!"/>);
-      setTimeout(() => setNotification(null), 3000);
+      toast.error("Volunteer not added! Empty Field(s)!");
       return;
     }
 
@@ -108,25 +83,19 @@ export default function Page() {
         throw new Error(data.message || 'Failed to add volunteer');
       }
 
-      // Only execute if we got a successful response
       if (data.status === 200) {
         setVolunteersData((prevData) => [
           ...prevData,  
-          {...data.volunteer,
-            status: "AVAILABLE"},
+          { ...data.volunteer, status: "AVAILABLE" },
         ]);
-        
         setAddFormData({ firstName: "", lastName: "", email: "", phone: "" });
-        setNotification(<AddVolunteerPositive />);
-        setTimeout(() => setNotification(null), 3000);
+        toast.success("Volunteer added successfully!");
       }
-      
     } catch (error) {
       console.error('Error adding volunteer:', error);
-      setNotification(<AddVolunteerNeg errorMessage = {error.message}/>);
-      setTimeout(() => setNotification(null), 3000);
+      toast.error(error.message || "Failed to add volunteer.");
     }
-};
+  };
 
   const handleEditClick = (volunteer) => {
     setEditVolunteerId(volunteer.VolunteerID);
@@ -146,41 +115,39 @@ export default function Page() {
   };
 
   const handleSaveClick = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     try {
       const response = await fetch('/api/editVolunteer', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            id: editVolunteerId,
-            ...editFormData
-          }),
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: editVolunteerId,
+          ...editFormData
+        }),
       });
 
       const result = await response.json();
 
       if (result.status === 200) {
         const updatedVolunteers = volunteersData.map((volunteer) =>
-        volunteer.VolunteerID == editVolunteerId
-        ?{...volunteer, ...editFormData}:
-        volunteer);
+          volunteer.VolunteerID === editVolunteerId
+            ? { ...volunteer, ...editFormData }
+            : volunteer
+        );
 
-      setVolunteersData(updatedVolunteers);
-      setEditVolunteerId(null);
-      setShowEditModal(false);
-
-    } else {
-      console.error(result.message);
-      setNotification(<AddVolunteerNeg errorMessage = {result.message} className = "z-[100]"/>);
-      setTimeout(() => setNotification(null), 3000);
-   
-      
+        setVolunteersData(updatedVolunteers);
+        setEditVolunteerId(null);
+        setShowEditModal(false);
+        toast.success("Volunteer updated successfully!");
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error('Error updating volunteer:', error);
+      toast.error(error.message || "Failed to update volunteer.");
     }
-  }catch (error){
-    console.error('Error updating volunteer:', error);
-  }
   };
 
   const handleDeleteClick = (VolunteerID) => {
@@ -203,24 +170,21 @@ export default function Page() {
 
       const data = await response.json();
 
-      if(response.ok) {
+      if (response.ok) {
         setVolunteersData(volunteersData.filter(
           (volunteer) => volunteer.VolunteerID !== volunteerToDelete.VolunteerID
         ));
-
-      
         setShowDeleteModal(false);
         setVolunteerToDelete(null);
-      
+        toast.success("Volunteer deleted successfully!");
       } else {
         throw new Error(data.message || 'Failed to delete volunteer');
       }
-
-      }catch (error) {
-       console.error('Error deleting volunteer:', error);
-      }
-
-    };
+    } catch (error) {
+      console.error('Error deleting volunteer:', error);
+      toast.error(error.message || "Failed to delete volunteer.");
+    }
+  };
 
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
@@ -232,13 +196,8 @@ export default function Page() {
     setShowEditModal(false);
   };
 
-
-
   return (
     <div className="h-full w-full bg-white px-6">
-      {notification && <div className="absolute top-4 right-4">{notification}</div>}
-
-      {}
       <div className="flex justify-center items-center">
         <AddVolunteerForm
           addFormData={addFormData}
@@ -246,8 +205,6 @@ export default function Page() {
           handleAddFormChange={handleAddFormChange}
         />
       </div>
-      
-      {}
       <div className="mt-8">
         <AddVolunteersTable
           volunteersData={volunteersData}
@@ -260,15 +217,6 @@ export default function Page() {
           editFormData={editFormData}
         />
       </div>
-      {/*{}
-      
-      
-      <div className="mt-8 mb-4 px-8">
-        <h2 className="text-lg font-semibold text-center">Schedule Availability</h2>
-        <MyCalendar events={events} />
-      </div>
-      */}
-      {}
       {showEditModal && (
         <EditVolunteerModal
           editFormData={editFormData}
@@ -277,9 +225,6 @@ export default function Page() {
           handleCancelClick={handleCancelClick}
         />
       )}
-
-      {}
-      
       {showDeleteModal && (
         <DeleteConfirmationModal
           volunteerName={`${volunteerToDelete?.firstName} ${volunteerToDelete?.lastName}`}
