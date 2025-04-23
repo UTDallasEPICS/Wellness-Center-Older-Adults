@@ -27,7 +27,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
-.env*.test
+# .env*.test
 
 # vercel
 .vercel
@@ -39,10 +39,11 @@ next-env.d.ts
 # Postgres database
 postgres-data
 /prisma/migrations
-/prisma/seed.js
 /prisma/customerQueries.js
 # Package Lock
 package-lock.json
 
 #Cypress env
 cypress.env.json
+
+mydb.db
