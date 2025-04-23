@@ -2,7 +2,7 @@
 import React from "react";
 import NavLinks from "./nav-links"; 
 
-const SideNav = ({ toggleCollapse, isCollapsed }) => {
+const SideNav = ({ toggleCollapse, isCollapsed}) => {
   return (
     <div className={`fixed top-[70px] h-[calc(100vh-70px)] bg-white transition-all duration-300 ease-in-out z-10 
         ${isCollapsed ? "w-[70px]" : "w-[250px]"} md:w-[250px]"`}>

@@ -80,7 +80,7 @@ const ReservedRidesTable = ({ initialContacts }) => {
               <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
               <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
               <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Volunteer Name</th>
+              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Volunteer</th>
               <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
             </tr>
           </thead>

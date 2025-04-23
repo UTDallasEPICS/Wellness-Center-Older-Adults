@@ -91,7 +91,7 @@ const CompletedRidesTable = ({ initialContacts }) => {
                 Pick-up Time
               </th>
               <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Volunteer Name
+                Volunteer
               </th>
               <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Actions

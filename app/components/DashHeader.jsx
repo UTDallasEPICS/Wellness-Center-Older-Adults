@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import "/app/styles/dashHeader.css";
 
 export default function DashHeader() {
   const [display, setDisplay] = useState(false);
@@ -8,7 +7,7 @@ export default function DashHeader() {
     <div>
       <div className="flex w-full h-full flex-row items-center">
         <div className="ml-12">
-          <a href="/dashboardEmployee">
+          <a href="/Dashboard">
             <p className="text-black text-left text-2xl font-light">WCOA</p>
           </a>
         </div>

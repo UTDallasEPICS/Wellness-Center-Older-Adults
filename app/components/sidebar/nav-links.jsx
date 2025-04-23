@@ -1,26 +1,60 @@
 "use client";
 import { useAuth } from "../../providers/Auth";
 import Link from "next/link";
-import { useState } from "react"; 
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import "/app/globalicons.css";
 
 export default function NavLinks({ isCollapsed }) {
   const [activeLink, setActiveLink] = useState(null);
+  const [role, setRole] = useState(null);
   const pathname = usePathname();
   const { handleLogout } = useAuth();
+
+  useEffect(() => {
+    async function fetchRole() {
+      try {
+        const response = await fetch("/api/getRole");
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched role:", data.role); // Debugging log
+          setRole(data.role);
+        } else {
+          console.error("Failed to fetch role:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching role:", error);
+      }
+    }
+
+    fetchRole();
+  }, []);
 
   const handleClick = (index) => {
     setActiveLink(index);
   };
 
-  const links = [
-    { name: "Dashboard", href: "/dashboardEmployee" },
-    { name: "Rides", href: "/dashboardEmployee/rides" },
-    { name: "Volunteers", href: "/dashboardEmployee/volunteers" },
-    { name: "Clients", href: "/dashboardEmployee/clients" },
-    { name: "Admin", href: "/dashboardEmployee/admin" },
-  ];
+  // Define links based on the user's role
+  let links = [];
+  if (role === "ADMIN") {
+    links = [
+      { name: "Dashboard", href: "/Dashboard" },
+      { name: "Rides", href: "/Dashboard/rides" },
+      { name: "Volunteers", href: "/Dashboard/volunteers" },
+      { name: "Clients", href: "/Dashboard/clients" },
+      { name: "Admin", href: "/Dashboard/admin" },
+    ];
+  } else if (role === "VOLUNTEER") {
+
+    links = [
+      { name: "Dashboard", href: "/Dashboard" },
+      { name: "Rides", href: "/Dashboard/rides-volunteer" },
+      { name: "Hours", href: "/Dashboard/hours" },
+      { name: "Settings", href: "/Dashboard/settings" },
+    ];
+  } else {
+    console.log("Role is not set or unrecognized:", role);
+  }
 
   return (
     <>
@@ -57,6 +91,3 @@ export default function NavLinks({ isCollapsed }) {
     </>
   );
 }
-
-
-
