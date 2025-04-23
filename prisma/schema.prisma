@@ -1,108 +1,67 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-
-model Customer {
-  customerID Int @id @default(autoincrement())
-  customerEmail String @unique
-  firstName String
-  middleName String? // make optional
-  lastName String
-  streetAddress String 
-  city String
-  state String? // make optional
-  birthdate DateTime? // make optional
-  customerPhone String
-  rides Ride[]
-  customerZipCode Int
-
-
-  @@unique([customerID, firstName, lastName])
-
+model Address {
+  id         Int        @id @default(autoincrement())
+  street     String
+  city       String
+  state      String
+  postalCode String
+  customers  Customer[]
+  endRides   Ride[]     @relation("EndAddress")
+  startRides Ride[]     @relation("StartAddress")
 }
-
 
 model Ride {
-  rideId Int @id @default(autoincrement())
-  //customer Customer @relation(fields: [customerID], references: [id])
-  //customerID Int @unique
-  customerName String
-  
-  customerPhone String
-  //references employeeID 
-  volunteer Volunteer? @relation(fields: [volunteerID], references: [VolunteerID])
-  volunteerID Int
-  
-
-  customer Customer? @relation(fields: [customerID], references: [customerID])
-  customerID Int
-
-  
-
-  date DateTime @db.Date
-  startTime DateTime @db.Time(2)
-  endTime DateTime @db.Time(2)
-  startLocation String
-  endLocation String
-  status Status @default(AVAILABLE)
-
-
-
+  id             Int            @id @default(autoincrement())
+  customerID     Int
+  date           DateTime
+  pickupTime     DateTime
+  startAddressID Int
+  endAddressID   Int
+  specialNote    String?
+  status         String         @default("AVAILABLE")
+  volunteerID    Int?
+  isArchived     Boolean        @default(false)
+  customer       Customer       @relation(fields: [customerID], references: [id])
+  addrEnd        Address        @relation("EndAddress", fields: [endAddressID], references: [id])
+  addrStart      Address        @relation("StartAddress", fields: [startAddressID], references: [id])
+  volunteer      VolunteerInfo? @relation(fields: [volunteerID], references: [id])
 }
 
-model Admin {
-  AdminID         Int        @id @default(autoincrement())  // Primary Key
-  email           String     @unique
-  firstName       String
-  lastName        String
-  phone           String     @unique
-
-  @@unique([AdminID, email])
+model User {
+  id         Int            @id @default(autoincrement())
+  email      String         @unique
+  firstName  String
+  lastName   String
+  phone      String?        @unique
+  role       String
+  isArchived Boolean        @default(false)
+  volunteer  VolunteerInfo?
 }
 
-model Employee {
-  EmployeeID    Int        @id @default(autoincrement())  // Primary Key
-  email         String     @unique
+model Customer {
+  id            Int     @id @default(autoincrement())
   firstName     String
+  middleName    String?
   lastName      String
-  phone         String     @unique
-  @@unique([EmployeeID, email])
+  addressID     Int
+  customerPhone String
+  address       Address @relation(fields: [addressID], references: [id])
+  rides         Ride[]
 }
 
-model Volunteer {
-  VolunteerID   Int        @id @default(autoincrement())  // Primary Key
-  email           String     @unique
-  firstName       String
-  lastName        String
-  phone           String     @unique
-  status Status @default(AVAILABLE)
-  rides         Ride[]  
-  @@unique([VolunteerID, email])
+model VolunteerInfo {
+  id     Int    @id @default(autoincrement())
+  userID Int    @unique
+  status String @default("AVAILABLE")
+  rides  Ride[]
+  user   User   @relation(fields: [userID], references: [id])
 }
-
-enum Status {
-
-  COMPLETED
-  AVAILABLE
-  RESERVED
-
-}
-
-
-// model Customer {  
-//   user User @relation(fields: [customerID], references: [id])
-//   customerID Int @id
-//   homeAddress String 
-//   @@unique([customerID, homeAddress])
-// }
