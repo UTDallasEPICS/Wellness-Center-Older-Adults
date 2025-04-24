@@ -1,13 +1,17 @@
-import React from 'react';
-import { UserProvider } from './providers/Auth';
-import './globals.css';
+import React from "react";
+import { UserProvider } from "./providers/Auth";
+import "./globals.css";
 
 export const metadata = {
-  title: 'WCOA Rides',
-  description: 'A Unique Employee Management System',
+  title: "WCOA Rides",
+  description: "A Unique Employee Management System",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>

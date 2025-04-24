@@ -1,6 +1,12 @@
-'use client';
+"use client";
 
-import React, { useContext, useState, useEffect, createContext, ReactNode } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  createContext,
+  ReactNode,
+} from "react";
 
 interface AuthContextType {}
 
@@ -20,7 +26,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within a UserProvider');
+    throw new Error("useAuth must be used within a UserProvider");
   }
   return context;
 };
@@ -33,7 +39,7 @@ function useProvideAuth(): AuthContextType {
   // Marks the user as authenticated if the cvtoken exists and is not blank.
   const checkSession = () => {
     const fetchAuthStatus = async () => {
-      const response = await fetch('/api/auth/session');
+      const response = await fetch("/api/auth/session");
       const data = await response.json();
       setIsAuthenticated(data.isAuthenticated);
     };
@@ -43,9 +49,9 @@ function useProvideAuth(): AuthContextType {
   // Redirects user to login page
   const handleLogin = async () => {
     try {
-      const response = await fetch('/api/auth/login');
+      const response = await fetch("/api/auth/login");
       if (!response.ok) {
-        throw new Error('Failed to fetch login URL');
+        throw new Error("Failed to fetch login URL");
       }
 
       // Extract the URL from the response
@@ -53,23 +59,23 @@ function useProvideAuth(): AuthContextType {
       const { url } = data;
       window.location.href = url;
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error("Error during login:", error);
     }
   };
 
   // Any call to this function will log the user out of their account
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/auth/logout');
+      const response = await fetch("/api/auth/logout");
       if (!response.ok) {
-        throw new Error('Failed to fetch logout URL');
+        throw new Error("Failed to fetch logout URL");
       }
       const data = await response.json();
       const { url } = data;
       setIsAuthenticated(false);
       window.location.href = url;
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Error during logout:", error);
     }
   };
 
