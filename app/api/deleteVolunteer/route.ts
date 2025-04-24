@@ -17,9 +17,9 @@ export async function DELETE(req: Request) {
   try {
     const { id } = (await req.json()) as DeleteVolunteerParams;
 
-    const existingVolunteer = await prisma.volunteer.findUnique({
+    const existingVolunteer = await prisma.volunteerInfo.findUnique({
       where: {
-        VolunteerID: id,
+        id,
       },
     });
 
@@ -30,18 +30,21 @@ export async function DELETE(req: Request) {
       });
     }
 
-    await prisma.volunteer.delete({
+    await prisma.user.update({
       where: {
-        VolunteerID: id,
+        id: existingVolunteer.userID,
+      },
+      data: {
+        isArchived: true,
       },
     });
 
     return Response.json({
       status: 200,
-      message: 'Volunteer deleted successfully',
+      message: 'Volunteer archived successfully',
     });
   } catch (error) {
-    console.error('Error deleting volunteer:', error);
+    console.error('Error archiving volunteer:', error);
     return Response.json({
       status: 500,
       message: 'Internal Server Error',
