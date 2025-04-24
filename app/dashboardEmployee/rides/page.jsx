@@ -1,168 +1,89 @@
 "use client";
-import React, { useState } from "react";
-import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
-import AddRidesTable from "/app/components/AddRidesTable.jsx";
-import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
-import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
-import AddRideForm from "/app/components/AddRideForm.jsx";
-import newMockData from "/app/mockdata/mock-data-new"; 
-import AddRidePositive from "/app/components/AddRidePositive.jsx";
-import AddRideNeg from "/app/components/AddRideNeg.jsx";
-import { nanoid } from "nanoid";
-import { add } from "date-fns";
+import RideMap from '../../../../components/RideMap';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 
-export default function Page() {
-  const [ridesData, setRidesData] = useState(newMockData);
+export default function Ride() {
+    const { id } = useParams();
+    const [rideDetails, setRideDetails] = useState(null);
+    const [error, setError] = useState(null);
 
-  const [addFormData, setAddFormData] = useState({
-    clientName: "",
-    phoneNumber: "",
-    address: "",
-    startTime: "",
-  });
+    useEffect(() => {
+        const fetchRideDetails = async () => {
+            try {
+                const response = await fetch(`/api/ride/get/${id}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ride details: ${response.status}`);
+                }
+                const data = await response.json();
+                setRideDetails(data);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
 
-  const [notification, setNotification] = useState(null);
+        fetchRideDetails();
+    }, [id]);
 
-  const handleAddFormChange = (event) => {
-    if (event.preventDefault) {
-      event.preventDefault();
-      const fieldName = event.target.getAttribute("name");
-      const fieldValue = event.target.value;
-  
-      const newFormData = { ...addFormData };
-      newFormData[fieldName] = fieldValue;
-  
-      setAddFormData(newFormData);
-    } else {
-      const fieldName = "startTime";
-      const fieldValue = event;
-  
-      const newFormData = { ...addFormData };
-      newFormData[fieldName] = fieldValue;
-  
-      setAddFormData(newFormData);
-    }
-  };
+    if (error) return <div className="text-red-600">Error: {error}</div>;
+    if (!rideDetails) return <div className="animate-pulse">Loading...</div>;
 
-
-  const handleAddFormSubmit = async (event) => {
-
-    event.preventDefault();
-
-    
-    if (
-      addFormData.clientName.trim() === "" ||
-      addFormData.phoneNumber.trim() === "" ||
-      addFormData.address.trim() === "" ||
-      addFormData.startTime.trim() === ""
-    ) {
-     
-      setNotification(<AddRideNeg />);
-
-     
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-
-      return;
+    function formatTime(timeString) {
+        if (!timeString) return "";
+        const [hours, minutes] = timeString.split(":");
+        let formattedHours = parseInt(hours, 10);
+        const formattedMinutes = String(minutes).padStart(2, "0");
+        const ampm = formattedHours >= 12 ? 'PM' : 'AM';
+        formattedHours = formattedHours % 12;
+        formattedHours = formattedHours ? formattedHours : 12;
+        return `${formattedHours}:${formattedMinutes} ${ampm}`;
     }
 
-    try {
-      const reply = await fetch('/api/createRide', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          clientName: addFormData.clientName,   
-          phoneNumber: addFormData.phoneNumber,     
-          address: addFormData.address,
-          startTime: addFormData.startTime,
-        }),
-      });
+    return (
+        <div className="flex h-screen">
+            <div className="w-1/2 p-5 bg-gray-100 font-sans">
+                <div className="flex justify-between mb-5">
+                    <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
+                    <p className="m-0">Date: {new Date().toLocaleDateString()}</p>
+                </div>
 
-      const data = await reply.json();
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-    }
+                <div className="flex justify-between mb-5">
+                    <div>
+                        <p className="my-1 font-semibold"><strong>Trip</strong></p>
+                        <p className="my-1">A: {rideDetails.pickupAddress}</p>
+                        <p className="my-1">B: {rideDetails.dropoffAddress}</p>
+                    </div>
+                    <p className="m-0">
+                        <strong>Pick-up Time</strong><br />
+                        {rideDetails.pickupTime
+                            ? formatTime(new Date(rideDetails.pickupTime).toLocaleTimeString('en-US', { hour12: false }))
+                            : 'N/A'}
+                    </p>
+                </div>
 
+                <div className="flex justify-between mb-5">
+                    <p className="m-0"><strong>Client</strong><br />{rideDetails.customer?.name}</p>
+                    <p className="m-0"><strong>Drive Time</strong><br />A-B: {rideDetails.driveTimeAB}<br />B-C: {rideDetails.driveTimeBC || 'N/A'}</p>
+                </div>
 
-       
-  
-    // else we want to add the new ride if the inputs are filled
-    const newRide = {
+                <div className="flex justify-between mb-5">
+                    <p className="m-0"><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
+                    <p className="m-0"><strong>Wait Time</strong><br />{rideDetails.waitTime || 'N/A'}</p>
+                </div>
 
-      id: nanoid(),
-      clientName: addFormData.clientName,
-      phoneNumber: addFormData.phoneNumber,
-      address: addFormData.address,
-      startTime: addFormData.startTime,
-      status: "Added",
-      volunteerName: "",
-      hours: 0,
-      date: new Date().toLocaleDateString(), 
-      time: new Date().toLocaleTimeString(), 
-    };
-
-    const newRidesData = [...ridesData, newRide];
-    setRidesData(newRidesData);
-
-  
-    setAddFormData({
-      clientName: "",
-      phoneNumber: "",
-      address: "",
-      startTime: "",
-    });
-
-   
-    setNotification(<AddRidePositive />);
-
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-  };
-
-  const tabs = [
-    {
-      aKey: "added",
-      title: "Added/Unreserved", 
-      content: <AddRidesTable initialContacts={ridesData} />,
-    },
-    {
-      aKey: "reserved",
-      title: "Reserved",
-      content: <ReservedRidesTable initialContacts={ridesData} />,
-    },
-    {
-      aKey: "completed",
-      title: "Completed",
-      content: <CompletedRidesTable initialContacts={ridesData} />,
-    },
-  ];
-
-  return (
-    <div className="h-full w-full bg-white">
-      {notification && (
-        <div className="absolute top-4 right-4">
-          {notification}
+                <div className="flex justify-between mb-5">
+                    <button className="px-5 py-2 bg-green-500 text-white rounded">Accept?</button>
+                    <p className="m-0"><strong>Notes</strong><br />N/A</p>
+                </div>
+            </div>
+            <div className="w-1/2 h-screen">
+                {console.log({ rideDetails: rideDetails.pickupAddress })}
+                <RideMap
+                    pickupAddress={rideDetails.pickupAddress}
+                    dropoffAddress={rideDetails.dropoffAddress}
+                    finalAddress={rideDetails.dropoffAddress}
+                />
+            </div>
         </div>
-      )}
-
-      <AddRideForm
-        addFormData={addFormData}
-        handleAddFormSubmit={handleAddFormSubmit}
-        handleAddFormChange={handleAddFormChange}
-      />
-      <SimpleTab activeKey="added">
-        {tabs.map((item) => (
-          <Tab key={item.aKey} aKey={item.aKey} title={item.title}>
-            {React.cloneElement(item.content, { initialContacts: ridesData })}
-          </Tab>
-        ))}
-      </SimpleTab>
-    </div>
-  );
+    );
 }
-
