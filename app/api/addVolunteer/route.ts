@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../../util/prisma-client';
 
 interface VolunteerRequestBody {
   firstName: string;
@@ -11,58 +9,85 @@ interface VolunteerRequestBody {
 
 export async function POST(req: Request) {
   if (req.method !== 'POST') {
-    return Response.json({
-      status: 405,
-      message: 'Method Not Allowed',
-    });
+    return new Response(
+      JSON.stringify({
+        status: 405,
+        message: 'Method Not Allowed',
+      }),
+      { status: 405 }
+    );
   }
 
   try {
     const { firstName, lastName, email, phone } = (await req.json()) as VolunteerRequestBody;
 
-    const existingVolunteer = await prisma.volunteer.findFirst({
+    // Check if the user already exists
+    const existingUser = await prisma.user.findUnique({
       where: {
-        OR: [{ email: email }, { phone: phone }],
+        email,
       },
     });
 
-    if (existingVolunteer) {
-      // Return a specific error message if the email or phone exists
-      if (existingVolunteer.email === email) {
-        return Response.json({
+    if (existingUser) {
+      return new Response(
+        JSON.stringify({
           status: 400,
           message: 'Volunteer not added! Email already exists',
-        });
-      } else if (existingVolunteer.phone === phone) {
-        return Response.json({
-          status: 400,
-          message: 'Volunteer not added! Phone number already exists',
-        });
-      }
+        }),
+        { status: 400 }
+      );
     }
 
-    const volunteer = await prisma.volunteer.create({
+    // Check if the phone number already exists
+    const existingPhone = await prisma.user.findUnique({
+      where: {
+        phone,
+      },
+    });
+
+    if (existingPhone) {
+      return new Response(
+        JSON.stringify({
+          status: 400,
+          message: 'Volunteer not added! Phone number already exists',
+        }),
+        { status: 400 }
+      );
+    }
+
+    // Create the user and link it to the volunteer
+    const newUser = await prisma.user.create({
       data: {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        phone: phone,
-        rides: {
-          create: [],
+        firstName,
+        lastName,
+        email,
+        phone,
+        role: 'VOLUNTEER',
+        volunteer: {
+          create: {
+            status: 'AVAILABLE',
+          },
         },
       },
     });
 
-    return Response.json({
-      status: 200,
-      message: `${volunteer} created successfully!`,
-      volunteer: volunteer,
-    });
+    return new Response(
+      JSON.stringify({
+        status: 201,
+        message: 'Volunteer created successfully',
+        data: newUser,
+      }),
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating volunteer:', error);
-    return Response.json({
-      status: 500,
-      message: 'Internal Server Error',
-    });
+    return new Response(
+      JSON.stringify({
+        status: 500,
+        message: 'Internal Server Error',
+        error: (error as Error).message,
+      }),
+      { status: 500 }
+    );
   }
 }
