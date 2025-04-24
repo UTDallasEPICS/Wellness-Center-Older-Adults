@@ -21,9 +21,9 @@ export async function PUT(req: Request) {
   try {
     const { id, firstName, lastName, email, phone } = (await req.json()) as EditVolunteerParams;
 
-    const existingVolunteer = await prisma.volunteer.findUnique({
+    const existingVolunteer = await prisma.volunteerInfo.findUnique({
       where: {
-        VolunteerID: id,
+        id,
       },
     });
 
@@ -34,41 +34,41 @@ export async function PUT(req: Request) {
       });
     }
 
-    const existingEmailVolunteer = await prisma.volunteer.findFirst({
+    const existingEmailUser = await prisma.user.findFirst({
       where: {
-        email: email,
+        email,
         NOT: {
-          VolunteerID: id,
+          id: existingVolunteer.userID,
         },
       },
     });
 
-    if (existingEmailVolunteer && existingEmailVolunteer.VolunteerID !== id) {
+    if (existingEmailUser) {
       return Response.json({
         status: 409,
-        message: 'Email is already in use by another volunteer',
+        message: 'Email is already in use by another user',
       });
     }
 
-    const existingPhoneVolunteer = await prisma.volunteer.findFirst({
+    const existingPhoneUser = await prisma.user.findFirst({
       where: {
-        phone: phone,
+        phone,
         NOT: {
-          VolunteerID: id,
+          id: existingVolunteer.userID,
         },
       },
     });
 
-    if (existingPhoneVolunteer && existingPhoneVolunteer.VolunteerID !== id) {
+    if (existingPhoneUser) {
       return Response.json({
         status: 409,
-        message: 'Phone number is already in use by another volunteer',
+        message: 'Phone number is already in use by another user',
       });
     }
 
-    const updatedVolunteer = await prisma.volunteer.update({
+    const updatedUser = await prisma.user.update({
       where: {
-        VolunteerID: id,
+        id: existingVolunteer.userID,
       },
       data: {
         firstName,
@@ -81,7 +81,7 @@ export async function PUT(req: Request) {
     return Response.json({
       status: 200,
       message: 'Volunteer updated successfully',
-      volunteer: updatedVolunteer,
+      user: updatedUser,
     });
   } catch (error) {
     console.error('Error updating volunteer:', error);
