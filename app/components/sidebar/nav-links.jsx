@@ -1,5 +1,6 @@
 import { useAuth } from "../../providers/Auth";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import "/app/globalicons.css";
 
 export default function NavLinks({ isCollapsed }) {
@@ -22,55 +23,55 @@ export default function NavLinks({ isCollapsed }) {
   if (isCollapsed) return null;
   if (role === null) {
     return (
-      <ul className="space-y-2">
+      <ul className="py-2">
         <li className="px-4 py-2 text-gray-400">Loading...</li>
       </ul>
     );
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="py-2">
       {role === "ADMIN" && (
         <>
           <li>
-            <a
+            <Link
               href="/Dashboard"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Dashboard
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href="/Dashboard/rides"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Rides
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href="/Dashboard/volunteers"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Volunteers
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href="/Dashboard/client"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Clients
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href="/Dashboard/admin"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Admin
-            </a>
+            </Link>
           </li>
         </>
       )}
@@ -78,36 +79,36 @@ export default function NavLinks({ isCollapsed }) {
       {role === "VOLUNTEER" && (
         <>
           <li>
-            <a
+            <Link
               href="/Dashboard"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Dashboard
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href="/Dashboard/rides-volunteer"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Rides
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href="/Dashboard/hours"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Hours
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href="/Dashboard/settings"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-200"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Settings
-            </a>
+            </Link>
           </li>
         </>
       )}
@@ -115,7 +116,7 @@ export default function NavLinks({ isCollapsed }) {
       <li>
         <button
           onClick={handleLogout}
-          className="w-full text-left px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+          className="w-full text-left px-4 py-2 rounded hover:bg-red-500 hover:text-white transition mt-2"
         >
           Log Out
         </button>
