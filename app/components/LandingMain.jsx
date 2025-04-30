@@ -22,19 +22,17 @@ const LandingPage = () => {
           </p>
           {isAuthenticated ? (
             <>
+              <a href="/Dashboard">
+                <button className="h-[50px] w-[200px] bg-[#419902] text-white text-[25px] rounded-lg cursor-pointer mt-2">
+                  Go Dashboard
+                </button>
+              </a>
               <button
                 className="h-[50px] w-[200px] bg-[#419902] text-white text-[25px] rounded-lg cursor-pointer"
                 onClick={handleLogout}
               >
                 Log Out
               </button>
-              <a href="/Dashboard">
-                <button
-                  className="h-[50px] w-[200px] bg-[#419902] text-white text-[25px] rounded-lg cursor-pointer mt-2"
-                >
-                  Go Dashboard
-                </button>
-              </a>
             </>
           ) : (
             <button

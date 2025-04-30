@@ -1,178 +1,227 @@
+// /app/components/ClientInputForm.jsx
 "use client";
 
 import { useState } from "react";
 
-const AddClientForm = () => {
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [customerFname, setCustomerFName] = useState("");
-  const [customerMname, setCustomerMName] = useState("");
-  const [customerLname, setCustomerLName] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
-  const [customerCity, setCustomerCity] = useState("");
-  const [customerState, setCustomerState] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [display, setDisplay] = useState(false);
+const ClientInputForm = () => {
+  const [clientInfo, setClientInfo] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    phone: "",
+    zipcode: "", // Added zipcode to the state
+    birthdate: "", // Added birthdate to the state
+  });
 
-const handleAddClient = async (event) => {
-  event.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setClientInfo((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
-  try {
-    const payload = {
-      customerEmail,
-      firstName: customerFname,
-      middleName: customerMname,
-      lastName: customerLname,
-      streetAddress: customerAddress,
-      city: customerCity,
-      state: customerState,
-      customerPhone,
-      customerZipCode: 75024, 
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-     
+    try {
+      const response = await fetch('/api/createCustomerAccount', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerEmail: clientInfo.email,
+          firstName: clientInfo.firstName,
+          lastName: clientInfo.lastName,
+          middleName: clientInfo.middleName,
+          customerPhone: clientInfo.phone,
+          streetAddress: clientInfo.address,
+          city: clientInfo.city,
+          state: clientInfo.state,
+          customerZipCode: parseInt(clientInfo.zipcode),
+          birthdate: clientInfo.birthdate,
+        }),
+      });
 
-    const reply = await fetch("/api/createCustomerAccount/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+      const data = await response.json();
 
-    if (!reply.ok) {
-      const errorResponse = await reply.json();
-      console.error("Error:", errorResponse.message);
-      return;
+      if (response.ok) {
+        console.log('Customer created successfully:', data);
+        alert('Customer account created successfully!');
+        // Optionally clear the form after successful submission
+        setClientInfo({
+          firstName: "",
+          middleName: "",
+          lastName: "",
+          email: "",
+          address: "",
+          city: "",
+          state: "",
+          phone: "",
+          zipcode: "",
+          birthdate: "",
+        });
+      } else {
+        console.error('Failed to create customer:', data);
+        alert(`Failed to create customer: ${data.message || 'An error occurred.'}`);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('An unexpected error occurred while submitting the form.');
     }
-
-    const data = await reply.json();
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+  };
 
   return (
-    <div>
-      <button
-        className="h-[45px] w-[45px] rounded-full text-white bg-black border-none cursor-pointer text-center text-[35px]"
-        onClick={() => setDisplay((prevDisplay) => !prevDisplay)}
-      >
-        <span className="material-symbols-rounded">add</span>
-      </button>
+    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+      <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 w-full max-w-md">
+        <h1 className="block text-gray-700 text-2xl font-bold mb-6 text-center">Input Client Information</h1>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-4 mb-6">
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
+              Full Name:
+            </label>
+            <div className="grid grid-cols-3 gap-x-2">
+              <div>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="firstName"
+                  type="text"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={clientInfo.firstName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="middleName"
+                  type="text"
+                  placeholder="Middle Name"
+                  name="middleName"
+                  value={clientInfo.middleName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="lastName"
+                  type="text"
+                  placeholder="Last Name"
+                  name="lastName"
+                  value={clientInfo.lastName}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between text-gray-700 text-xs mt-1">
+              <span>First</span>
+              <span>Middle</span>
+              <span>Last</span>
+            </div>
+          </div>
 
-      <div
-        id="formPopUp"
-        className={`fixed top-0 left-0 flex justify-center items-center w-full h-full ${
-          display ? "flex" : "hidden"
-        }`}
-      >
-        <form
-          className="fixed h-[85%] w-[90%] bg-gray-100 p-8 rounded-lg overflow-y-scroll"
-          onSubmit={handleAddClient}
-        >
-          <h1 className="text-center font-light text-[40px]">Input Client Information</h1>
-
-          <fieldset className="mt-4">
-            <legend className="font-light text-[20px]">Full Name:</legend>
-            <label className="block text-black text-[15px]">First name</label>
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              Contact
+            </label>
             <input
-              type="text"
-              name="clientFirstName"
-              autoFocus
-              required
-              value={customerFname}
-              onChange={(e) => setCustomerFName(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
-            />
-
-            <label className="block mt-4 text-black text-[15px]">Middle name</label>
-            <input
-              type="text"
-              name="clientMiddleName"
-              value={customerMname}
-              onChange={(e) => setCustomerMName(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
-            />
-
-            <label className="block mt-4 text-black text-[15px]">Last name</label>
-            <input
-              type="text"
-              name="clientLastName"
-              required
-              value={customerLname}
-              onChange={(e) => setCustomerLName(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
-            />
-          </fieldset>
-
-          <fieldset className="mt-4">
-            <legend className="font-light text-[20px]">Contact</legend>
-            <label className="block text-black text-[15px]">Email</label>
-            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+              id="email"
               type="email"
-              name="clientEmail"
-              required
-              value={customerEmail}
-              onChange={(e) => setCustomerEmail(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
+              placeholder="Email"
+              name="email"
+              value={clientInfo.email}
+              onChange={handleChange}
             />
-
-            <label className="block mt-4 text-black text-[15px]">Address</label>
             <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+              id="address"
               type="text"
-              name="clientAddress"
-              required
-              value={customerAddress}
-              onChange={(e) => setCustomerAddress(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
+              placeholder="Address"
+              name="address"
+              value={clientInfo.address}
+              onChange={handleChange}
             />
-
-            <label className="block mt-4 text-black text-[15px]">City</label>
+            <div className="grid grid-cols-2 gap-x-2 mb-2">
+              <div>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="city"
+                  type="text"
+                  placeholder="City"
+                  name="city"
+                  value={clientInfo.city}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="state"
+                  type="text"
+                  placeholder="State"
+                  name="state"
+                  value={clientInfo.state}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
             <input
-              type="text"
-              name="clientCity"
-              required
-              value={customerCity}
-              onChange={(e) => setCustomerCity(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
-            />
-
-            <label className="block mt-4 text-black text-[15px]">State</label>
-            <input
-              type="text"
-              name="clientState"
-              value={customerState}
-              onChange={(e) => setCustomerState(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
-            />
-
-            <label className="block mt-4 text-black text-[15px]">Phone</label>
-            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="phone"
               type="tel"
-              name="clientPhone"
-              required
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              className="block w-full p-3 border border-gray-300 rounded mt-1"
+              placeholder="Phone"
+              name="phone"
+              value={clientInfo.phone}
+              onChange={handleChange}
             />
-          </fieldset>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="zipcode"
+              type="text"
+              placeholder="Zip Code"
+              name="zipcode"
+              value={clientInfo.zipcode}
+              onChange={handleChange}
+            />
+            <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="birthdate">
+              Birthdate:
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="birthdate"
+              type="date"
+              name="birthdate"
+              value={clientInfo.birthdate}
+              onChange={handleChange}
+            />
+          </div>
 
-          <input
-            type="submit"
-            value="Submit"
-            className="mt-6 w-full bg-black text-white py-4 rounded-lg cursor-pointer"
-          />
-          <button
-            type="button"
-            onClick={() => setDisplay((prevDisplay) => !prevDisplay)}
-            className="mt-4 w-full border border-gray-400 py-4 rounded-lg text-gray-500"
-          >
-            Cancel
-          </button>
+          <div className="flex items-center justify-between">
+            <button
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="submit"
+            >
+              Save
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 };
 
-export default AddClientForm;
+export default ClientInputForm;

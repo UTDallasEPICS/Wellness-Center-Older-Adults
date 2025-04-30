@@ -1,64 +1,63 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { loginRedirectUrl, logoutRedirectUrl } from './app/api/auth/auth0';
+import { loginRedirectUrl } from './app/api/auth/auth0';
 import { jwtVerify, importX509 } from 'jose';
- 
-const localDatabasePort = process.env.WEBSOCKET_PORT || 6432;
-const localDatabaseHost = 'localhost';
 
 export async function middleware(request: NextRequest) {
-  try {
-    const cvtoken = request.cookies.get('cvtoken')?.value;
-    const response = NextResponse.next();
+    try {
+        const cvtoken = request.cookies.get('cvtoken')?.value;
+        const pathname = request.nextUrl.pathname;
 
-    if (!cvtoken && request.url !== 'http://localhost:3000/') {
-      // redirect to login if no cvtoken and path requires authentication
-      return NextResponse.redirect(loginRedirectUrl(), { status: 302 });
-    } else if (cvtoken && request.url !== 'http://localhost:3000/') {
-      // convert certificate PEM into KeyLike object
-      let key;
-      const certPem = process.env.CERT_PEM;
-      if (!certPem) {
-        throw new Error('Certificate not found in environment variables or code');
-      }
-      try {
-        key = await importX509(certPem, 'RS256');
-      } catch (error) {
-        console.error('Error importing certificate:', error);
-        throw new Error('Failed to import certificate');
-      }
-      try {
-        // Token verification
-        const decoded = await jwtVerify(cvtoken, key);
-        const email = decoded.payload.email as string;
-        // Remove Prisma database check from here
-      } catch (err) {
-        console.error(err);
-      }
+        if (!cvtoken && pathname !== '/') {
+            console.log(`No cvtoken found for protected route: ${pathname}. Redirecting to login.`);
+            return NextResponse.redirect(loginRedirectUrl(), { status: 302 });
+        } else if (cvtoken) {
+            const certPem = process.env.CERT_PEM;
+            if (!certPem) {
+                console.error('Middleware Error: CERT_PEM environment variable not found.');
+                const response = NextResponse.next();
+                response.cookies.delete('cvtoken');
+                response.cookies.delete('cvuser');
+                return NextResponse.redirect(loginRedirectUrl(), { status: 302 });
+            }
+
+            let key;
+            try {
+                key = await importX509(certPem, 'RS256');
+            } catch (error) {
+                console.error('Middleware Error: Error importing certificate:', error);
+                const response = NextResponse.next();
+                response.cookies.delete('cvtoken');
+                response.cookies.delete('cvuser');
+                return NextResponse.redirect(loginRedirectUrl(), { status: 302 });
+            }
+
+            try {
+                await jwtVerify(cvtoken, key);
+                // Token is valid, allow the request to proceed
+                return NextResponse.next();
+            } catch (err) {
+                console.error("Middleware Warning: Token verification failed:", err);
+                // DO NOT redirect here. Just log the error and allow the request to proceed.
+                // The API route or page will handle the missing/invalid session if needed.
+                return NextResponse.next();
+            }
+        }
+
+        // If no cvtoken and it's the landing page, allow access
+        return NextResponse.next();
+
+    } catch (err) {
+        console.error("Middleware Critical Error:", err);
+        const response = NextResponse.next();
+        response.cookies.delete('cvtoken');
+        response.cookies.delete('cvuser');
+        return NextResponse.redirect(loginRedirectUrl(), { status: 302 });
     }
-  } catch (err) {
-    // If there is any error, assume the user's authentication is malformed and redirect to login
-    const response = NextResponse.next();
-    response.cookies.set('cvtoken', '');
-    response.cookies.set('cvuser', '');
-    console.error(err);
-    return NextResponse.redirect(loginRedirectUrl(), { status: 302 });
-  }
-  return NextResponse.next();
 }
 
 export const config = {
-  /*
-   * Match all request paths except for the ones starting with:
-   * - api/auth/ (API routes)
-   * - _next/static (static files)
-   * - _next/image (image optimization files)
-   * - favicon.ico (favicon file)
-   * - logo.png (logo file)
-   */
-
-  matcher: [
-    // Exclude specified paths from the middleware
-    '/((?!api|logo.png|_next/static|_next/image|favicon.ico).*)',
-  ],
+    matcher: [
+        '/((?!api|logo.png|_next/static|_next/image|favicon.ico).*)',
+    ],
 };

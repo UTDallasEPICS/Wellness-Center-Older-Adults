@@ -9,7 +9,7 @@ async function main() {
       email: "admin@admin.com",
       firstName: "Admin",
       lastName: "User",
-      phone: "1234567890",
+      phone: "012346789",
       role: "ADMIN",
     },
   });

@@ -1,6 +1,8 @@
+// app/api/vs/user/route.ts
+
 import { PrismaClient } from '@prisma/client';
-import { getManagementApiToken } from '../../auth/auth0';
-// pages/api/create-user.js
+import { NextResponse } from 'next/server';
+import { getManagementApiToken } from '@/app/api/auth/auth0'; // Adjust path as needed
 
 interface UserRequestBody {
   email: string;
@@ -10,22 +12,24 @@ interface UserRequestBody {
   connection: string;
 }
 
-export async function POST(request: Request) {
-  //const auth0 = params.auth0;
-  const prisma = new PrismaClient();
-  const { email, firstName, lastName, password, connection } =
-    (await request.json()) as UserRequestBody;
+const prisma = new PrismaClient();
 
+export async function POST(request: Request) {
   try {
+    const { email, firstName, lastName, password, connection } =
+      (await request.json()) as UserRequestBody;
+
+    // Save user to your local database
     await prisma.admin.create({
       data: {
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        phone: '',
+        email,
+        firstName,
+        lastName,
+        phone: '', // Adjust if you're collecting phone separately
       },
     });
 
+    // Call Auth0 API to create user
     const ISSUER_BASEURL = process.env.AUTH0_ISSUER_BASE_URL;
     const token = await getManagementApiToken();
 
@@ -41,23 +45,25 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(userData), // Data from the client to create the user
+      body: JSON.stringify(userData),
     });
 
     const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to create user');
+      throw new Error(data.message || 'Failed to create Auth0 user');
     }
 
-    return Response.json({
-      status: 200,
-      data: data,
-    });
+    return NextResponse.json({
+      message: 'User created successfully',
+      user: data,
+    }, { status: 201 });
+
   } catch (error) {
-    console.error('Error parsing Request:', error);
-    return Response.json({
-      error: 'Invalid Request',
-      status: 400,
-    });
+    console.error('Error creating user:', error);
+    return NextResponse.json({
+      message: 'Error creating user',
+      error: (error as Error).message,
+    }, { status: 400 });
   }
 }

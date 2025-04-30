@@ -43,6 +43,7 @@ model User {
   lastName   String
   phone      String?        @unique
   role       String
+  isAdmin    Boolean        @default(false)
   isArchived Boolean        @default(false)
   volunteer  VolunteerInfo?
 }
@@ -53,7 +54,7 @@ model Customer {
   middleName    String?
   lastName      String
   addressID     Int
-  customerPhone String
+  customerPhone String  @unique
   address       Address @relation(fields: [addressID], references: [id])
   rides         Ride[]
 }
