@@ -34,44 +34,44 @@ export default function NavLinks({ isCollapsed }) {
       {role === "ADMIN" && (
         <>
           <li>
-            <Link
+            <a
               href="/Dashboard"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Dashboard
-            </Link>
+            </a>
           </li>
           <li>
-            <Link
+            <a
               href="/Dashboard/rides"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Rides
-            </Link>
+            </a>
           </li>
           <li>
-            <Link
+            <a
               href="/Dashboard/volunteers"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Volunteers
-            </Link>
+            </a>
           </li>
           <li>
-            <Link
+            <a
               href="/Dashboard/client"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Clients
-            </Link>
+            </a>
           </li>
           <li>
-            <Link
+            <a
               href="/Dashboard/admin"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Admin
-            </Link>
+            </a>
           </li>
         </>
       )}
@@ -79,36 +79,36 @@ export default function NavLinks({ isCollapsed }) {
       {role === "VOLUNTEER" && (
         <>
           <li>
-            <Link
+            <a
               href="/Dashboard"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Dashboard
-            </Link>
+            </a>
           </li>
           <li>
-            <Link
+            <a
               href="/Dashboard/rides-volunteer"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Rides
-            </Link>
+            </a>
           </li>
           <li>
-            <Link
+            <a
               href="/Dashboard/hours"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Hours
-            </Link>
+            </a>
           </li>
           <li>
-            <Link
+            <a
               href="/Dashboard/settings"
               className="block px-4 py-2 rounded hover:bg-gray-100 transition"
             >
               Settings
-            </Link>
+            </a>
           </li>
         </>
       )}
