@@ -1,9 +1,8 @@
-// /app/components/ClientInputForm.jsx
 "use client";
 
 import { useState } from "react";
 
-const ClientInputForm = () => {
+const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onClose as props
   const [clientInfo, setClientInfo] = useState({
     firstName: "",
     middleName: "",
@@ -13,8 +12,8 @@ const ClientInputForm = () => {
     city: "",
     state: "",
     phone: "",
-    zipcode: "", // Added zipcode to the state
-    birthdate: "", // Added birthdate to the state
+    zipcode: "",
+    birthdate: "",
   });
 
   const handleChange = (e) => {
@@ -27,105 +26,71 @@ const ClientInputForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch('/api/createCustomerAccount', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerEmail: clientInfo.email,
-          firstName: clientInfo.firstName,
-          lastName: clientInfo.lastName,
-          middleName: clientInfo.middleName,
-          customerPhone: clientInfo.phone,
-          streetAddress: clientInfo.address,
-          city: clientInfo.city,
-          state: clientInfo.state,
-          customerZipCode: parseInt(clientInfo.zipcode),
-          birthdate: clientInfo.birthdate,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Customer created successfully:', data);
-        alert('Customer account created successfully!');
-        // Optionally clear the form after successful submission
-        setClientInfo({
-          firstName: "",
-          middleName: "",
-          lastName: "",
-          email: "",
-          address: "",
-          city: "",
-          state: "",
-          phone: "",
-          zipcode: "",
-          birthdate: "",
-        });
-      } else {
-        console.error('Failed to create customer:', data);
-        alert(`Failed to create customer: ${data.message || 'An error occurred.'}`);
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('An unexpected error occurred while submitting the form.');
-    }
+    onSubmit(clientInfo); // Call the onSubmit prop, passing the client info
+    // Optionally clear the form here if you don't want the parent to handle it
+    setClientInfo({
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      email: "",
+      address: "",
+      city: "",
+      state: "",
+      phone: "",
+      zipcode: "",
+      birthdate: "",
+    });
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-      <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 w-full max-w-md">
-        <h1 className="block text-gray-700 text-2xl font-bold mb-6 text-center">Input Client Information</h1>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-4 mb-6">
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
-              Full Name:
-            </label>
-            <div className="grid grid-cols-3 gap-x-2">
-              <div>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="firstName"
-                  type="text"
-                  placeholder="First Name"
-                  name="firstName"
-                  value={clientInfo.firstName}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="middleName"
-                  type="text"
-                  placeholder="Middle Name"
-                  name="middleName"
-                  value={clientInfo.middleName}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="lastName"
-                  type="text"
-                  placeholder="Last Name"
-                  name="lastName"
-                  value={clientInfo.lastName}
-                  onChange={handleChange}
-                />
-              </div>
+    <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 w-full max-w-md">
+      <h1 className="block text-gray-700 text-2xl font-bold mb-6 text-center">Input Client Information</h1>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-4 mb-6">
+        <div>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
+            Full Name:
+          </label>
+          <div className="grid grid-cols-3 gap-x-2">
+            <div>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="firstName"
+                type="text"
+                placeholder="First Name"
+                name="firstName"
+                value={clientInfo.firstName}
+                onChange={handleChange}
+              />
             </div>
-            <div className="flex justify-between text-gray-700 text-xs mt-1">
-              <span>First</span>
-              <span>Middle</span>
-              <span>Last</span>
+            <div>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="middleName"
+                type="text"
+                placeholder="Middle Name"
+                name="middleName"
+                value={clientInfo.middleName}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="lastName"
+                type="text"
+                placeholder="Last Name"
+                name="lastName"
+                value={clientInfo.lastName}
+                onChange={handleChange}
+              />
             </div>
           </div>
+          <div className="flex justify-between text-gray-700 text-xs mt-1">
+            <span>First</span>
+            <span>Middle</span>
+            <span>Last</span>
+          </div>
+        </div>
 
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -205,21 +170,21 @@ const ClientInputForm = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <button
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
+          <button
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="button"
+            onClick={onClose} // Call the onClose prop when the button is clicked
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="submit"
+          >
+            Save
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

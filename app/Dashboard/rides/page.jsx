@@ -63,16 +63,6 @@ export default function Page() {
     ]);
   }, [ridesData, convertTo12Hour]);
 
-  const handleAddTab = () => {
-    const newKey = `newTab${newTabIndex}`;
-    const newTab = {
-      aKey: newKey,
-      title: 'New Tab',
-      content: <div>Content for the new tab</div>,
-    };
-    setTabsData([...tabsData, newTab]);
-    setNewTabIndex(newTabIndex + 1);
-  };
 
   const handleAddFormSubmit = (newRide) => {
     // Optimistically update the UI by adding the new ride to the state
