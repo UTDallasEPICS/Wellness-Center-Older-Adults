@@ -8,6 +8,7 @@ export default function Page() {
   const [error, setError] = useState(null);
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
 
+<<<<<<< Updated upstream
   const fetchCustomers = async () => {
     try {
       const response = await fetch('/api/customer/getCustomer');
@@ -23,6 +24,8 @@ export default function Page() {
       setLoading(false);
     }
   };
+=======
+>>>>>>> Stashed changes
 
   useEffect(() => {
     fetchCustomers();

@@ -20,6 +20,7 @@ export default function NavLinks({ isCollapsed }) {
     { name: "Volunteers", href: "/dashboardEmployee/volunteers" },
     { name: "Clients", href: "/dashboardEmployee/clients" },
     { name: "Admin", href: "/dashboardEmployee/admin" },
+    
   ];
 
   return (
