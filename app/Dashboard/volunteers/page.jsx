@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import TextContainer from "/app/components/TextContainer.jsx";
 import RecentActivity from "/app/components/RecentActivity";
+import RecentActivity from "/app/components/RecentActivity";
 
 export default function Page() {
   const [welcomeMessage, setWelcomeMessage] = useState('');
@@ -11,7 +12,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchUserName() {
       try {
-        const response = await fetch('/api/getFirstName');
+        const response = await fetch("/api/getFirstName");
         const data = await response.json();
         if (response.ok) {
           setWelcomeMessage(data.message);
@@ -27,6 +28,7 @@ export default function Page() {
         setLoading(false);
       }
     }
+
 
     fetchUserName();
   }, []);

@@ -1,93 +1,126 @@
-"use client";
 import { useAuth } from "../../providers/Auth";
-import Link from "next/link";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
 import "/app/globalicons.css";
 
 export default function NavLinks({ isCollapsed }) {
-  const [activeLink, setActiveLink] = useState(null);
   const [role, setRole] = useState(null);
-  const pathname = usePathname();
   const { handleLogout } = useAuth();
 
   useEffect(() => {
-    async function fetchRole() {
+    (async () => {
       try {
-        const response = await fetch("/api/getRole");
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Fetched role:", data.role); // Debugging log
-          setRole(data.role);
-        } else {
-          console.error("Failed to fetch role:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching role:", error);
+        const res = await fetch("/api/getRole");
+        if (!res.ok) throw new Error(res.statusText);
+        const { role } = await res.json();
+        setRole(role);
+      } catch (e) {
+        console.error("Could not load role:", e);
       }
-    }
-
-    fetchRole();
+    })();
   }, []);
 
-  const handleClick = (index) => {
-    setActiveLink(index);
-  };
-
-  // Define links based on the user's role
-  let links = [];
-  if (role === "ADMIN") {
-    links = [
-      { name: "Dashboard", href: "/Dashboard" },
-      { name: "Rides", href: "/Dashboard/rides" },
-      { name: "Volunteers", href: "/Dashboard/volunteers" },
-      { name: "Clients", href: "/Dashboard/client" },
-      { name: "Admin", href: "/Dashboard/admin" },
-    ];
-  } else if (role === "VOLUNTEER") {
-
-    links = [
-      { name: "Dashboard", href: "/Dashboard" },
-      { name: "Rides", href: "/Dashboard/rides-volunteer" },
-      { name: "Hours", href: "/Dashboard/hours" },
-      { name: "Settings", href: "/Dashboard/settings" },
-    ];
-  } else {
-    console.log("Role is not set or unrecognized:", role);
+  if (isCollapsed) return null;
+  if (role === null) {
+    return (
+      <ul className="py-2">
+        <li className="px-4 py-2 text-gray-400">Loading...</li>
+      </ul>
+    );
   }
 
   return (
-    <>
-      {links.map((link, index) => (
-        <Link
-          key={link.name}
-          href={link.href}
-          className={`flex items-center text-left p-0 no-underline cursor-pointer focus:outline-none ${
-            index === activeLink ? "active" : ""
-          }`}
-          onClick={() => handleClick(index)}
-        >
-          <p
-            className={`nav-p p-4 text-lg font-light no-underline hover:bg-gray-100 ${
-              isCollapsed ? "hidden" : ""
-            }`}
-          >
-            {link.name}
-          </p>
-        </Link>
-      ))}
-      <button
-        className="flex items-center text-left p-0 no-underline cursor-pointer focus:outline-none"
-        onClick={handleLogout}
-      >
-        <p
-          className={`nav-p p-4 text-lg font-light no-underline hover:bg-gray-100 ${
-            isCollapsed ? "hidden" : ""
-          }`}
+    <ul className="py-2">
+      {role === "ADMIN" && (
+        <>
+          <li>
+            <a
+              href="/Dashboard"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/rides"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Rides
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/volunteers"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Volunteers
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/client"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Clients
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/admin"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Admin
+            </a>
+          </li>
+        </>
+      )}
+
+      {role === "VOLUNTEER" && (
+        <>
+          <li>
+            <a
+              href="/Dashboard"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/rides-volunteer"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Rides
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/hours"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Hours
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/settings"
+              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+            >
+              Settings
+            </a>
+          </li>
+        </>
+      )}
+
+      <li>
+        <button
+          onClick={handleLogout}
+          className="w-full text-left px-4 py-2 rounded hover:bg-red-500 hover:text-white transition mt-2"
         >
           Log Out
-        </p>
-      </button>
-    </>
+        </button>
+      </li>
+    </ul>
   );
 }

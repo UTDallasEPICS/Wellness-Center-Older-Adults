@@ -45,7 +45,9 @@ export default function Page() {
       setRidesData(data);
     } catch (error) {
       setError(error.message);
-      toast.error("Failed to load rides. Please check your network connection.");
+      toast.error(
+        "Failed to load rides. Please check your network connection."
+      );
     } finally {
       setLoading(false);
     }
@@ -57,16 +59,52 @@ export default function Page() {
 
   useEffect(() => {
     setTabsData([
-      { aKey: "added", title: "Added/Unreserved", content: <AddRidesTable initialContacts={ridesData.filter(ride => ride.status === "Added" || ride.status === "Unreserved")} convertTime={convertTo12Hour} /> },
-      { aKey: "reserved", title: "Reserved", content: <ReservedRidesTable initialContacts={ridesData.filter(ride => ride.status === "Reserved")} convertTime={convertTo12Hour} /> },
-      { aKey: "completed", title: "Completed", content: <CompletedRidesTable initialContacts={ridesData.filter(ride => ride.status === "Completed")} convertTime={convertTo12Hour} /> },
+      {
+        aKey: "added",
+        title: "Added/Unreserved",
+        content: (
+          <AddRidesTable
+            initialContacts={ridesData.filter(
+              (ride) => ride.status === "Added" || ride.status === "Unreserved"
+            )}
+            convertTime={convertTo12Hour}
+          />
+        ),
+      },
+      {
+        aKey: "reserved",
+        title: "Reserved",
+        content: (
+          <ReservedRidesTable
+            initialContacts={ridesData.filter(
+              (ride) => ride.status === "Reserved"
+            )}
+            convertTime={convertTo12Hour}
+          />
+        ),
+      },
+      {
+        aKey: "completed",
+        title: "Completed",
+        content: (
+          <CompletedRidesTable
+            initialContacts={ridesData.filter(
+              (ride) => ride.status === "Completed"
+            )}
+            convertTime={convertTo12Hour}
+          />
+        ),
+      },
     ]);
   }, [ridesData, convertTo12Hour]);
 
 
   const handleAddFormSubmit = (newRide) => {
     // Optimistically update the UI by adding the new ride to the state
-    setRidesData((prevRides) => [...prevRides, { ...newRide, status: "Added" }]);
+    setRidesData((prevRides) => [
+      ...prevRides,
+      { ...newRide, status: "Added" },
+    ]);
     setIsModalOpen(false);
     toast.success("Ride added successfully!");
   };
