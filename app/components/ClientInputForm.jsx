@@ -7,13 +7,11 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
     firstName: "",
     middleName: "",
     lastName: "",
-    email: "",
     address: "",
     city: "",
     state: "",
     phone: "",
     zipcode: "",
-    birthdate: "",
   });
 
   const handleChange = (e) => {
@@ -26,19 +24,27 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(clientInfo); // Call the onSubmit prop, passing the client info
+    const formattedClientInfo = {
+      firstName: clientInfo.firstName,
+      middleName: clientInfo.middleName,
+      lastName: clientInfo.lastName,
+      customerPhone: clientInfo.phone,
+      streetAddress: clientInfo.address,
+      city: clientInfo.city,
+      state: clientInfo.state,
+      customerZipCode: clientInfo.zipcode,
+    };
+    onSubmit(formattedClientInfo); // Call the onSubmit prop with the formatted data
     // Optionally clear the form here if you don't want the parent to handle it
     setClientInfo({
       firstName: "",
       middleName: "",
       lastName: "",
-      email: "",
       address: "",
       city: "",
       state: "",
       phone: "",
       zipcode: "",
-      birthdate: "",
     });
   };
 
@@ -92,19 +98,7 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
           </div>
         </div>
 
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              Contact
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
-              id="email"
-              type="email"
-              placeholder="Email"
-              name="email"
-              value={clientInfo.email}
-              onChange={handleChange}
-            />
+        <div>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
               id="address"
@@ -154,17 +148,6 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
               placeholder="Zip Code"
               name="zipcode"
               value={clientInfo.zipcode}
-              onChange={handleChange}
-            />
-            <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="birthdate">
-              Birthdate:
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="birthdate"
-              type="date"
-              name="birthdate"
-              value={clientInfo.birthdate}
               onChange={handleChange}
             />
           </div>

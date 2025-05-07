@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 interface UserRequestBody {
-  customerEmail: string;
   firstName: string;
   lastName: string;
   middleName?: string;
@@ -11,8 +10,7 @@ interface UserRequestBody {
   streetAddress?: string;
   city?: string;
   state?: string;
-  customerZipCode?: number;
-  birthdate?: string;
+  customerZipCode?: string;
 }
 
 export async function POST(req: Request) {
@@ -28,47 +26,38 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json()) as UserRequestBody;
+    console.log('Received request body:', body);
 
-    // Validation: Ensure required fields are provided
-    const { customerEmail, firstName, lastName } = body;
-    if (!customerEmail || !firstName || !lastName) {
+    // Validation: Ensure required fields are provided for both Customer and Address
+    const { firstName, lastName, streetAddress, city, state, customerZipCode } = body;
+    if (!firstName || !lastName || !streetAddress || !city || !state || !customerZipCode) {
       return new Response(
         JSON.stringify({
           status: 400,
-          message: 'Missing required fields: customerEmail, firstName, or lastName',
+          message: 'Missing required fields for customer or address',
         }),
         { status: 400 }
       );
     }
 
-    const existingCustomer = await prisma.customer.findUnique({
-      where: {
-        customerEmail,
+    // 1. Create the new Address record
+    const newAddress = await prisma.address.create({
+      data: {
+        street: streetAddress,
+        city: city,
+        state: state,
+        postalCode: customerZipCode.toString(), // Ensure it's a string
       },
     });
 
-    if (existingCustomer) {
-      return new Response(
-        JSON.stringify({
-          status: 409,
-          message: 'Customer already exists',
-        }),
-        { status: 409 }
-      );
-    }
-
+    // 2. Create the new Customer record and link it to the new Address
     const newCustomer = await prisma.customer.create({
       data: {
-        customerEmail,
         firstName,
         lastName,
         middleName: body.middleName || null,
-        customerPhone: body.customerPhone || '0000000000',
-        streetAddress: body.streetAddress || 'N/A',
-        city: body.city || 'N/A',
-        state: body.state || 'N/A',
-        customerZipCode: body.customerZipCode || 0,
-        birthdate: body.birthdate ? new Date(body.birthdate).toISOString() : null,
+        customerPhone: body.customerPhone || null, // Allow null if phone isn't always required
+        addressID: newAddress.id, // Link to the newly created Address
       },
     });
 
@@ -76,7 +65,7 @@ export async function POST(req: Request) {
       JSON.stringify({
         status: 201,
         message: 'Customer created successfully',
-        data: newCustomer,
+        data: { ...newCustomer, address: newAddress }, // Include the created address in the response
       }),
       { status: 201 }
     );
@@ -90,5 +79,7 @@ export async function POST(req: Request) {
       }),
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

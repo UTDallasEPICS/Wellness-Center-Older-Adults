@@ -8,7 +8,6 @@ export default function Page() {
   const [error, setError] = useState(null);
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
 
-<<<<<<< Updated upstream
   const fetchCustomers = async () => {
     try {
       const response = await fetch('/api/customer/getCustomer');
@@ -24,22 +23,17 @@ export default function Page() {
       setLoading(false);
     }
   };
-=======
->>>>>>> Stashed changes
 
   useEffect(() => {
     fetchCustomers();
   }, []);
 
-<<<<<<< Updated upstream
   const handleAddCustomerSubmit = (newCustomer) => {
-    // Optimistically update the UI by adding the new customer to the state
-    setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
+    // Optimistically update the UI
+    setCustomers((prevCustomers) => [...prevCustomers, { ...newCustomer, address: { street: newCustomer.streetAddress, city: newCustomer.city, state: newCustomer.state, postalCode: newCustomer.customerZipCode } }]);
     setIsAddCustomerModalOpen(false);
-    // toast.success("Customer added successfully!");
 
-    // Ideally, you would also make an API call here to persist the new customer
-    fetch('/api/customer/addCustomer', {
+    fetch('/api/createCustomerAccount', { // Updated API endpoint URL
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,22 +42,23 @@ export default function Page() {
     })
     .then(response => {
       if (!response.ok) {
-        // toast.error("Failed to add customer.");
-        // Optionally, revert the optimistic update on error
-        setCustomers(prevCustomers => prevCustomers.filter(cust => cust !== newCustomer));
+        console.error('Failed to add customer:', response.status);
+        // Optionally, revert the optimistic update on error (you might need a unique identifier for this)
+        setCustomers(prevCustomers => prevCustomers.filter(cust => cust.firstName !== newCustomer.firstName || cust.lastName !== newCustomer.lastName));
         throw new Error('Failed to add customer');
       }
       return response.json();
     })
     .then(data => {
-      // Optionally, update the state with the server's response if needed
-      // setCustomers(prevCustomers => [...prevCustomers, data]);
-      // toast.success("Customer added successfully!");
-      // Re-fetch customers to ensure the list is up-to-date
+      console.log('Customer added successfully:', data);
+      // Re-fetch customers to update the list with the actual database data
       fetchCustomers();
+      // Optionally update local state with the full data returned from the server
+      // setCustomers(prevCustomers => [...prevCustomers, data.data]);
     })
     .catch(error => {
       console.error('Error adding customer:', error);
+      // Optionally display an error message to the user
     });
   };
 
@@ -82,58 +77,6 @@ export default function Page() {
       </div>
     );
   }
-=======
-  const handleAddCustomerSubmit = (newCustomer) => {
-    // Optimistically update the UI by adding the new customer to the state
-    setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
-    setIsAddCustomerModalOpen(false);
-    // toast.success("Customer added successfully!");
-
-    // Ideally, you would also make an API call here to persist the new customer
-    fetch('/api/createCustomerAccount', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newCustomer),
-    })
-    .then(response => {
-      if (!response.ok) {
-        // toast.error("Failed to add customer.");
-        // Optionally, revert the optimistic update on error
-        setCustomers(prevCustomers => prevCustomers.filter(cust => cust !== newCustomer));
-        throw new Error('Failed to add customer');
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Optionally, update the state with the server's response if needed
-      // setCustomers(prevCustomers => [...prevCustomers, data]);
-      // toast.success("Customer added successfully!");
-      // Re-fetch customers to ensure the list is up-to-date
-      fetchCustomers();
-    })
-    .catch(error => {
-      console.error('Error adding customer:', error);
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading Customers...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen text-red-500">
-        <p>Error: {error}</p>
-      </div>
-    );
-  }
->>>>>>> Stashed changes
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col relative"> {/* Main container */}
@@ -160,9 +103,8 @@ export default function Page() {
       <div className="grid grid-cols-5 text-black px-6 py-4 font-light text-[15px] bg-white border-b border-gray-300 w-full">
         <p>Name</p>
         <p>Address</p>
-        <p>Email</p>
         <p>Phone</p>
-        <p>Birthdate</p>
+        <div></div> {/* Empty column for potential actions */}
       </div>
 
       {/* Client List Table */}
@@ -170,15 +112,13 @@ export default function Page() {
         {customers.map((customer, index) => (
           <div key={index} className="grid grid-cols-5 py-4 border-b border-gray-300 px-6">
             <p>{`${customer.firstName} ${customer.lastName}`}</p>
-            <p>{`${customer.streetAddress}, ${customer.city}, ${customer.state} ${customer.zipcode}`}</p>
-            <p>{customer.customerEmail}</p>
+            <p>{`${customer.address?.street}, ${customer.address?.city}, ${customer.address?.state} ${customer.address?.postalCode}`}</p>
             <p>{customer.customerPhone}</p>
-            <p>{customer.birthdate ? new Date(customer.birthdate).toLocaleDateString() : 'N/A'}</p>
+            <div>{/* Potential action buttons */}</div>
           </div>
         ))}
       </div>
 
-      {/* Conditionally render the ClientInputForm as the modal */}
       {isAddCustomerModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-md shadow-lg">
@@ -187,4 +127,5 @@ export default function Page() {
         </div>
       )}
     </div>
-  )};
+  );
+};
