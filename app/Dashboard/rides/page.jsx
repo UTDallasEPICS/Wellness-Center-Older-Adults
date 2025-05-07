@@ -1,3 +1,4 @@
+// ride/page.jsx
 "use client";
 import React, { useState, useEffect } from "react";
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
@@ -30,7 +31,7 @@ export default function Page() {
     } else if (hours12 === 0) {
       hours12 = 12;
     }
-    return `${hours12}:${minutes} ${ampm}`;
+    return `<span class="math-inline">\{hours12\}\:</span>{minutes} ${ampm}`;
   };
 
   const fetchRides = async () => {
@@ -42,7 +43,20 @@ export default function Page() {
         throw new Error(`Failed to fetch rides: ${response.status}`);
       }
       const data = await response.json();
-      setRidesData(data);
+      // Format the data to match the expected structure of AddRidesTable
+      const formattedData = data.map(ride => ({
+        id: ride.id, // Assuming your API returns an ID
+        customerID: ride.customer?.id, // Adjust based on your actual data structure
+        customerName: `${ride.customer?.firstName} ${ride.customer?.lastName}`,
+        customerPhone: ride.customer?.customerPhone,
+        startAddressID: ride.addrStart?.id, // Adjust based on your data structure
+        startLocation: `${ride.addrStart?.street}, ${ride.addrStart?.city}, ${ride.addrStart?.state} ${ride.addrStart?.postalCode}`,
+        endLocation: `${ride.addrEnd?.street}, ${ride.addrEnd?.city}, ${ride.addrEnd?.state} ${ride.addrEnd?.postalCode}`,
+        date: ride.date,
+        pickupTime: ride.startTime,
+        status: ride.status || "Unreserved", // Default status
+      }));
+      setRidesData(formattedData);
     } catch (error) {
       setError(error.message);
       toast.error(
@@ -57,17 +71,82 @@ export default function Page() {
     fetchRides();
   }, []);
 
+  const handleAddRide = async (newRideData) => {
+    try {
+      const response = await fetch("/api/createRide", { // Use your ride creation API endpoint
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newRideData),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to add ride: ${response.status} - ${errorData?.message || 'Unknown error'}`);
+      }
+      toast.success("Ride added successfully!");
+      fetchRides(); // Re-fetch to update the UI
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding ride:", error);
+      toast.error(`Failed to add ride: ${error.message}`);
+    }
+  };
+
+  const handleEditRide = async (updatedRideData) => {
+    try {
+      const response = await fetch(`/api/rides/${updatedRideData.id}`, { // Create an API endpoint for updating rides
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedRideData),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to update ride: ${response.status} - ${errorData?.message || 'Unknown error'}`);
+      }
+      toast.success("Ride updated successfully!");
+      fetchRides(); // Re-fetch to update the UI
+    } catch (error) {
+      console.error("Error updating ride:", error);
+      toast.error(`Failed to update ride: ${error.message}`);
+    }
+  };
+
+  const handleDeleteRide = async (rideId) => {
+    if (window.confirm("Are you sure you want to delete this ride?")) {
+      try {
+        const response = await fetch(`/api/rides/${rideId}`, { // Create an API endpoint for deleting rides
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Failed to delete ride: ${response.status} - ${errorData?.message || 'Unknown error'}`);
+        }
+        toast.success("Ride deleted successfully!");
+        fetchRides(); // Re-fetch to update the UI
+      } catch (error) {
+        console.error("Error deleting ride:", error);
+        toast.error(`Failed to delete ride: ${error.message}`);
+      }
+    }
+  };
+
   useEffect(() => {
     setTabsData([
       {
         aKey: "available",
         title: "Available Rides",
         content: (
-          <AddRidesTable // Assuming AddRidesTable is for available rides
+          <AddRidesTable // Now passing the callback props
             initialContacts={ridesData.filter(
               (ride) => ride.status === "Added" || ride.status === "Unreserved" // Adjust filter as needed
             )}
             convertTime={convertTo12Hour}
+            onAddRide={handleAddRide}
+            onEditRide={handleEditRide}
+            onDeleteRide={handleDeleteRide}
           />
         ),
       },
@@ -76,9 +155,7 @@ export default function Page() {
         title: "Reserved Rides",
         content: (
           <ReservedRidesTable
-            initialContacts={ridesData.filter(
-              (ride) => ride.status === "Reserved"
-            )}
+            initialContacts={ridesData.filter((ride) => ride.status === "Reserved")}
             convertTime={convertTo12Hour}
           />
         ),
@@ -88,28 +165,19 @@ export default function Page() {
         title: "Completed Rides",
         content: (
           <CompletedRidesTable
-            initialContacts={ridesData.filter(
-              (ride) => ride.status === "Completed"
-            )}
+            initialContacts={ridesData.filter((ride) => ride.status === "Completed")}
             convertTime={convertTo12Hour}
           />
         ),
       },
     ]);
-  }, [ridesData, convertTo12Hour]);
-
+  }, [ridesData, convertTo12Hour, handleAddRide, handleEditRide, handleDeleteRide]);
 
   const handleAddFormSubmit = (newRide) => {
-    // Optimistically update the UI by adding the new ride to the state
-    setRidesData((prevRides) => [
-      ...prevRides,
-      { ...newRide, status: "Added" },
-    ]);
-    setIsModalOpen(false);
-    toast.success("Ride added successfully!");
+    // This function is now primarily for the AddRideForm modal
+    handleAddRide(newRide);
   };
 
-  // Define handleAddTab function (if needed)
   const handleAddTab = () => {
     const newTabKey = `newTab${newTabIndex}`;
     setTabsData((prevTabs) => [
@@ -141,8 +209,7 @@ export default function Page() {
         type="button"
         className="h-[45px] w-[45px] rounded-full text-white bg-black border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
         onClick={() => setIsModalOpen(true)}
-      >
-        <span className="material-symbols-rounded">add</span>
+      ><span className="material-symbols-rounded">add</span>
       </button>
 
       <AddRideForm
