@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 interface RideRequestBody {
-    customerName: string;
+    customerId: number; // Changed to customerId, should be number to match your schema
     pickupStreet: string;
     pickupCity: string;
     pickupState: string;
@@ -16,7 +16,7 @@ interface RideRequestBody {
     date: string;
     ways: string;
     extraInfo: string;
-    // You might expect isTwoWayChecked here if needed
+    // isTwoWayChecked?: boolean; // If you sent it from the front-end
 }
 
 export async function POST(req: Request) {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     try {
         const {
-            customerName,
+            customerId, // Changed to customerId
             pickupStreet,
             pickupCity,
             pickupState,
@@ -42,10 +42,11 @@ export async function POST(req: Request) {
             // isTwoWayChecked, // If you sent it from the front-end
         } = (await req.json()) as RideRequestBody;
 
-        // 1. Find the Customer ID based on the customerName
-        const customer = await prisma.customer.findFirst({
+
+        // 1.  Find the Customer ID.
+        const customer = await prisma.customer.findUnique({
             where: {
-                firstName: customerName,
+                id: customerId,
             },
         });
 
@@ -53,54 +54,61 @@ export async function POST(req: Request) {
             return Response.json({ status: 400, message: 'Customer not found' });
         }
 
-        // 2. Create the Pickup Address
-        const startAddress = await prisma.address.create({
-            data: {
-                street: pickupStreet,
-                city: pickupCity,
-                state: pickupState,
-                postalCode: pickupZip,
-            },
-        });
-
-        // 3. Create the Destination Address
-        const endAddress = await prisma.address.create({
-            data: {
-                street: destinationStreet,
-                city: destinationCity,
-                state: destinationState,
-                postalCode: destinationZip,
-            },
-        });
-
-        // 4. Parse the Pick-Up Time
-        const [hours, minutes] = pickUpTime.split(':').map(Number);
         const pickupDateTime = new Date(date);
+        const [hours, minutes] = pickUpTime.split(':').map(Number);
         pickupDateTime.setHours(hours, minutes, 0, 0);
 
-        // 5. Create the Ride record, linking to the created addresses and customer
-        const createdRide = await prisma.ride.create({
-            data: {
-                customerID: customer.id,
-                date: new Date(date),
-                pickupTime: pickupDateTime,
-                startAddressID: startAddress.id,
-                endAddressID: endAddress.id,
-                specialNote: extraInfo,
-                // If you added these fields to your Ride schema:
-                // isTwoWay: isTwoWayChecked,
-                // waitTime: ways ? parseInt(ways) : null,
-                volunteerID: 1, // Replace with your dynamic logic
-            },
+
+        // Use a transaction to ensure atomicity
+        const createdRide = await prisma.$transaction(async (tx) => {
+            // 2. Create the Pickup Address
+            const startAddress = await tx.address.create({
+                data: {
+                    street: pickupStreet,
+                    city: pickupCity,
+                    state: pickupState,
+                    postalCode: pickupZip,
+                },
+            });
+
+            // 3. Create the Destination Address
+            const endAddress = await tx.address.create({
+                data: {
+                    street: destinationStreet,
+                    city: destinationCity,
+                    state: destinationState,
+                    postalCode: destinationZip,
+                },
+            });
+
+            // 5. Create the Ride record, linking to the created addresses and customer
+            const ride = await tx.ride.create({
+                data: {
+                    customerID: customer.id,
+                    date: pickupDateTime,
+                    pickupTime: pickupDateTime,
+                    startAddressID: startAddress.id,
+                    endAddressID: endAddress.id,
+                    specialNote: extraInfo,
+                    // isTwoWay: isTwoWayChecked, // If you added these fields to your Ride schema:
+                    // waitTime: ways ? parseInt(ways) : null,
+                    volunteerID: 1, // Replace with your dynamic logic
+                },
+            });
+            return ride;
         });
 
         const successResponse = { status: 201, message: 'Ride created successfully', data: createdRide };
         console.log("API Success Response:", successResponse);
         return Response.json(successResponse);
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error creating ride:', error);
-        return Response.json({ status: 500, message: 'Internal Server Error', error: error.message });
+        return Response.json({
+            status: 500,
+            message: 'Internal Server Error',
+            error: error, // Include the error object for more details
+        });
     } finally {
         await prisma.$disconnect();
     }

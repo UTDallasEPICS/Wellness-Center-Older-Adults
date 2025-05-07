@@ -14,9 +14,9 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tabsData, setTabsData] = useState([
-    { aKey: "added", title: "Added/Unreserved", content: null },
-    { aKey: "reserved", title: "Reserved", content: null },
-    { aKey: "completed", title: "Completed", content: null },
+    { aKey: "available", title: "Available Rides", content: null },
+    { aKey: "reserved", title: "Reserved Rides", content: null },
+    { aKey: "completed", title: "Completed Rides", content: null },
   ]);
   const [newTabIndex, setNewTabIndex] = useState(0);
 
@@ -60,12 +60,12 @@ export default function Page() {
   useEffect(() => {
     setTabsData([
       {
-        aKey: "added",
-        title: "Added/Unreserved",
+        aKey: "available",
+        title: "Available Rides",
         content: (
-          <AddRidesTable
+          <AddRidesTable // Assuming AddRidesTable is for available rides
             initialContacts={ridesData.filter(
-              (ride) => ride.status === "Added" || ride.status === "Unreserved"
+              (ride) => ride.status === "Added" || ride.status === "Unreserved" // Adjust filter as needed
             )}
             convertTime={convertTo12Hour}
           />
@@ -73,7 +73,7 @@ export default function Page() {
       },
       {
         aKey: "reserved",
-        title: "Reserved",
+        title: "Reserved Rides",
         content: (
           <ReservedRidesTable
             initialContacts={ridesData.filter(
@@ -85,7 +85,7 @@ export default function Page() {
       },
       {
         aKey: "completed",
-        title: "Completed",
+        title: "Completed Rides",
         content: (
           <CompletedRidesTable
             initialContacts={ridesData.filter(
@@ -107,6 +107,16 @@ export default function Page() {
     ]);
     setIsModalOpen(false);
     toast.success("Ride added successfully!");
+  };
+
+  // Define handleAddTab function (if needed)
+  const handleAddTab = () => {
+    const newTabKey = `newTab${newTabIndex}`;
+    setTabsData((prevTabs) => [
+      ...prevTabs,
+      { aKey: newTabKey, title: `New Tab ${newTabIndex + 1}`, content: <div>Content for new tab</div> },
+    ]);
+    setNewTabIndex((prevIndex) => prevIndex + 1);
   };
 
   if (loading) {
@@ -141,7 +151,7 @@ export default function Page() {
         handleAddFormSubmit={handleAddFormSubmit}
       />
 
-      <SimpleTab activeKey="added" onTabAdd={handleAddTab}>
+      <SimpleTab activeKey="available" onTabAdd={handleAddTab}>
         {tabsData.map((item) => (
           <div key={item.aKey} aKey={item.aKey} title={item.title}>
             {item.content}
