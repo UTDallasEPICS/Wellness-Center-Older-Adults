@@ -27,8 +27,61 @@ export default function Page() {
     fetchCustomers();
   }, []);
 
+<<<<<<< Updated upstream
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
+=======
+  const handleAddCustomerSubmit = (newCustomer) => {
+    // Optimistically update the UI by adding the new customer to the state
+    setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
+    setIsAddCustomerModalOpen(false);
+    // toast.success("Customer added successfully!");
+
+    // Ideally, you would also make an API call here to persist the new customer
+    fetch('/api/createCustomerAccount', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newCustomer),
+    })
+    .then(response => {
+      if (!response.ok) {
+        // toast.error("Failed to add customer.");
+        // Optionally, revert the optimistic update on error
+        setCustomers(prevCustomers => prevCustomers.filter(cust => cust !== newCustomer));
+        throw new Error('Failed to add customer');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Optionally, update the state with the server's response if needed
+      // setCustomers(prevCustomers => [...prevCustomers, data]);
+      // toast.success("Customer added successfully!");
+      // Re-fetch customers to ensure the list is up-to-date
+      fetchCustomers();
+    })
+    .catch(error => {
+      console.error('Error adding customer:', error);
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading Customers...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+>>>>>>> Stashed changes
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col">
