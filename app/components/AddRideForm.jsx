@@ -95,7 +95,18 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
         e.preventDefault();
 
         try {
+            const selectedCustomer = customers.find(
+                (customer) => customer.firstName === formData.customerName
+            );
+
+            if (!selectedCustomer) {
+                console.error("Error: Selected customer not found.");
+                // Optionally display an error message to the user
+                return;
+            }
+
             const rideDataToSend = {
+                customerId: selectedCustomer.id, // <---- ADD THIS LINE
                 customerName: formData.customerName,
                 pickupStreet: formData.pickupStreet,
                 pickupCity: formData.pickupCity,
@@ -111,6 +122,8 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 extraInfo: formData.extraInfo,
                 // You might want to send isTwoWayChecked if your backend needs it
             };
+
+            console.log("Data being sent:", rideDataToSend); // Add this for verification
 
             const response = await fetch("/api/createRide", {
                 method: "POST",

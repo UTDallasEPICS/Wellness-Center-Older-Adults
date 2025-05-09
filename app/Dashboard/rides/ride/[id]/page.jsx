@@ -41,7 +41,7 @@ export default function Ride() {
 
     return (
         <div className="flex h-screen">
-            <div className="w-1/2 p-5 bg-gray-100 font-sans">
+            <div className="w-1/2 p-5 bg-[#fffdf5] font-sans">
                 <div className="flex justify-between mb-5">
                     <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
                     <p className="m-0">Date: {new Date().toLocaleDateString()}</p>
@@ -72,7 +72,7 @@ export default function Ride() {
                 </div>
 
                 <div className="flex justify-between mb-5">
-                    <button className="px-5 py-2 bg-green-500 text-white rounded">Accept?</button>
+                    <button className="px-5 py-2 bg-[#419902] text-white rounded">Accept?</button>
                     <p className="m-0"><strong>Notes</strong><br />N/A</p>
                 </div>
             </div>

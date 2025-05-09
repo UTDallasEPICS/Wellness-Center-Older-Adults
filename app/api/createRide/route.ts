@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     try {
         const {
-            customerId, // Changed to customerId
+            customerId,
             pickupStreet,
             pickupCity,
             pickupState,
@@ -39,9 +39,8 @@ export async function POST(req: Request) {
             date,
             ways,
             extraInfo,
-            // isTwoWayChecked, // If you sent it from the front-end
+            // isTwoWayChecked,
         } = (await req.json()) as RideRequestBody;
-
 
         // 1.  Find the Customer ID.
         const customer = await prisma.customer.findUnique({
@@ -57,7 +56,6 @@ export async function POST(req: Request) {
         const pickupDateTime = new Date(date);
         const [hours, minutes] = pickUpTime.split(':').map(Number);
         pickupDateTime.setHours(hours, minutes, 0, 0);
-
 
         // Use a transaction to ensure atomicity
         const createdRide = await prisma.$transaction(async (tx) => {
@@ -90,24 +88,35 @@ export async function POST(req: Request) {
                     startAddressID: startAddress.id,
                     endAddressID: endAddress.id,
                     specialNote: extraInfo,
-                    // isTwoWay: isTwoWayChecked, // If you added these fields to your Ride schema:
+                    // isTwoWay: isTwoWayChecked,
                     // waitTime: ways ? parseInt(ways) : null,
                     volunteerID: 1, // Replace with your dynamic logic
                 },
             });
             return ride;
+        })
+        .then((ride) => {
+            const successResponse = { status: 201, message: 'Ride created successfully', data: ride };
+            console.log("API Success Response:", successResponse);
+            return Response.json(successResponse);
+        })
+        .catch((error) => {
+            console.error('Error creating ride within transaction:', error);
+            return Response.json({
+                status: 500,
+                message: 'Failed to create ride due to a database error',
+                error: error.message, // Include a more specific error message
+            });
         });
 
-        const successResponse = { status: 201, message: 'Ride created successfully', data: createdRide };
-        console.log("API Success Response:", successResponse);
-        return Response.json(successResponse);
+        return createdRide; // Return the promise from the transaction
 
     } catch (error: any) {
-        console.error('Error creating ride:', error);
+        console.error('Error during request processing:', error);
         return Response.json({
             status: 500,
-            message: 'Internal Server Error',
-            error: error, // Include the error object for more details
+            message: 'Internal Server Error during request processing',
+            error: error.message,
         });
     } finally {
         await prisma.$disconnect();

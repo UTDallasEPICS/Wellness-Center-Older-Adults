@@ -4,6 +4,7 @@ import SideNav from "@/app/components/Sidebar/sidenav";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from 'next/image';
 
 export default function DashboardLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -27,11 +28,22 @@ export default function DashboardLayout({ children }) {
     }
   }, []);
 
+/*<div className="w-full h-[70px] bg-[#fffdf5] border-b border-gray-300">
+        <a href="/Dashboard">
+       
+        </a>
+      </div>*/
   return (
     <div className="flex flex-col w-full min-h-screen">
-      <div className="w-full h-[70px] border-b border-gray-300">
+      <div className="w-full h-[70px] bg-[#fffdf5] border-b border-gray-300">
         <a href="/Dashboard">
-          <p className="p-5 text-lg font-light text-left text-gray-900 w-1/2">WCOA</p>
+        <Image 
+            className="w-60 h-auto mt-2" 
+            src="/logo.png" 
+            alt="Logo" 
+            width={1600} 
+            height={800} 
+          />    
         </a>
       </div>
 
