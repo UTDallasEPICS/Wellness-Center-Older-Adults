@@ -5,11 +5,11 @@ const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) =>
   const router = useRouter();
 
   const handleRowClick = () => {
-    router.push(`rides/ride/${contact.id}`);
+    router.push(`/Dashboard/rides/ride/${contact.id}`);
   };
 
   return (
-    <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100">
+    <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200">
       <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         {contact.clientName}
       </td>

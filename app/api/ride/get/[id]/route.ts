@@ -1,9 +1,20 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse, NextRequest } from 'next/server';
-import { Client } from '@googlemaps/google-maps-services-js';
+import { Client, DistanceMatrixResponse, DistanceMatrixRequest } from '@googlemaps/google-maps-services-js';
 
 const prisma = new PrismaClient();
 const googleMapsClient = new Client({});
+
+// Utility function to handle Google Maps API call
+const getDistanceMatrix = async (req: DistanceMatrixRequest): Promise<DistanceMatrixResponse> => {
+    try {
+        const response = await googleMapsClient.distancematrix(req);
+        return response;
+    } catch (error: any) {
+        // Improved error handling: Wrap the error and provide context.
+        throw new Error(`Google Maps API error: ${error.message}`, { cause: error });
+    }
+};
 
 export async function GET(
     request: NextRequest,
@@ -33,53 +44,67 @@ export async function GET(
             },
         });
 
-        console.log({ ride });
-
         if (!ride) {
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
 
-        // Google Maps Distance Matrix API calls
-        const distanceMatrixAB = await googleMapsClient.distancematrix({
-            params: {
-                origins: [`${ride.addrStart?.street}, ${ride.addrStart?.city}, ${ride.addrStart?.state}, ${ride.addrStart?.postalCode}`],
-                destinations: [`${ride.addrEnd?.street}, ${ride.addrEnd?.city}, ${ride.addrEnd?.state}, ${ride.addrEnd?.postalCode}`],
-                key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
-                units: 'imperial',
-            },
-            timeout: 1000,
-        });
-
-        const driveTimeAB = distanceMatrixAB.data.rows[0].elements[0].duration?.text || 'N/A';
-        const mileageText = distanceMatrixAB.data.rows[0].elements[0].distance?.text || 'N/A';
-        const mileage = mileageText.includes('mi') ? mileageText : mileageText + " mi";
-
-        // Concatenate address properties
-        const pickupAddressString = ride.addrStart
+        // Construct origin and destination strings
+        const origin = ride.addrStart
             ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`
-            : 'N/A';
-        const dropoffAddressString = ride.addrEnd
+            : '';
+        const destination = ride.addrEnd
             ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`
-            : 'N/A';
+            : '';
 
-        // Format the ride data as needed
+        let driveTimeAB = 'N/A';
+        let mileage = 'N/A';
+
+        // Only call Google Maps if we have both origin and destination
+        if (origin && destination) {
+            try {
+                const distanceMatrixAB = await getDistanceMatrix({
+                    params: {
+                        origins: [origin],
+                        destinations: [destination],
+                        key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '', // Ensure key is provided
+                        units: 'imperial',
+                    },
+                    timeout: 5000, // Increased timeout to 5 seconds
+                });
+
+                // Refactor: Simplify access and handle missing elements robustly
+                const element = distanceMatrixAB.data?.rows?.[0]?.elements?.[0];
+                driveTimeAB = element?.duration?.text || 'N/A';
+                const mileageText = element?.distance?.text;
+                mileage = mileageText ? (mileageText.includes('mi') ? mileageText : `${mileageText} mi`) : 'N/A';
+            } catch (error: any) {
+                // Handle Google Maps API errors gracefully.  Log the error and set to N/A
+                console.error('Error fetching distance matrix:', error);
+                driveTimeAB = 'N/A';
+                mileage = 'N/A';
+            }
+        }
+
+        // Format the ride data
         const formattedRide = {
             id: ride.id,
-            pickupAddress: pickupAddressString, // Use the concatenated string
-            dropoffAddress: dropoffAddressString, // Use the concatenated string
+            pickupAddress: origin || 'N/A', // Use the origin/destination variables
+            dropoffAddress: destination || 'N/A',
             pickupTime: ride.pickupTime,
-            customer: ride.customer ? { name: ride.customer.firstName + ' ' + ride.customer.lastName } : { name: 'N/A' },
-            mileage: mileage,
+            customer: ride.customer ? { name: `${ride.customer.firstName} ${ride.customer.lastName}` } : { name: 'N/A' },
+            mileage,
             status: ride.status,
-            driveTimeAB: driveTimeAB,
+            driveTimeAB,
             waitTime: 'N/A',
         };
 
         return NextResponse.json(formattedRide);
-    } catch (error) {
-        console.error('Error fetching ride:', error);
+    } catch (error: any) {
+        // Catch any errors in the  try block
+        console.error('Error fetching ride details:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     } finally {
         await prisma.$disconnect();
     }
 }
+
