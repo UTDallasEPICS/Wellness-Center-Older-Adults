@@ -10,14 +10,14 @@ const CancelRidesModel = ({ handleConfirmCancel, handleDenyCancel}) => {
           <button
             type="button"
             onClick={handleDenyCancel}
-            className="bg-gray-600 text-white py-2 px-4 rounded-md mr-2"
+            className="bg-gray-600 text-white py-2 px-4 rounded-md mr-2 hover:bg-gray-700 transition duration-200"
           >
             No
           </button>
           <button
             type="button"
             onClick={handleConfirmCancel}
-            className="bg-red-600 text-white py-2 px-4 rounded-md"
+            className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition duration-200"
           >
             Yes
           </button>

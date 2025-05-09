@@ -162,7 +162,7 @@ export default function Page() {
   const handleDeleteRide = async (rideId) => {
     if (window.confirm("Are you sure you want to delete this ride?")) {
       try {
-        const response = await fetch(`/api/rides/${rideId}`, {
+        const response = await fetch(`/api/deleteRides/${rideId}`, { // Corrected delete route
           method: "DELETE",
         });
         if (!response.ok) {
@@ -216,7 +216,7 @@ export default function Page() {
           )}
           convertTime={convertTo12Hour}
           onEditRide={handleEditRide}
-          onDeleteRide={handleDeleteRide}
+          onDeleteRide={handleDeleteRide} // Passing the delete handler
         />
       ),
     },
@@ -227,6 +227,8 @@ export default function Page() {
         <ReservedRidesTable
           initialContacts={ridesData.filter((ride) => ride.status === "Reserved")}
           convertTime={convertTo12Hour}
+          onRideDeleted={handleDeleteRide} // Passing the delete handler
+          onRideUpdated={handleEditRide} // Assuming you want to edit from this table too
         />
       ),
     },
@@ -237,6 +239,8 @@ export default function Page() {
         <CompletedRidesTable
           initialContacts={ridesData.filter((ride) => ride.status === "Completed")}
           convertTime={convertTo12Hour}
+          // You might not want delete/edit on completed rides, adjust as needed
+          onDeleteRide={handleDeleteRide}
         />
       ),
     },

@@ -1,10 +1,11 @@
 "use client";
 import RideMap from '../../../../components/RideMap';
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function Ride() {
     const { id } = useParams();
+    const router = useRouter();
     const [rideDetails, setRideDetails] = useState(null);
     const [error, setError] = useState(null);
 
@@ -39,6 +40,29 @@ export default function Ride() {
         return `${formattedHours}:${formattedMinutes} ${ampm}`;
     }
 
+    const handleAcceptRide = async () => {
+        if (rideDetails) {
+            try {
+                const response = await fetch(`/api/rides/${rideDetails.id}`, { // Updated API endpoint
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'Reserved' }), // Only updating the status
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update ride status: ${response.status}`);
+                }
+
+                router.push('/reserved-rides'); // Navigate to the reserved rides page
+            } catch (err) {
+                console.error("Error updating ride status:", err);
+                setError("Failed to reserve ride.");
+            }
+        }
+    };
+
     return (
         <div className="flex h-screen">
             <div className="w-1/2 p-5 bg-[#fffdf5] font-sans">
@@ -72,17 +96,24 @@ export default function Ride() {
                 </div>
 
                 <div className="flex justify-between mb-5">
-                    <button className="px-5 py-2 bg-[#419902] text-white rounded">Accept?</button>
+                    <button
+                        className="px-5 py-2 bg-[#419902] text-white rounded"
+                        onClick={handleAcceptRide}
+                    >
+                        Accept?
+                    </button>
                     <p className="m-0"><strong>Notes</strong><br />N/A</p>
                 </div>
             </div>
             <div className="w-1/2 h-screen">
-                {console.log({ rideDetails: rideDetails.pickupAddress })}
-                <RideMap
-                    pickupAddress={rideDetails.pickupAddress}
-                    dropoffAddress={rideDetails.dropoffAddress}
-                    finalAddress={rideDetails.dropoffAddress}
-                />
+                {console.log({ rideDetails: rideDetails?.pickupAddress })}
+                {rideDetails?.pickupAddress && rideDetails?.dropoffAddress && (
+                    <RideMap
+                        pickupAddress={rideDetails.pickupAddress}
+                        dropoffAddress={rideDetails.dropoffAddress}
+                        finalAddress={rideDetails.dropoffAddress}
+                    />
+                )}
             </div>
         </div>
     );

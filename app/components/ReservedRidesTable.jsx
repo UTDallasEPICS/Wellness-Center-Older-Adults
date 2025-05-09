@@ -1,9 +1,8 @@
 import { useState, Fragment, useEffect } from "react";
-import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
-import EditableRow from "/app/components/EditableRow.jsx";
+import ReadOnlyRow from "./ReadOnlyRow";
+import EditableRow from "./EditableRow";
 
-
-const ReservedRidesTable = ({ initialContacts }) => {
+const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated }) => {
   const [contacts, setContacts] = useState(initialContacts);
   const [editContactId, setEditContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -40,34 +39,60 @@ const ReservedRidesTable = ({ initialContacts }) => {
     setEditFormData(newFormData);
   };
 
-  const handleEditFormSubmit = (event) => {
+  const handleEditFormSubmit = async (event) => {
     event.preventDefault();
-    const editedContact = {
-      id: editContactId,
-      clientName: editFormData.clientName,
-      phoneNumber: editFormData.phoneNumber,
-      address: editFormData.address,
-      startTime: editFormData.startTime,
-      volunteerName: editFormData.volunteerName,
-      status: contacts.find((contact) => contact.id === editContactId).status,
-      hours: contacts.find((contact) => contact.id === editContactId).hours,
-    };
-    const newContacts = [...contacts];
-    const index = contacts.findIndex((contact) => contact.id === editContactId);
-    newContacts[index] = editedContact;
-    setContacts(newContacts);
-    setEditContactId(null);
+    try {
+      const response = await fetch(`/api/rides/${editContactId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editFormData),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update ride:", response.status);
+        return;
+      }
+
+      const updatedRide = await response.json();
+      const newContacts = contacts.map((contact) =>
+        contact.id === editContactId ? updatedRide : contact
+      );
+      setContacts(newContacts);
+      setEditContactId(null);
+      if (onRideUpdated) {
+        onRideUpdated(updatedRide);
+      }
+    } catch (error) {
+      console.error("Error updating ride:", error);
+    }
   };
 
-  const handleCancelClick = () => {
-    setEditContactId(null);
-  };
+const handleCancelClick = async (contactId) => {
+    try {
+      const response = await fetch(`/api/deleteRides/${contactId}`, { // ENSURE THIS IS CORRECT
+        method: 'DELETE',
+      });
 
-  const handleDeleteClick = (contactId) => {
-    const newContacts = [...contacts];
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    newContacts.splice(index, 1);
-    setContacts(newContacts);
+      if (!response.ok) {
+        console.error("Failed to cancel ride:", response.status);
+        const errorData = await response.text();
+        console.error("Error data:", errorData);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Deletion successful:", data);
+
+      if (onRideDeleted) {
+        onRideDeleted(contactId);
+      }
+      const newContacts = contacts.filter((contact) => contact.id !== contactId);
+      setContacts(newContacts);
+    } catch (error) {
+      console.error("Error deleting ride:", error);
+    }
   };
 
   return (
@@ -94,19 +119,16 @@ const ReservedRidesTable = ({ initialContacts }) => {
                       editFormData={editFormData}
                       handleEditFormChange={handleEditFormChange}
                       status={contact.status}
-                      handleCancelClick={handleCancelClick}
+                      handleCancelClick={() => setEditContactId(null)}
                     />
                   ) : (
                     <ReadOnlyRow
                       key={contact.id}
                       contact={contact}
                       handleEditClick={handleEditClick}
-                      handleDeleteClick={handleDeleteClick}
+                      handleDeleteClick={handleCancelClick} // Now correctly calling the delete function
                       status={contact.status}
                     />
-
-
-                   
                   )}
                 </Fragment>
               ))}

@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) => {
   const router = useRouter();
 
-const handleRowClick = () => {
-  router.push(`/Dashboard/rides/ride/${contact.id}`);
-};
+  const handleRowClick = () => {
+    router.push(`/Dashboard/rides/ride/${contact.id}`);
+  };
 
   return (
     <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200">
@@ -40,7 +40,7 @@ const handleRowClick = () => {
             <span className="material-symbols-rounded">edit</span>
           </button>
           <button
-            className="text-white bg-[#419902] cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-[#2b6701]"
+            className="text-white bg-red-500 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-700"
             type="button"
             onClick={(event) => {
               event.stopPropagation();

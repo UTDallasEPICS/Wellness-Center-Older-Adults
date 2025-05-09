@@ -61,21 +61,22 @@ export default function Page() {
   const [volunteerToDelete, setVolunteerToDelete] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); // State for the Add Volunteer Modal
 
-  useEffect(() => {
-    async function fetchVolunteers() {
-      try {
-        const response = await fetch('/api/getAllVolunteers');
-        const data = await response.json();
-        if (response.ok) {
-          setVolunteersData(data);
-        } else {
-          throw new Error(data.message || 'Failed to fetch volunteers');
-        }
-      } catch (error) {
-        console.error('Error fetching volunteers:', error);
-        toast.error('Error fetching volunteers.');
+  const fetchVolunteers = async () => {
+    try {
+      const response = await fetch('/api/getAllVolunteers');
+      const data = await response.json();
+      if (response.ok) {
+        setVolunteersData(data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch volunteers');
       }
+    } catch (error) {
+      console.error('Error fetching volunteers:', error);
+      toast.error('Error fetching volunteers.');
     }
+  };
+
+  useEffect(() => {
     fetchVolunteers();
   }, []);
 
@@ -201,6 +202,16 @@ export default function Page() {
   };
 
   const handleConfirmDelete = async () => {
+    const volunteerIdToDelete = volunteerToDelete.VolunteerID;
+    const previousVolunteersData = [...volunteersData]; // Create a copy for potential rollback
+
+    // Optimistically update the UI
+    setVolunteersData(volunteersData.filter(
+      (volunteer) => volunteer.VolunteerID !== volunteerIdToDelete
+    ));
+    setShowDeleteModal(false);
+    setVolunteerToDelete(null);
+
     try {
       const response = await fetch('/api/deleteVolunteer', {
         method: 'DELETE',
@@ -208,25 +219,24 @@ export default function Page() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: volunteerToDelete.VolunteerID
+          id: volunteerIdToDelete
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        setVolunteersData(volunteersData.filter(
-          (volunteer) => volunteer.VolunteerID !== volunteerToDelete.VolunteerID
-        ));
-        setShowDeleteModal(false);
-        setVolunteerToDelete(null);
-        toast.success("Volunteer deleted successfully!");
-      } else {
+      if (!response.ok) {
+        // Revert the optimistic update on error
+        setVolunteersData(previousVolunteersData);
         throw new Error(data.message || 'Failed to delete volunteer');
       }
+
+      toast.success("Volunteer deleted successfully!");
     } catch (error) {
       console.error('Error deleting volunteer:', error);
       toast.error(error.message || "Failed to delete volunteer.");
+      // Optionally, re-fetch data to ensure consistency if optimistic update fails consistently
+      // fetchVolunteers();
     }
   };
 

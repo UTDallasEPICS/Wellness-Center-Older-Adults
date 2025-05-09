@@ -57,7 +57,6 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
             className="w-full p-1 h-20 border border-gray-300 rounded-sm box-border resize-y block mx-auto text-center font-sans"
             type="text"
             name="volunteerName"
-            required="required"
             placeholder="Enter volunteer name"
             value={editFormData.volunteerName}
             onChange={handleEditFormChange}
@@ -73,7 +72,7 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
           <span className="material-symbols-rounded">done</span>
         </button>
         <button
-          className="text-white bg-green-600 border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-green-700"
+          className="text-white bg-red-500 border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-red-700"
           type="button"
           onClick={handleCancelClick}
         >
