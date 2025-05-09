@@ -1,93 +1,116 @@
-import { useState } from "react";
+// /app/components/AddVolunteerForm.jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-const AddVolunteerForm = ({
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-6 rounded-md shadow-lg relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <svg
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+const VolunteerForm = ({
   handleAddFormSubmit,
   handleAddFormChange,
   addFormData,
 }) => {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
-
   return (
-    <div className="max-w-[70%] mx-auto">
-      <h2 className="text-left font-light text-2xl mb-5">Add a Volunteer</h2>
-      <form
-        className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0"
-        onSubmit={handleAddFormSubmit}
-      >
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            First Name
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={addFormData.firstName}
-            onChange={handleAddFormChange}
-          />
-        </div>
+    <form
+      className="flex flex-col space-y-4"
+      onSubmit={handleAddFormSubmit}
+    >
+      <div className="w-full">
+        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+          First Name
+        </label>
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+          type="text"
+          name="firstName"
+          placeholder="First Name"
+          value={addFormData.firstName}
+          onChange={handleAddFormChange}
+        />
+      </div>
 
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Last Name
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={addFormData.lastName}
-            onChange={handleAddFormChange}
-          />
-        </div>
+      <div className="w-full">
+        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+          Last Name
+        </label>
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+          type="text"
+          name="lastName"
+          placeholder="Last Name"
+          value={addFormData.lastName}
+          onChange={handleAddFormChange}
+        />
+      </div>
 
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={addFormData.email}
-            onChange={handleAddFormChange}
-          />
-        </div>
+      <div className="w-full">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={addFormData.email}
+          onChange={handleAddFormChange}
+        />
+      </div>
 
-        <div className="w-full lg:w-1/4">
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-            Phone
-          </label>
-          <input
-            className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-            type="text"
-            name="phone"
-            placeholder="Phone"
-            value={addFormData.phone}
-            onChange={handleAddFormChange}
-          />
-        </div>
+      <div className="w-full">
+        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+          Phone
+        </label>
+        <input
+          className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+          type="text"
+          name="phone"
+          placeholder="Phone"
+          value={addFormData.phone}
+          onChange={handleAddFormChange}
+        />
+      </div>
 
-        
-
-        <div className="w-full lg:w-auto flex items-end lg:mt-0 mt-4">
-          <button
-            className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
-            type="submit"
-          >
-            Add
-          </button>
-        </div>
-      </form>
-    </div>
+      <div className="w-full flex justify-end mt-4">
+        <button
+          className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
+          type="submit"
+        >
+          Add
+        </button>
+      </div>
+    </form>
   );
 };
 
-export default AddVolunteerForm;
+export default VolunteerForm;
