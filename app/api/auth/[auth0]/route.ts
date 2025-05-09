@@ -85,7 +85,7 @@ export async function POST(request: Request, { params }: { params: { auth0: stri
                 return ret;
             }
 
-            let redirectTo = `/Dashboard/volunteers`;
+            let redirectTo = `/Dashboard`;
             if (user.isAdmin) {
                 redirectTo = '/Dashboard/dashboardEmployee/rides/page';
             }
