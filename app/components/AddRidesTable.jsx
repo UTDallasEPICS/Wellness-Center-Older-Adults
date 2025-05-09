@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
 import EditableRow from "/app/components/EditableRow.jsx";
 
-const AddRidesTable = ({ initialContacts, convertTime }) => {
+const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide }) => {
   const [contacts, setContacts] = useState(initialContacts);
   const [editContactId, setEditContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -48,10 +48,7 @@ const AddRidesTable = ({ initialContacts, convertTime }) => {
       pickupTime: editFormData.pickupTime,
       status: contacts.find((contact) => contact.id === editContactId).status,
     };
-    const newContacts = [...contacts];
-    const index = contacts.findIndex((contact) => contact.id === editContactId);
-    newContacts[index] = editedContact;
-    setContacts(newContacts);
+    onEditRide(editedContact); // Call the onEditRide prop to update the data
     setEditContactId(null);
   };
 
@@ -60,10 +57,7 @@ const AddRidesTable = ({ initialContacts, convertTime }) => {
   };
 
   const handleDeleteClick = (contactId) => {
-    const newContacts = [...contacts];
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    newContacts.splice(index, 1);
-    setContacts(newContacts);
+    onDeleteRide(contactId); // Call the onDeleteRide prop to delete the data
   };
 
   return (
@@ -81,9 +75,10 @@ const AddRidesTable = ({ initialContacts, convertTime }) => {
           </thead>
           <tbody>
             {contacts
-              .filter((contact) => contact.status === "Unreserved")
-              .map((contact) =>
-                editContactId === contact.id ? (
+              .filter((contact) => contact.status === "Unreserved" || contact.status === "AVAILABLE")
+              .map((contact) => {
+                console.log("Contact being passed to ReadOnlyRow:", contact); // Debugging line
+                return editContactId === contact.id ? (
                   <EditableRow
                     key={contact.id}
                     editFormData={editFormData}
@@ -98,9 +93,10 @@ const AddRidesTable = ({ initialContacts, convertTime }) => {
                     handleEditClick={handleEditClick}
                     handleDeleteClick={handleDeleteClick}
                     convertTime={convertTime}
+                    status={contact.status}
                   />
-                )
-              )}
+                );
+              })}
           </tbody>
         </table>
       </form>

@@ -63,7 +63,7 @@ export default function Ride() {
 
                 <div className="flex justify-between mb-5">
                     <p className="m-0"><strong>Client</strong><br />{rideDetails.customer?.name}</p>
-                    <p className="m-0"><strong>Drive Time</strong><br />A-B: {rideDetails.driveTimeAB}<br />B-C: {rideDetails.driveTimeBC || 'N/A'}</p>
+                    <p className="m-0"><strong>Drive Time</strong><br />A-B: {rideDetails.driveTimeAB}</p>
                 </div>
 
                 <div className="flex justify-between mb-5">

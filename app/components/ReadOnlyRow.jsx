@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) => {
   const router = useRouter();
 
-  const handleRowClick = () => {
-    router.push(`/Dashboard/rides/ride/${contact.id}`);
-  };
+const handleRowClick = () => {
+  router.push(`/Dashboard/rides/ride/${contact.id}`);
+};
 
   return (
     <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200">

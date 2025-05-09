@@ -15,10 +15,9 @@ export async function GET(req: Request) {
     const rides = await prisma.ride.findMany({
       where: {
         status: 'AVAILABLE',
-        // NOTE: EVENTUALLY YOU SHOULD ALSO LOOK FOR RIDES THAT ARE CONNECTED TO THE ID OF
-        // THE VOLUNTEER SHOULD ALSO BE ABLE TO SEE WHAT RIDES THEY HAVE RESERVED
       },
       select: {
+        id: true,
         customer: {
           select: {
             firstName: true,
@@ -47,19 +46,14 @@ export async function GET(req: Request) {
       },
     });
 
-    const formattedRides = rides.map((ride: {
-      customer: { firstName: string; lastName: string; customerPhone: string };
-      addrStart: { street: string; city: string; state: string; postalCode: string };
-      addrEnd: { street: string; city: string; state: string; postalCode: string };
-      date: string;
-      pickupTime: string;
-    }) => ({
+    const formattedRides = rides.map((ride) => ({
+      id: ride.id,
       customerName: `${ride.customer.firstName} ${ride.customer.lastName}`,
       customerPhone: ride.customer.customerPhone,
       startLocation: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
       endLocation: `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`,
-      date: ride.date,
-      startTime: ride.pickupTime,
+      date: ride.date.toISOString(), // Convert Date to ISO string
+      startTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }), // Format time as HH:MM
     }));
 
     return NextResponse.json(formattedRides);

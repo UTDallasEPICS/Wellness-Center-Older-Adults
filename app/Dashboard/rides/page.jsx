@@ -41,30 +41,33 @@ export default function Page() {
       const rawData = await response.json();
       console.log("Raw API Data:", rawData);
 
-      const formattedData = rawData.map((ride) => ({
-        id: ride.id,
-        customerID: ride.customer?.id,
-        customerName: `${ride.customer?.firstName || ""} ${
-          ride.customer?.lastName || ""
-        }`.trim(),
-        customerPhone: ride.customer?.customerPhone || "",
-        startAddressID: ride.addrStart?.id,
-        startLocation: `${ride.addrStart?.street || ""}, ${
-          ride.addrStart?.city || ""
-        }, ${ride.addrStart?.state || ""} ${
-          ride.addrStart?.postalCode || ""
-        }`
-          .replace(/,\s*,/, ",")
-          .replace(/^,|,$/g, ""),
-        endLocation: `${ride.addrEnd?.street || ""}, ${
-          ride.addrEnd?.city || ""
-        }, ${ride.addrEnd?.state || ""} ${ride.addrEnd?.postalCode || ""}`
-          .replace(/,\s*,/, ",")
-          .replace(/^,|,$/g, ""),
-        date: ride.date,
-        pickupTime: ride.startTime,
-        status: ride.status || "Unreserved",
-      }));
+      const formattedData = rawData.map((ride) => {
+        console.log("Raw ride object:", ride); // Debugging line
+        return {
+          id: ride.id,
+          customerID: ride.customer?.id,
+          customerName: `${ride.customer?.firstName || ""} ${
+            ride.customer?.lastName || ""
+          }`.trim(),
+          customerPhone: ride.customer?.customerPhone || "",
+          startAddressID: ride.addrStart?.id,
+          startLocation: `${ride.addrStart?.street || ""}, ${
+            ride.addrStart?.city || ""
+          }, ${ride.addrStart?.state || ""} ${
+            ride.addrStart?.postalCode || ""
+          }`
+            .replace(/,\s*,/, ",")
+            .replace(/^,|,$/g, ""),
+          endLocation: `${ride.addrEnd?.street || ""}, ${
+            ride.addrEnd?.city || ""
+          }, ${ride.addrEnd?.state || ""} ${ride.addrEnd?.postalCode || ""}`
+            .replace(/,\s*,/, ",")
+            .replace(/^,|,$/g, ""),
+          date: ride.date,
+          pickupTime: ride.startTime,
+          status: ride.status || "Unreserved",
+        };
+      });
       console.log("Formatted Data:", formattedData);
       setRidesData(formattedData);
     } catch (error) {
@@ -206,7 +209,10 @@ export default function Page() {
       content: (
         <AddRidesTable
           initialContacts={ridesData.filter(
-            (ride) => ride.status === "Added" || ride.status === "Unreserved"
+            (ride) =>
+              ride.status === "Added" ||
+              ride.status === "Unreserved" ||
+              ride.status === "AVAILABLE"
           )}
           convertTime={convertTo12Hour}
           onEditRide={handleEditRide}
