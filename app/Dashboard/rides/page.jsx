@@ -9,9 +9,14 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddRidePositive from "/app/components/AddRidePositive.jsx";
 import AddRideNeg from "/app/components/AddRideNeg.jsx";
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+import { useSearchParams, useRouter } from 'next/navigation'; // Import useSearchParams and useRouter
+import RideMap from '../../components/RideMap';
+import { useParams } from 'next/navigation';
 
 export default function Page() {
+  const { id: rideIdFromParams } = useParams();
+  const router = useRouter();
+  const [rideDetails, setRideDetails] = useState(null);
   const [ridesData, setRidesData] = useState([]);
   const [notification, setNotification] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +35,7 @@ export default function Page() {
     } else if (hours12 === 0) {
       hours12 = 12;
     }
-    return `${hours12}:${minutes} ${ampm}`;
+    return `<span class="math-inline">\{hours12\}\:</span>{minutes} ${ampm}`;
   };
 
   const fetchRides = async () => {
@@ -81,65 +86,81 @@ export default function Page() {
     }
   };
 
+  const fetchRideDetails = async (id) => {
+    try {
+      const response = await fetch(`/api/ride/get/${id}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ride details: ${response.status}`);
+      }
+      const data = await response.json();
+      setRideDetails(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   useEffect(() => {
     const tabFromQuery = searchParams.get('tab');
     if (tabFromQuery && ['available', 'reserved', 'completed'].includes(tabFromQuery)) {
       setActiveTab(tabFromQuery);
     }
     fetchRides();
-  }, [searchParams]); // Re-run effect when query parameters change
+    if (rideIdFromParams) {
+      fetchRideDetails(rideIdFromParams);
+    }
+  }, [searchParams, rideIdFromParams]); // Re-run effect when query parameters or rideId changes
 
-  const handleAddRide = async (newRideData) => {
-    if (
-      !newRideData.customerName?.trim() ||
-      !newRideData.pickupStreet?.trim() ||
-      !newRideData.destinationStreet?.trim() ||
-      !newRideData.pickUpTime?.trim() ||
-      !newRideData.date?.trim()
-    ) {
-      setNotification(<AddRideNeg />);
+const handleAddRide = async (newRideData) => {
+  if (
+    !newRideData.customerName?.trim() ||
+    !newRideData.pickupStreet?.trim() ||
+    !newRideData.destinationStreet?.trim() ||
+    !newRideData.pickUpTime?.trim() ||
+    !newRideData.date?.trim()
+  ) {
+    setNotification(<AddRideNeg />);
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/createRide", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newRideData),
+    });
+    if (!response.ok) {
+      const errorMessage = `HTTP error! status: ${response.status}`;
+      console.error(errorMessage);
+      setNotification(<AddRideNeg message={errorMessage} />);
       setTimeout(() => {
         setNotification(null);
       }, 3000);
       return;
     }
 
-    try {
-      const response = await fetch("/api/createRide", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newRideData),
-      });
-      if (!response.ok) {
-        const errorMessage = `HTTP error! status: ${response.status}`;
-        console.error(errorMessage);
-        setNotification(<AddRideNeg message={errorMessage} />);
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("API Response:", data);
-      fetchRides(); // Re-fetch rides to update the UI
-      setNotification(<AddRidePositive />);
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error adding ride:", error);
-      setNotification(
-        <AddRideNeg message="Failed to add ride due to a client-side error." />
-      );
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-    }
-  };
+    const data = await response.json();
+    console.log("API Response:", data);
+    fetchRides(); // Re-fetch rides to update the UI
+    setNotification(<AddRidePositive />);
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+    setIsModalOpen(false);
+  } catch (error) {
+    console.error("Error adding ride:", error);
+    setNotification(
+      <AddRideNeg message="Failed to add ride due to a client-side error." />
+    );
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  }
+};
 
   const handleEditRide = async (updatedRideData) => {
     try {
@@ -160,6 +181,9 @@ export default function Page() {
       }
       toast.success("Ride updated successfully!");
       fetchRides();
+      if (rideDetails?.id === updatedRideData.id) {
+        fetchRideDetails(updatedRideData.id); // Update details view if it's the same ride
+      }
     } catch (error) {
       console.error("Error updating ride:", error);
       toast.error(`Failed to update ride: ${error.message}`);
@@ -182,6 +206,9 @@ export default function Page() {
         }
         toast.success("Ride deleted successfully!");
         fetchRides();
+        if (rideDetails?.id === rideId) {
+          setRideDetails(null); // Clear details view if it was the deleted ride
+        }
       } catch (error) {
         console.error("Error deleting ride:", error);
         toast.error(`Failed to delete ride: ${error.message}`);
@@ -193,7 +220,90 @@ export default function Page() {
     handleAddRide(formData);
   };
 
-  if (loading) {
+  function formatTime(timeString) {
+    if (!timeString) return "";
+    const [hours, minutes] = timeString.split(":");
+    let formattedHours = parseInt(hours, 10);
+    const formattedMinutes = String(minutes).padStart(2, "0");
+    const ampm = formattedHours >= 12 ? 'PM' : 'AM';
+    formattedHours = formattedHours % 12;
+    formattedHours = formattedHours ? formattedHours : 12;
+    return `<span class="math-inline">\{formattedHours\}\:</span>{formattedMinutes} ${ampm}`;
+  }
+
+  const handleAcceptRide = async () => {
+    if (rideDetails) {
+      try {
+        const response = await fetch(`/api/rides/${rideDetails.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'Reserved' }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update ride status: ${response.status}`);
+        }
+
+        setRideDetails({ ...rideDetails, status: 'Reserved' }); // Update local state
+        router.push('/Dashboard/rides?tab=reserved');
+      } catch (err) {
+        console.error("Error updating ride status:", err);
+        setError("Failed to reserve ride.");
+      }
+    }
+  };
+
+  const handleCompleteRide = async () => {
+    if (rideDetails) {
+      try {
+        const response = await fetch(`/api/rides/${rideDetails.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'Completed' }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`);
+        }
+
+        setRideDetails({ ...rideDetails, status: 'Completed' }); // Update local state
+        router.push('/Dashboard/rides?tab=completed');
+      } catch (err) {
+        console.error("Error updating ride status to Completed:", err);
+        setError("Failed to mark ride as completed.");
+      }
+    }
+  };
+
+  let actionButton;
+  if (rideDetails?.status === 'AVAILABLE' || rideDetails?.status === 'Added' || rideDetails?.status === 'Unreserved') {
+    actionButton = (
+      <button
+        className="px-5 py-2 bg-[#419902] text-white rounded mr-2"
+        onClick={handleAcceptRide}
+      >
+        Accept?
+      </button>
+    );
+  } else if (rideDetails?.status === 'Reserved') {
+    actionButton = (
+      <button
+        className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
+        onClick={handleCompleteRide}
+      >
+        Completed
+      </button>
+    );
+  } else if (rideDetails?.status === 'Completed') {
+    actionButton = null;
+  }
+
+  if (loading && !rideIdFromParams) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>Loading rides...</p>
@@ -205,6 +315,61 @@ export default function Page() {
     return (
       <div className="flex items-center justify-center h-screen text-red-500">
         <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (rideIdFromParams) {
+    if (!rideDetails) {
+      return <div className="animate-pulse">Loading ride details...</div>;
+    }
+    return (
+      <div className="flex h-screen">
+        <div className="w-1/2 p-5 bg-[#fffdf5] font-sans">
+          <div className="flex justify-between mb-5">
+            <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
+            <p className="m-0">Date: {new Date().toLocaleDateString()}</p>
+          </div>
+
+          <div className="flex justify-between mb-5">
+            <div>
+              <p className="my-1 font-semibold"><strong>Trip</strong></p>
+              <p className="my-1">A: {rideDetails.pickupAddress}</p>
+              <p className="my-1">B: {rideDetails.dropoffAddress}</p>
+            </div>
+            <p className="m-0">
+              <strong>Pick-up Time</strong><br />
+              {rideDetails.pickupTime
+                ? formatTime(new Date(rideDetails.pickupTime).toLocaleTimeString('en-US', { hour12: false }))
+                : 'N/A'}
+            </p>
+          </div>
+
+          <div className="flex justify-between mb-5">
+            <p className="m-0"><strong>Client</strong><br />{rideDetails.customer?.name}</p>
+            <p className="m-0"><strong>Drive Time</strong><br />A-B: {rideDetails.driveTimeAB}</p>
+          </div>
+
+          <div className="flex justify-between mb-5">
+            <p className="m-0"><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
+            <p className="m-0"><strong>Wait Time</strong><br />{rideDetails.waitTime || 'N/A'}</p>
+          </div>
+
+          <div className="flex justify-between mb-5">
+            {actionButton}
+            <p className="m-0"><strong>Notes</strong><br />N/A</p>
+          </div>
+        </div>
+        <div className="w-1/2 h-screen">
+          {console.log({ rideDetails: rideDetails?.pickupAddress })}
+          {rideDetails?.pickupAddress && rideDetails?.dropoffAddress && (
+            <RideMap
+              pickupAddress={rideDetails.pickupAddress}
+              dropoffAddress={rideDetails.dropoffAddress}
+              finalAddress={rideDetails.dropoffAddress}
+            />
+          )}
+        </div>
       </div>
     );
   }
@@ -244,7 +409,7 @@ export default function Page() {
       title: "Completed",
       content: (
         <CompletedRidesTable
-          initialContacts={ridesData.filter((ride) => ride.status === "Completed")}
+          initialContactsinitialContacts={ridesData.filter((ride) => ride.status === "Completed")}
           convertTime={convertTo12Hour}
           // You might not want delete/edit on completed rides, adjust as needed
           onDeleteRide={handleDeleteRide}

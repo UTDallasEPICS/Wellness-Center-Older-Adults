@@ -71,38 +71,39 @@ const CompletedRidesTable = ({ initialContacts }) => {
     setContacts(newContacts);
   };
 
-  return (
-    <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
-      <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
-        <table className="border-collapse ml-[0.5%] w-[99%]">
-          {/* Serves as the header of the table */}
-          <thead>
-            <tr>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Client Name
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Contact Number
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Address
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Pick-up Time
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Volunteer Name
-              </th>
-              <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Actions
-              </th>
-            </tr>
-          </thead>
+return (
+  <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
+    <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
+      <table className="border-collapse ml-[0.5%] w-[99%]">
+        {/* Serves as the header of the table */}
+        <thead>
+          <tr>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Client Name
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Contact Number
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Address
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Pick-up Time
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Volunteer Name
+            </th>
+            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+              Actions
+            </th>
+          </tr>
+        </thead>
 
-          {/* Stores the data */}
-          <tbody>
-            {/*Pulls element from the data structure to map out information */}
-            {contacts
+        {/* Stores the data */}
+        <tbody>
+          {/*Pulls element from the data structure to map out information */}
+          {Array.isArray(initialContacts) &&
+            initialContacts
               .filter((contact) => contact.status === "Completed")
               .map((contact) => (
                 <Fragment key={contact.id}>
@@ -124,12 +125,12 @@ const CompletedRidesTable = ({ initialContacts }) => {
                   )}
                 </Fragment>
               ))}
-          </tbody>
-        </table>
-        {/* Could prob make this a separate component to make it a prompt to add info */}
-      </form>
-    </div>
-  );
+        </tbody>
+      </table>
+      {/* Could prob make this a separate component to make it a prompt to add info */}
+    </form>
+  </div>
+);
 };
 
 export default CompletedRidesTable;
