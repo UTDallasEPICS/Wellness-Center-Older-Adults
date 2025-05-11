@@ -1,3 +1,4 @@
+// app\Dashboard\rides\ride\[id]\page.jsx
 "use client";
 import RideMap from '../../../../components/RideMap';
 import React, { useState, useEffect } from 'react';
@@ -43,25 +44,75 @@ export default function Ride() {
     const handleAcceptRide = async () => {
         if (rideDetails) {
             try {
-                const response = await fetch(`/api/rides/${rideDetails.id}`, { // Updated API endpoint
+                const response = await fetch(`/api/rides/${rideDetails.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ status: 'Reserved' }), // Only updating the status
+                    body: JSON.stringify({ status: 'Reserved' }),
                 });
 
                 if (!response.ok) {
                     throw new Error(`Failed to update ride status: ${response.status}`);
                 }
 
-                router.push('/Dashboard/rides?tab=reserved'); // Corrected navigation path
+                setRideDetails({ ...rideDetails, status: 'Reserved' }); // Update local state
+                // Optionally, you could navigate away immediately or show a success message
+                // router.push('/Dashboard/rides?tab=reserved');
             } catch (err) {
                 console.error("Error updating ride status:", err);
                 setError("Failed to reserve ride.");
             }
         }
     };
+
+    const handleCompleteRide = async () => {
+        if (rideDetails) {
+            try {
+                const response = await fetch(`/api/rides/${rideDetails.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'Completed' }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`);
+                }
+
+                setRideDetails({ ...rideDetails, status: 'Completed' }); // Update local state
+                router.push('/Dashboard/rides?tab=completed');
+            } catch (err) {
+                console.error("Error updating ride status to Completed:", err);
+                setError("Failed to mark ride as completed.");
+            }
+        }
+    };
+
+    let actionButton;
+    if (rideDetails?.status === 'AVAILABLE' || rideDetails?.status === 'Added' || rideDetails?.status === 'Unreserved') {
+        actionButton = (
+            <button
+                className="px-5 py-2 bg-[#419902] text-white rounded mr-2"
+                onClick={handleAcceptRide}
+            >
+                Accept?
+            </button>
+        );
+    } else if (rideDetails?.status === 'Reserved') {
+        actionButton = (
+            <button
+                className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
+                onClick={handleCompleteRide}
+            >
+                Completed
+            </button>
+        );
+    } else if (rideDetails?.status === 'Completed') {
+        actionButton = actionButton = null;
+    }
 
     return (
         <div className="flex h-screen">
@@ -96,12 +147,7 @@ export default function Ride() {
                 </div>
 
                 <div className="flex justify-between mb-5">
-                    <button
-                        className="px-5 py-2 bg-[#419902] text-white rounded"
-                        onClick={handleAcceptRide}
-                    >
-                        Accept?
-                    </button>
+                    {actionButton}
                     <p className="m-0"><strong>Notes</strong><br />N/A</p>
                 </div>
             </div>
