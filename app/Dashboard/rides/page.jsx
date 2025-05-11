@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddRidePositive from "/app/components/AddRidePositive.jsx";
 import AddRideNeg from "/app/components/AddRideNeg.jsx";
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 
 export default function Page() {
   const [ridesData, setRidesData] = useState([]);
@@ -16,6 +17,8 @@ export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const searchParams = useSearchParams(); // Get access to URL query parameters
+  const [activeTab, setActiveTab] = useState('available'); // Default active tab
 
   const convertTo12Hour = (time24) => {
     if (!time24) return "";
@@ -79,8 +82,12 @@ export default function Page() {
   };
 
   useEffect(() => {
+    const tabFromQuery = searchParams.get('tab');
+    if (tabFromQuery && ['available', 'reserved', 'completed'].includes(tabFromQuery)) {
+      setActiveTab(tabFromQuery);
+    }
     fetchRides();
-  }, []);
+  }, [searchParams]); // Re-run effect when query parameters change
 
   const handleAddRide = async (newRideData) => {
     if (
@@ -266,7 +273,7 @@ export default function Page() {
         handleAddFormSubmit={handleAddFormSubmit}
       />
 
-      <SimpleTab activeKey="available">
+      <SimpleTab activeKey={activeTab}>
         {tabs.map((item) => (
           <Tab key={item.aKey} aKey={item.aKey} title={item.title}>
             {item.content}

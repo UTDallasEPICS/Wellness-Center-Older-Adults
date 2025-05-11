@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import AddVolunteersTable from "/app/components/AddVolunteersTable.jsx"; // Volunteer Table
+import AddVolunteersTable from "/app/components/AddVolunteersTable.jsx";
 import EditVolunteerModal from "/app/components/EditVolunteerModal.jsx";
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
 import { toast } from "react-toastify";
@@ -59,7 +59,7 @@ export default function Page() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [volunteerToDelete, setVolunteerToDelete] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // State for the Add Volunteer Modal
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const fetchVolunteers = async () => {
     try {
@@ -92,7 +92,7 @@ export default function Page() {
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false);
-    setAddFormData({ firstName: "", lastName: "", email: "", phone: "" }); // Reset form on close
+    setAddFormData({ firstName: "", lastName: "", email: "", phone: "" });
   };
 
   const handleAddFormSubmit = async (event) => {
@@ -133,7 +133,7 @@ export default function Page() {
           ...prevData,
           { ...data.volunteer, status: "AVAILABLE" },
         ]);
-        handleCloseAddModal(); // Close the modal on successful submission
+        handleCloseAddModal();
         toast.success("Volunteer added successfully!");
       }
     } catch (error) {
@@ -196,14 +196,18 @@ export default function Page() {
   };
 
   const handleDeleteClick = (VolunteerID) => {
+    console.log("Delete button clicked for VolunteerID:", VolunteerID);
     const volunteer = volunteersData.find((v) => v.VolunteerID === VolunteerID);
     setVolunteerToDelete(volunteer);
+    console.log("volunteerToDelete state:", volunteer);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    const volunteerIdToDelete = volunteerToDelete.VolunteerID;
-    const previousVolunteersData = [...volunteersData]; // Create a copy for potential rollback
+    console.log("handleConfirmDelete called. volunteerToDelete:", volunteerToDelete);
+    const volunteerIdToDelete = volunteerToDelete?.VolunteerID;
+    console.log("volunteerIdToDelete:", volunteerIdToDelete);
+    const previousVolunteersData = [...volunteersData];
 
     // Optimistically update the UI
     setVolunteersData(volunteersData.filter(
@@ -213,22 +217,15 @@ export default function Page() {
     setVolunteerToDelete(null);
 
     try {
-      const response = await fetch('/api/deleteVolunteer', {
+      const response = await fetch(`/api/deleteVolunteer/${volunteerIdToDelete}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: volunteerIdToDelete
-        }),
       });
-
-      const data = await response.json();
 
       if (!response.ok) {
         // Revert the optimistic update on error
         setVolunteersData(previousVolunteersData);
-        throw new Error(data.message || 'Failed to delete volunteer');
+        const errorData = await response.json();
+        throw new Error(errorData?.message || 'Failed to delete volunteer');
       }
 
       toast.success("Volunteer deleted successfully!");
@@ -256,7 +253,7 @@ export default function Page() {
         <button
           type="button"
           className="h-[45px] w-[45px] rounded-full text-white bg-black border-none flex items-center justify-center"
-          onClick={handleOpenAddModal} // Open the modal on button click
+          onClick={handleOpenAddModal}
         >
           <span className="material-symbols-rounded">add</span>
         </button>
@@ -274,7 +271,6 @@ export default function Page() {
         />
       </div>
 
-      {/* Add Volunteer Modal */}
       {isAddModalOpen && (
         <div style={modalOverlayStyle}>
           <div style={modalContentStyle}>
@@ -353,7 +349,6 @@ export default function Page() {
         </div>
       )}
 
-      {/* Edit Volunteer Modal */}
       {showEditModal && (
         <EditVolunteerModal
           editFormData={editFormData}
@@ -363,7 +358,6 @@ export default function Page() {
         />
       )}
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <DeleteConfirmationModal
           volunteerName={`${volunteerToDelete?.firstName} ${volunteerToDelete?.lastName}`}

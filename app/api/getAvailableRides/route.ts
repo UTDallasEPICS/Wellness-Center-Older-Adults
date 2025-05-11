@@ -13,9 +13,6 @@ export async function GET(req: Request) {
 
   try {
     const rides = await prisma.ride.findMany({
-      where: {
-        status: 'AVAILABLE',
-      },
       select: {
         id: true,
         customer: {
@@ -43,6 +40,7 @@ export async function GET(req: Request) {
         },
         date: true,
         pickupTime: true,
+        status: true, // Include the status in the fetched data
       },
     });
 
@@ -54,6 +52,7 @@ export async function GET(req: Request) {
       endLocation: `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`,
       date: ride.date.toISOString(), // Convert Date to ISO string
       startTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }), // Format time as HH:MM
+      status: ride.status, // Include the status in the formatted data
     }));
 
     return NextResponse.json(formattedRides);

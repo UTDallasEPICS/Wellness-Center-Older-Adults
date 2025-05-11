@@ -55,7 +55,7 @@ export default function Ride() {
                     throw new Error(`Failed to update ride status: ${response.status}`);
                 }
 
-                router.push('/reserved-rides'); // Navigate to the reserved rides page
+                router.push('/Dashboard/rides?tab=reserved'); // Corrected navigation path
             } catch (err) {
                 console.error("Error updating ride status:", err);
                 setError("Failed to reserve ride.");
