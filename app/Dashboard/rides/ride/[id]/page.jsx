@@ -57,11 +57,34 @@ export default function Ride() {
                 }
 
                 setRideDetails({ ...rideDetails, status: 'Reserved' }); // Update local state
-                // Optionally, you could navigate away immediately or show a success message
-                // router.push('/Dashboard/rides?tab=reserved');
+                router.push('/Dashboard/rides?tab=reserved');
             } catch (err) {
                 console.error("Error updating ride status:", err);
                 setError("Failed to reserve ride.");
+            }
+        }
+    };
+
+    const handleUnreserveRide = async () => {
+        if (rideDetails) {
+            try {
+                const response = await fetch(`/api/rides/${rideDetails.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'AVAILABLE' }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update ride status: ${response.status}`);
+                }
+
+                setRideDetails({ ...rideDetails, status: 'AVAILABLE' }); // Update local state
+                router.push('/Dashboard/rides?tab=available');
+            } catch (err) {
+                console.error("Error updating ride status:", err);
+                setError("Failed to unreserve ride.");
             }
         }
     };
@@ -103,15 +126,23 @@ export default function Ride() {
         );
     } else if (rideDetails?.status === 'Reserved') {
         actionButton = (
-            <button
-                className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
-                onClick={handleCompleteRide}
-            >
-                Completed
-            </button>
+            <>
+                <button
+                    className="px-5 py-2 bg-yellow-500 hover:bg-yellow-700 text-white rounded mr-2"
+                    onClick={handleUnreserveRide}
+                >
+                    Unreserve
+                </button>
+                <button
+                    className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
+                    onClick={handleCompleteRide}
+                >
+                    Completed
+                </button>
+            </>
         );
     } else if (rideDetails?.status === 'Completed') {
-        actionButton = actionButton = null;
+        actionButton = null;
     }
 
     return (

@@ -9,9 +9,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddRidePositive from "/app/components/AddRidePositive.jsx";
 import AddRideNeg from "/app/components/AddRideNeg.jsx";
-import { useSearchParams, useRouter } from 'next/navigation'; // Import useSearchParams and useRouter
+import { useSearchParams, useRouter, useParams } from 'next/navigation'; // Import useSearchParams and useRouter
 import RideMap from '../../components/RideMap';
-import { useParams } from 'next/navigation';
 
 export default function Page() {
   const { id: rideIdFromParams } = useParams();
@@ -35,7 +34,7 @@ export default function Page() {
     } else if (hours12 === 0) {
       hours12 = 12;
     }
-    return `<span class="math-inline">\{hours12\}\:</span>{minutes} ${ampm}`;
+    return `<span class="math-inline"><span class="math-inline">\{hours12\}\\\:</span>{minutes} ${ampm}`;
   };
 
   const fetchRides = async () => {
@@ -110,57 +109,8 @@ export default function Page() {
     }
   }, [searchParams, rideIdFromParams]); // Re-run effect when query parameters or rideId changes
 
-const handleAddRide = async (newRideData) => {
-  if (
-    !newRideData.customerName?.trim() ||
-    !newRideData.pickupStreet?.trim() ||
-    !newRideData.destinationStreet?.trim() ||
-    !newRideData.pickUpTime?.trim() ||
-    !newRideData.date?.trim()
-  ) {
-    setNotification(<AddRideNeg />);
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/createRide", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newRideData),
-    });
-    if (!response.ok) {
-      const errorMessage = `HTTP error! status: ${response.status}`;
-      console.error(errorMessage);
-      setNotification(<AddRideNeg message={errorMessage} />);
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-      return;
-    }
-
-    const data = await response.json();
-    console.log("API Response:", data);
-    fetchRides(); // Re-fetch rides to update the UI
-    setNotification(<AddRidePositive />);
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-    setIsModalOpen(false);
-  } catch (error) {
-    console.error("Error adding ride:", error);
-    setNotification(
-      <AddRideNeg message="Failed to add ride due to a client-side error." />
-    );
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-  }
-};
+  const handleAddRide = async (newRideData) => {
+  };
 
   const handleEditRide = async (updatedRideData) => {
     try {
@@ -228,7 +178,7 @@ const handleAddRide = async (newRideData) => {
     const ampm = formattedHours >= 12 ? 'PM' : 'AM';
     formattedHours = formattedHours % 12;
     formattedHours = formattedHours ? formattedHours : 12;
-    return `<span class="math-inline">\{formattedHours\}\:</span>{formattedMinutes} ${ampm}`;
+    return `<span class="math-inline"><span class="math-inline">\{formattedHours\}\\\:</span>{formattedMinutes} ${ampm}`;
   }
 
   const handleAcceptRide = async () => {
@@ -409,7 +359,7 @@ const handleAddRide = async (newRideData) => {
       title: "Completed",
       content: (
         <CompletedRidesTable
-          initialContactsinitialContacts={ridesData.filter((ride) => ride.status === "Completed")}
+          initialContacts={ridesData.filter((ride) => ride.status === "Completed")}
           convertTime={convertTo12Hour}
           // You might not want delete/edit on completed rides, adjust as needed
           onDeleteRide={handleDeleteRide}
