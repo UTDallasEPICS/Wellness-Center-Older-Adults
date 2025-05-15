@@ -1,44 +1,13 @@
+// client/page.jsx
 "use client";
 import React, { useState, useEffect } from 'react';
 import ClientInputForm from "/app/components/ClientInputForm.jsx";
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
+import AddClientsTable from "/app/components/AddClientsTable.jsx"; // Import the new component
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const modalOverlayStyle = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 50,
-};
-
-const modalContentStyle = {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-    maxWidth: '90%',
-    maxHeight: '90%',
-    overflowY: 'auto',
-    position: 'relative',
-};
-
-const modalCloseButtonStyle = {
-    position: 'absolute',
-    top: '10px',
-    right: '10px',
-    background: 'none',
-    border: 'none',
-    fontSize: '1.5em',
-    cursor: 'pointer',
-    color: 'gray',
-};
+// ... (rest of your modal styles remain the same)
 
 export default function Page() {
     const [customers, setCustomers] = useState([]);
@@ -165,31 +134,8 @@ export default function Page() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-5 text-black px-6 py-4 font-light text-[15px] bg-white border-b border-gray-300 w-full">
-                <p>Name</p>
-                <p>Address</p>
-                <p>Phone</p>
-                <div></div> {/* Empty column for potential actions */}
-            </div>
-
-            {/* Client List Table */}
-            <div className="w-full flex flex-col text-black bg-white border-t border-b border-gray-300">
-                {customers.map((customer, index) => (
-                    <div key={index} className="grid grid-cols-5 py-4 border-b border-gray-300 px-6">
-                        <p>{`${customer.firstName} ${customer.lastName}`}</p>
-                        <p>{`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}</p>
-                        <p>{customer.customerPhone}</p>
-                        <div className="flex justify-end">
-                            <button
-                                onClick={() => handleDeleteClick(customer.id)}
-                                className="text-red-500 hover:text-red-700"
-                            >
-                                <span className="material-symbols-rounded">delete</span>
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {/* Client List Table using the new component */}
+            <AddClientsTable customers={customers} handleDeleteClick={handleDeleteClick} />
 
             {isAddCustomerModalOpen && (
                 <div style={modalOverlayStyle}>
