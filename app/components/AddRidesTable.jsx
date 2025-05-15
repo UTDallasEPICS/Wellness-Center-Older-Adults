@@ -76,9 +76,8 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide 
           <tbody>
             {contacts
               .filter((contact) => contact.status === "Unreserved" || contact.status === "AVAILABLE")
-              .map((contact) => {
-                console.log("Contact being passed to ReadOnlyRow:", contact); // Debugging line
-                return editContactId === contact.id ? (
+              .map((contact) => (
+                editContactId === contact.id ? (
                   <EditableRow
                     key={contact.id}
                     editFormData={editFormData}
@@ -95,8 +94,8 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide 
                     convertTime={convertTime}
                     status={contact.status}
                   />
-                );
-              })}
+                )
+              ))}
           </tbody>
         </table>
       </form>

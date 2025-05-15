@@ -34,7 +34,7 @@ export default function Page() {
     } else if (hours12 === 0) {
       hours12 = 12;
     }
-    return `<span class="math-inline"><span class="math-inline">\{hours12\}\\\:</span>{minutes} ${ampm}`;
+    return `<span class="math-inline"><span class="math-inline">\\\{hours12\\\}\\\:</span>{minutes} ${ampm}`;
   };
 
   const fetchRides = async () => {
@@ -52,26 +52,13 @@ export default function Page() {
         console.log("Raw ride object:", ride); // Debugging line
         return {
           id: ride.id,
-          customerID: ride.customer?.id,
-          customerName: `${ride.customer?.firstName || ""} ${
-            ride.customer?.lastName || ""
-          }`.trim(),
-          customerPhone: ride.customer?.customerPhone || "",
-          startAddressID: ride.addrStart?.id,
-          startLocation: `${ride.addrStart?.street || ""}, ${
-            ride.addrStart?.city || ""
-          }, ${ride.addrStart?.state || ""} ${
-            ride.addrStart?.postalCode || ""
-          }`
-            .replace(/,\s*,/, ",")
-            .replace(/^,|,$/g, ""),
-          endLocation: `${ride.addrEnd?.street || ""}, ${
-            ride.addrEnd?.city || ""
-          }, ${ride.addrEnd?.state || ""} ${ride.addrEnd?.postalCode || ""}`
-            .replace(/,\s*,/, ",")
-            .replace(/^,|,$/g, ""),
+          customerID: ride.customerID, // Assuming customerID is directly available
+          customerName: ride.customerName,
+          phoneNumber: ride.customerPhone,
+          startAddressID: ride.startLocation, // Use startLocation directly
+          endLocation: ride.endLocation,   // Use endLocation directly
           date: ride.date,
-          pickupTime: ride.startTime,
+          startTime: ride.startTime,
           status: ride.status || "Unreserved",
         };
       });
@@ -178,7 +165,7 @@ export default function Page() {
     const ampm = formattedHours >= 12 ? 'PM' : 'AM';
     formattedHours = formattedHours % 12;
     formattedHours = formattedHours ? formattedHours : 12;
-    return `<span class="math-inline"><span class="math-inline">\{formattedHours\}\\\:</span>{formattedMinutes} ${ampm}`;
+    return `<span class="math-inline"><span class="math-inline">\\\{formattedHours\\\}\\\:</span>{formattedMinutes} ${ampm}`;
   }
 
   const handleAcceptRide = async () => {
@@ -275,12 +262,14 @@ export default function Page() {
     }
     return (
       <div className="flex h-screen">
-        <div className="w-1/2 p-5 bg-[#fffdf5] font-sans">
+        <div className="w-1/2 p-5 ride-details-container">
           <div className="flex justify-between mb-5">
             <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
-            <p className="m-0">Date: {new Date().toLocaleDateString()}</p>
+            {console.log("rideDetails.date:", rideDetails.date)} {/* This will log to the console */}
+            <p className="m-0">
+              Date: {rideDetails.date ? rideDetails.date.toLocaleTimeString('en-US') : 'Date not available'}
+            </p>
           </div>
-
           <div className="flex justify-between mb-5">
             <div>
               <p className="my-1 font-semibold"><strong>Trip</strong></p>
@@ -370,6 +359,14 @@ export default function Page() {
 
   return (
     <div className="h-full w-full bg-white relative">
+      <style jsx>
+        {`
+          .main-container {
+            /* Add your global styles for this page here */
+            font-family: sans-serif; /* Example */
+          }
+        `}
+      </style>
       {notification && (
         <div className="absolute top-4 right-4 z-50">{notification}</div>
       )}
