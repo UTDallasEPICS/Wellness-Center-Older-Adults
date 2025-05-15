@@ -20,10 +20,10 @@ const SimpleTab = ({ activeKey, children, onTabAdd }) => {
         {childArray.map((item) => (
           <div
             key={item.props.aKey}
-            className={`min-w-[80px] px-5 py-4 text-gray-600 opacity-60 bg-white text-xl text-center font-light cursor-pointer transition-all duration-500 ease-in-out ${
+            className={`min-w-[80px] px-5 py-4 text-gray-600 opacity-60 bg-[#fffdf5] text-xl text-center font-light cursor-pointer transition-all ease-in-out ${
               key === item.props.aKey
-                ? 'opacity-100 bg-gray-100 border-b-4 border-black'
-                : 'hover:opacity-100 hover:bg-gray-50'
+                ? 'opacity-100 bg-[#fffdf5] text-black border-b-4 border-black'
+                : 'hover:opacity-100 hover:[#e2dbd0]/70'
             }`}
             onClick={() => handleTabClick(item.props.aKey)}
           >
