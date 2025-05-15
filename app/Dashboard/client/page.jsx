@@ -69,18 +69,6 @@ export default function Page() {
     }, []);
 
     const handleAddCustomerSubmit = (newCustomer) => {
-        // Optimistically update the UI (without address details for now)
-        setCustomers((prevCustomers) => [...prevCustomers, {
-            firstName: newCustomer.firstName,
-            lastName: newCustomer.lastName,
-            customerPhone: newCustomer.customerPhone,
-            address: {
-                street: newCustomer.streetAddress,
-                city: newCustomer.city,
-                state: newCustomer.state,
-                postalCode: newCustomer.customerZipCode
-            }
-        }]);
         setIsAddCustomerModalOpen(false);
 
         fetch('/api/createCustomerAccount', { // Updated API endpoint URL
@@ -93,23 +81,18 @@ export default function Page() {
             .then(response => {
                 if (!response.ok) {
                     console.error('Failed to add customer:', response.status);
-                    // Optionally, revert the optimistic update on error (you might need a unique identifier for this)
-                    setCustomers(prevCustomers => prevCustomers.filter(cust => cust.firstName !== newCustomer.firstName || cust.lastName !== newCustomer.lastName || cust.customerPhone !== newCustomer.customerPhone));
                     throw new Error('Failed to add customer');
                 }
                 return response.json();
             })
             .then(data => {
                 console.log('Customer added successfully:', data);
-                // Re-fetch customers to update the list with the actual database data
-                fetchCustomers();
-                // Optionally update local state with the full data returned from the server
-                // setCustomers(prevCustomers => [...prevCustomers, data.data]);
+                toast.success('Client added successfully!');
+                window.location.reload(); // Reload after successful add
             })
             .catch(error => {
                 console.error('Error adding customer:', error);
-                toast.error('Failed to add customer.');
-                // Optionally display an error message to the user
+                toast.error('Failed to add client.');
             });
     };
 
@@ -122,10 +105,7 @@ export default function Page() {
     const handleConfirmDelete = async () => {
         console.log("handleConfirmDelete called. customerToDelete:", customerToDelete);
         const customerIdToDelete = customerToDelete;
-        const previousCustomersData = [...customers];
 
-        // Optimistically update the UI to remove the customer
-        setCustomers(customers.filter(customer => customer.id !== customerIdToDelete));
         setShowDeleteModal(false);
         setCustomerToDelete(null);
 
@@ -135,19 +115,15 @@ export default function Page() {
             });
 
             if (!response.ok) {
-                // Revert the optimistic update on error
-                setCustomers(previousCustomersData);
                 const errorData = await response.json();
-                throw new Error(errorData?.message || 'Failed to delete customer'); // Updated error message
+                throw new Error(errorData?.message || 'Failed to delete client'); // Updated error message
             }
 
-            toast.success("Customer deleted successfully!"); // Updated success message
-            // No need to re-fetch immediately if the optimistic update is sufficient
+            toast.success("Client deleted successfully!"); // Updated success message
+            window.location.reload(); // Reload after successful delete
         } catch (error) {
-            console.error('Error deleting customer:', error); // Updated error message
-            toast.error(error.message || "Failed to delete customer."); // Updated error message
-            // Optionally, re-fetch data to ensure consistency if optimistic delete fails
-            // fetchCustomers();
+            console.error('Error deleting client:', error); // Updated error message
+            toast.error(error.message || "Failed to delete client."); // Updated error message
         }
     };
 
@@ -159,7 +135,7 @@ export default function Page() {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <p>Loading Customers...</p>
+                <p>Loading Clients...</p>
             </div>
         );
     }

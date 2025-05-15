@@ -81,7 +81,7 @@ export default function AdminPage() {
                     email: newAdmin.email,
                     firstName: newAdmin.firstName,
                     lastName: newAdmin.lastName,
-                    password: newAdmin.password, // Ensure you send the password
+                    // password: newAdmin.password, // Ensure you send the password if your backend expects it
                 }),
             });
 
@@ -90,8 +90,8 @@ export default function AdminPage() {
                 throw new Error(errorData?.message || 'Failed to add admin');
             }
 
-            fetchAdmins();
             toast.success('Admin created successfully!');
+            window.location.reload(); // Reload after successful add
         } catch (error) {
             console.error('Error adding admin:', error);
             toast.error(error.message || 'Failed to add admin.');
@@ -125,7 +125,7 @@ export default function AdminPage() {
             }
 
             toast.success("Admin deleted successfully!");
-            // Optionally, no need to re-fetch immediately if optimistic update is sufficient
+            window.location.reload(); // Reload after successful delete
         } catch (error) {
             console.error('Error deleting admin:', error);
             toast.error(error.message || "Failed to delete admin.");
@@ -199,14 +199,14 @@ export default function AdminPage() {
             </div>
 
             {isAddAdminModalOpen && (
-            <div style={modalOverlayStyle}>
-                <div style={modalContentStyle}>
-                    <button style={modalCloseButtonStyle} onClick={() => setIsAddAdminModalOpen(false)}>&times;</button>
-                    <h2 style={{ textAlign: 'left', fontWeight: '300', fontSize: '24px', marginBottom: '16px' }}>Add New Admin</h2>
-                    <AddAdminForm onSubmit={handleAddAdminSubmit} onClose={() => setIsAddAdminModalOpen(false)} />
+                <div style={modalOverlayStyle}>
+                    <div style={modalContentStyle}>
+                        <button style={modalCloseButtonStyle} onClick={() => setIsAddAdminModalOpen(false)}>&times;</button>
+                        <h2 style={{ textAlign: 'left', fontWeight: '300', fontSize: '24px', marginBottom: '16px' }}>Add New Admin</h2>
+                        <AddAdminForm onSubmit={handleAddAdminSubmit} onClose={() => setIsAddAdminModalOpen(false)} />
+                    </div>
                 </div>
-            </div>
-        )}
+            )}
 
             {showDeleteModal && (
                 <div style={modalOverlayStyle}>
