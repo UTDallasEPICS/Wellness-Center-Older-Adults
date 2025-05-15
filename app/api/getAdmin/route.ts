@@ -1,24 +1,29 @@
 // app/api/getAdmin/route.ts
-import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
 export async function GET() {
-  try {
-    // Fetch admin users from the database where isAdmin is true
-    const admins = await prisma.user.findMany({
-      where: {
-        isAdmin: true,
-      },
-    });
+    try {
+        const admins = await prisma.user.findMany({
+            where: {
+                isAdmin: true,
+                isArchived: false,
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+            },
+        });
 
-    return NextResponse.json(admins, { status: 200 });
-
-  } catch (error) {
-    console.error('Error fetching admins:', error);
-    return NextResponse.json({ error: 'Failed to fetch admins from the database' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect(); // Disconnect Prisma client after the request
-  }
+        return NextResponse.json(admins, { status: 200 });
+    } catch (error: any) {
+        console.error('Error fetching admins:', error);
+        return NextResponse.json({ message: 'Failed to fetch admins', error: error.message }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
 }
