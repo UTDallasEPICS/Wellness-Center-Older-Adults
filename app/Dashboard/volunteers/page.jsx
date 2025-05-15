@@ -136,6 +136,8 @@ export default function Page() {
         ]);
         handleCloseAddModal();
         toast.success("Volunteer added successfully!");
+        window.location.reload(); // Right here!
+
       }
     } catch (error) {
       console.error('Error adding volunteer:', error);
@@ -187,6 +189,8 @@ export default function Page() {
         setEditVolunteerId(null);
         setShowEditModal(false);
         toast.success("Volunteer updated successfully!");
+        window.location.reload(); // And here!
+
       } else {
         throw new Error(result.message);
       }
@@ -229,6 +233,8 @@ export default function Page() {
       }
 
       toast.success("Volunteer deleted successfully!");
+      window.location.reload();
+
     } catch (error) {
       console.error('Error deleting volunteer:', error);
       toast.error(error.message || "Failed to delete volunteer.");
