@@ -7,9 +7,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     type="text"
-                    name="clientName"
-                    placeholder="Enter client's name..."
-                    value={editFormData.clientName || ''}
+                    name="customerID" // Changed from "clientName"
+                    placeholder="Enter client's ID..."
+                    value={editFormData.customerID || ''}
                     onChange={handleEditFormChange}
                 />
             </td>
@@ -18,7 +18,7 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     type="text"
-                    name="phoneNumber"
+                    name="phoneNumber" // Keep this if it maps correctly to your data
                     placeholder="Enter contact number..."
                     value={editFormData.phoneNumber || ''}
                     onChange={handleEditFormChange}
@@ -29,9 +29,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     type="text"
-                    name="address"
-                    placeholder="Enter client's address"
-                    value={editFormData.address || ''}
+                    name="startAddressID" // Changed from "address"
+                    placeholder="Enter start address ID"
+                    value={editFormData.startAddressID || ''}
                     onChange={handleEditFormChange}
                 />
             </td>
@@ -39,10 +39,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
             <td className="p-2">
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
-                    type="text"
-                    name="startTime"
-                    placeholder="Enter time of pick-up..."
-                    value={editFormData.startTime || ''}
+                    type="time" // Changed from "text" to "time" for better UX
+                    name="pickupTime" // Changed from "startTime"
+                    value={editFormData.pickupTime || ''}
                     onChange={handleEditFormChange}
                 />
             </td>
@@ -52,7 +51,7 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                     <input
                         className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                         type="text"
-                        name="volunteerName"
+                        name="volunteerName" // Keep this if it maps correctly
                         placeholder="Enter volunteer name"
                         value={editFormData.volunteerName || ''}
                         onChange={handleEditFormChange}
@@ -60,23 +59,23 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 </td>
             ) : null}
 
-      <td className="text-center">
-        <button
-          className="text-white bg-[#419902] border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-[#419902]"
-          type="submit"
-        >
-          <span className="material-symbols-rounded">done</span>
-        </button>
-        <button
-          className="text-white bg-red-500 border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-red-700"
-          type="button"
-          onClick={handleCancelClick}
-        >
-          <span className="material-symbols-rounded">cancel</span>
-        </button>
-      </td>
-    </tr>
-  );
+            <td className="text-center">
+                <button
+                    className="text-white bg-[#419902] border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-[#419902]"
+                    type="submit"
+                >
+                    <span className="material-symbols-rounded">done</span>
+                </button>
+                <button
+                    className="text-white bg-red-500 border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-red-700"
+                    type="button"
+                    onClick={handleCancelClick}
+                >
+                    <span className="material-symbols-rounded">cancel</span>
+                </button>
+            </td>
+        </tr>
+    );
 };
 
 export default EditableRow;
