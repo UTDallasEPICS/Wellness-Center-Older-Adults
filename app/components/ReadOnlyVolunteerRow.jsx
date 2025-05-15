@@ -28,12 +28,12 @@ const ReadOnlyVolunteerRow = ({ contact, handleEditClick, handleDeleteClick }) =
           type="button"
           onClick={() => handleEditClick(contact)}
         >
-          <span className="material-symbols-rounded">edit</span>
+         <span className="material-symbols-rounded">edit</span>
         </button>
         <button
           className="text-white bg-red-700 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-800"
           type="button"
-          onClick={() => handleDeleteClick(contact.id)}
+          onClick={() => handleDeleteClick(contact.id)} // Ensure you are passing contact.id
         >
           <span className="material-symbols-rounded">delete</span>
         </button>
