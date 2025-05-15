@@ -118,12 +118,12 @@ export default function Page() {
     }
 
     return (
-        <div className="w-full min-h-screen bg-white flex flex-col relative"> {/* Main container */}
-            <div className="flex flex-row items-center py-8 px-8"> {/* Header */}
+        <div className="w-full min-h-screen bg-[#fffdf5] flex flex-col relative"> {/* Main container */}
+            <div className="flex flex-row items-center bg-[#fffdf5] py-8 px-8"> {/* Header */}
                 <div className="text-black text-left font-light text-[30px]">
-                    <h1>Client Page</h1>
+                    <h1>Clients</h1>
                 </div>
-                <div className="ml-auto flex pr-6">
+                <div className="ml-auto flex pr-6 pr-4 pt-4">
                     <button
                         type="button"
                         className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
@@ -134,8 +134,31 @@ export default function Page() {
                 </div>
             </div>
 
-            {/* Client List Table using the new component */}
-            <AddClientsTable customers={customers} handleDeleteClick={handleDeleteClick} />
+            <div className="grid grid-cols-5 text-black px-6 py-4 font-light text-[15px] bg-[#fffdf5] border-b border-gray-300 w-full">
+                <p>Name</p>
+                <p>Address</p>
+                <p>Phone</p>
+                <div></div> {/* Empty column for potential actions */}
+            </div>
+
+            {/* Client List Table */}
+            <div className="w-full flex flex-col text-black bg-white border-t border-b border-gray-300">
+                {customers.map((customer, index) => (
+                    <div key={index} className="grid grid-cols-5 py-4 border-b bg-[#fffdf5] border-gray-300 px-6">
+                        <p>{`${customer.firstName} ${customer.lastName}`}</p>
+                        <p>{`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}</p>
+                        <p>{customer.customerPhone}</p>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={() => handleDeleteClick(customer.id)}
+                                className="text-red-500 hover:text-red-700"
+                            >
+                                <span className="material-symbols-rounded">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
             {isAddCustomerModalOpen && (
                 <div style={modalOverlayStyle}>
@@ -156,7 +179,7 @@ export default function Page() {
                             <button onClick={handleCancelDelete} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded mr-2">
                                 Cancel
                             </button>
-                            <button onClick={handleConfirmDelete} className="bg-[#e2dbd0] hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                            <button onClick={handleConfirmDelete} className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
                                 Delete
                             </button>
                         </div>

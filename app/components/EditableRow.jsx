@@ -60,23 +60,23 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 </td>
             ) : null}
 
-            <td className="text-center p-2">
-                <button
-                    className="inline-flex items-center justify-center text-white bg-[#419902] border-none p-2 rounded-md cursor-pointer transition duration-300 hover:bg-green-700 hover:shadow-md"
-                    type="submit"
-                >
-                    <span className="material-symbols-rounded">done</span>
-                </button>
-                <button
-                    className="inline-flex items-center justify-center text-white bg-red-500 border-none p-2 rounded-md cursor-pointer transition duration-300 hover:bg-red-700 hover:shadow-md ml-2"
-                    type="button"
-                    onClick={handleCancelClick}
-                >
-                    <span className="material-symbols-rounded">cancel</span>
-                </button>
-            </td>
-        </tr>
-    );
+      <td className="text-center">
+        <button
+          className="text-white bg-[#419902] border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-[#419902]"
+          type="submit"
+        >
+          <span className="material-symbols-rounded">done</span>
+        </button>
+        <button
+          className="text-white bg-red-500 border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-red-700"
+          type="button"
+          onClick={handleCancelClick}
+        >
+          <span className="material-symbols-rounded">cancel</span>
+        </button>
+      </td>
+    </tr>
+  );
 };
 
 export default EditableRow;

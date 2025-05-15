@@ -24,14 +24,14 @@ const ReadOnlyVolunteerRow = ({ contact, handleEditClick, handleDeleteClick }) =
 
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         <button
-          className="text-white bg-green-700 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-800"
+          className="text-white bg-[#419902] cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-[#378300]"
           type="button"
           onClick={() => handleEditClick(contact)}
         >
          <span className="material-symbols-rounded">edit</span>
         </button>
         <button
-          className="text-white bg-red-700 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-800"
+          className="text-white bg-red-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-700"
           type="button"
           onClick={() => handleDeleteClick(contact.id)} // Ensure you are passing contact.id
         >

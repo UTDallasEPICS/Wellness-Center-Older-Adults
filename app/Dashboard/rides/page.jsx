@@ -191,16 +191,28 @@ export default function Page() {
         return `<span class="math-inline"><span class="math-inline">\\\{formattedHours\\\}\\\:</span>{formattedMinutes} ${ampm}`;
     }
 
-    const handleAcceptRide = async () => {
-        if (rideDetails) {
-            try {
-                const response = await fetch(`/api/rides/${rideDetails.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ status: 'Reserved' }),
-                });
+  let actionButton;
+  if (rideDetails?.status === 'AVAILABLE' || rideDetails?.status === 'Added' || rideDetails?.status === 'Unreserved') {
+    actionButton = (
+      <button
+        className="px-5 py-2 bg-[#419902] text-white rounded mr-2"
+        onClick={handleAcceptRide}
+      >
+        Accept?
+      </button>
+    );
+  } else if (rideDetails?.status === 'Reserved') {
+    actionButton = (
+      <button
+        className="px-5 py-2 bg-green-500 hover:bg-[#419902] text-white rounded"
+        onClick={handleCompleteRide}
+      >
+        Completed
+      </button>
+    );
+  } else if (rideDetails?.status === 'Completed') {
+    actionButton = null;
+  }
 
                 if (!response.ok) {
                     throw new Error(`Failed to update ride status: ${response.status}`);
@@ -212,8 +224,6 @@ export default function Page() {
                 console.error("Error updating ride status:", err);
                 setError("Failed to reserve ride.");
             }
-        }
-    };
 
     const handleCompleteRide = async () => {
         if (rideDetails) {
@@ -417,4 +427,90 @@ export default function Page() {
             </SimpleTab>
         </div>
     );
-}
+
+
+  const tabs = [
+    {
+      aKey: "available",
+      title: "Added/Unreserved",
+      content: (
+        <AddRidesTable
+          initialContacts={ridesData.filter(
+            (ride) =>
+              ride.status === "Added" ||
+              ride.status === "Unreserved" ||
+              ride.status === "AVAILABLE"
+          )}
+          convertTime={convertTo12Hour}
+          onEditRide={handleEditRide}
+          onDeleteRide={handleDeleteRide} // Passing the delete handler
+        />
+      ),
+    },
+    {
+      aKey: "reserved",
+      title: "Reserved",
+      content: (
+        <ReservedRidesTable
+          initialContacts={ridesData.filter((ride) => ride.status === "Reserved")}
+          convertTime={convertTo12Hour}
+          onRideDeleted={handleDeleteRide} // Passing the delete handler
+          onRideUpdated={handleEditRide} // Assuming you want to edit from this table too
+        />
+      ),
+    },
+    {
+      aKey: "completed",
+      title: "Completed",
+      content: (
+        <CompletedRidesTable
+          initialContacts={ridesData.filter((ride) => ride.status === "Completed")}
+          convertTime={convertTo12Hour}
+          // You might not want delete/edit on completed rides, adjust as needed
+          onDeleteRide={handleDeleteRide}
+        />
+      ),
+    },
+  ];
+
+  return (
+    <div className="w-full min-h-screen bg-[#fffdf5] flex flex-col relative">
+  <div className="px-8 pt-8"> {/* Header */}
+    <h1 className="text-black font-light text-[30px] text-left mb-4">Rides</h1>
+  </div>
+      <style jsx>
+        {`
+          .main-container {
+            /* Add your global styles for this page here */
+            font-family: sans-serif; /* Example */
+          }
+        `}
+      </style>
+      {notification && (
+        <div className="absolute top-4 right-4 z-50">{notification}</div>
+      )}
+      <div className="pr-6 pr-4">
+      <button
+        type="button"
+        className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] hover: bg-[#378300] border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <span className="material-symbols-rounded">add</span>
+      </button>
+
+      <AddRideForm
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        handleAddFormSubmit={handleAddFormSubmit}
+      />
+
+      <SimpleTab activeKey={activeTab}>
+        {tabs.map((item) => (
+          <Tab key={item.aKey} aKey={item.aKey} title={item.title}>
+            {item.content}
+          </Tab>
+        ))}
+      </SimpleTab>
+    </div>
+    </div>
+  );

@@ -234,7 +234,7 @@ const handleSaveClick = async () => {
           Unreserve
         </button>
         <button
-          className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
+          className="px-5 py-2 bg-green-500 hover:bg-[#419902] text-white rounded"
           onClick={handleCompleteRide}
         >
           Completed

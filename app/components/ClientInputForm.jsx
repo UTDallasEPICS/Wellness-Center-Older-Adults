@@ -49,126 +49,150 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 w-full max-w-md">
-      <h1 className="block text-gray-700 text-2xl font-bold mb-6 text-center">Input Client Information</h1>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-4 mb-6">
-        <div>
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
-            Full Name:
-          </label>
-          <div className="grid grid-cols-3 gap-x-2">
-            <div>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="firstName"
-                type="text"
-                placeholder="First Name"
-                name="firstName"
-                value={clientInfo.firstName}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="middleName"
-                type="text"
-                placeholder="Middle Name"
-                name="middleName"
-                value={clientInfo.middleName}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="lastName"
-                type="text"
-                placeholder="Last Name"
-                name="lastName"
-                value={clientInfo.lastName}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-          <div className="flex justify-between text-gray-700 text-xs mt-1">
-            <span>First</span>
-            <span>Middle</span>
-            <span>Last</span>
-          </div>
-        </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-8 rounded-lg w-full max-w-2xl relative">
+                <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
+                    <div className="flex justify-between items-center mb-5">
+                        <h2 className="text-left font-light text-2xl">Add a Client</h2>
+                        <button
+                            type="submit"
+                            className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-[#378300]"
+                        >
+                            Add
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[70vh]">
+                        {/* First Name */}
+                        <div>
+                            <label htmlFor="clientFirstName" className="block text-sm font-medium text-gray-700">
+                                First Name
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                name="clientFirstName"
+                                value={clientInfo.clientFirstName}
+                                placeholder="first name"
+                                onChange={handleChange}
+                            />
+                        </div>
 
-        <div>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
-              id="address"
-              type="text"
-              placeholder="Address"
-              name="address"
-              value={clientInfo.address}
-              onChange={handleChange}
-            />
-            <div className="grid grid-cols-2 gap-x-2 mb-2">
-              <div>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="city"
-                  type="text"
-                  placeholder="City"
-                  name="city"
-                  value={clientInfo.city}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="state"
-                  type="text"
-                  placeholder="State"
-                  name="state"
-                  value={clientInfo.state}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="phone"
-              type="tel"
-              placeholder="Phone"
-              name="phone"
-              value={clientInfo.phone}
-              onChange={handleChange}
-            />
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="zipcode"
-              type="text"
-              placeholder="Zip Code"
-              name="zipcode"
-              value={clientInfo.zipcode}
-              onChange={handleChange}
-            />
-          </div>
+                        {/* Middle Name */}
+                        <div>
+                            <label htmlFor="clientMiddleName" className="block text-sm font-medium text-gray-700">
+                                Middle Name
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="text"
+                                name="clientMiddleName"
+                                placeholder="middle name"
+                                value={clientInfo.clientMiddleName}
+                                onChange={handleChange}
+                            />
+                        </div>
 
-          <div className="flex items-center justify-between">
-          <button
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={onClose} // Call the onClose prop when the button is clicked
-          >
-            Cancel
-          </button>
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="submit"
-          >
-            Save
-          </button>
+                        {/* Last Name */}
+                        <div>
+                            <label htmlFor="clientLastName" className="block text-sm font-medium text-gray-700">
+                                Last Name
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="text"
+                                name="clientLastName"
+                                placeholder="last name"
+                                value={clientInfo.lastName}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        {/* Address */}
+                        <div>
+                            <label htmlFor="streetAddress" className="block text-sm font-medium text-gray-700">
+                                Street Address
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="text"
+                                name="streetAddress"
+                                placeholder="street address"
+                                value={clientInfo.address}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        {/* City */}
+                        <div>
+                            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                                City
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="text"
+                                name="city"
+                                placeholder="city"
+                                value={clientInfo.city}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        {/* State */}
+                        <div>
+                            <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                                State
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="text"
+                                name="state"
+                                placeholder="state"
+                                value={clientInfo.state}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        {/* Zip Code */}
+                        <div>
+                            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                                Zip Code
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="text"
+                                name="zipCode"
+                                placeholder="zip code"
+                                value={clientInfo.zipCode}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        {/* Phone Number */}
+                        <div>
+                            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                                Phone Number
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="text"
+                                name="phoneNumber"
+                                placeholder="phone number"
+                                value={clientInfo.phoneNumber}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end mt-4 space-x-2">
+                        <button
+                            className="bg-[#e2dbd0]/70 text-[gray-700] px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-[#e2dbd0]"
+                            type="button"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </form>
-    </div>
   );
 };
 
