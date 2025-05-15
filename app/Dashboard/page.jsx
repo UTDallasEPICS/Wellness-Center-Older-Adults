@@ -25,8 +25,8 @@ export default function Page() {
   }, []);
   
   return (
-    <div className="h-[90%] w-full">
-      <h1 className="text-black text-left font-light text-[40px] ml-[5%]">{welcomeMessage}</h1>
+    <div className="h-[90%] w-full bg-[#fffdf5]">
+      <h1 className="text-[#103713] text-left font-light text-[40px] ml-[5%]">{welcomeMessage}</h1>
       <div className="flex flex-col gap-5 md:flex-row">
         <TextContainer text="Recently Completed Rides" number="3" />
         <TextContainer text="This Week's Volunteer Hours" number="5" />
