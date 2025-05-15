@@ -1,3 +1,4 @@
+// app\components\DeleteConfirmationModal.jsx
 import React from 'react';
 
 const DeleteConfirmationModal = ({ volunteerName, handleConfirmDelete, handleCancelDelete }) => {

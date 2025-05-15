@@ -95,7 +95,9 @@ export async function GET(
             mileage,
             status: ride.status,
             driveTimeAB,
-            waitTime: 'N/A',
+            //waitTime: ride.waitTime,
+            waitime: 'N/A',
+            notes: ride.specialNote,
         };
 
         return NextResponse.json(formattedRide);

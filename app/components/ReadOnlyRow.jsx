@@ -9,15 +9,15 @@ const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) =>
   };
 
   return (
-    <tr onClick={handleRowClick} className="cursor-pointer bg-[#fffdf5] hover:bg-[#e2dbd0]/50 transition-colors duration-200">
+    <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200">
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
-        {contact.clientName}
+        {contact.customerName}
       </td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {contact.phoneNumber}
       </td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
-        {contact.address}
+        {contact.startAddressID}
       </td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {contact.startTime}

@@ -30,6 +30,7 @@
     "@react-google-maps/api": "^2.20.6",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/react-dom": "18.2.7",
+    "auth0": "^4.23.0",
     "cookies": "^0.9.1",
     "cookies-next": "^4.1.1",
     "date-fns": "^3.6.0",

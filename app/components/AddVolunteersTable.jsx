@@ -1,3 +1,4 @@
+// app\components\AddVolunteersTable.jsx
 import React from 'react';
 import ReadOnlyVolunteerRow from './ReadOnlyVolunteerRow';
 
@@ -25,27 +26,22 @@ const AddVolunteersTable = ({
           </tr>
         </thead>
         <tbody>
-          
-        {volunteersData.length === 0 ? 
-            //If empty then no volunteers
-            (
-              <tr>
-                <td colSpan="6" className="text-center text-lg font-semibold p-4">
-                  No volunteers available.
-                </td>
-              </tr>
-            ) : 
-          (
-            volunteersData.map((volunteer) => (
+          {volunteersData && volunteersData.length === 0 ? (
+            <tr>
+              <td colSpan="6" className="text-center text-lg font-semibold p-4">
+                No volunteers available.
+              </td>
+            </tr>
+          ) : (
+            volunteersData && volunteersData.map((volunteer) => (
               <ReadOnlyVolunteerRow
-                key={volunteer.VolunteerID}
+                key={volunteer?.VolunteerID} 
                 contact={volunteer}
-                handleEditClick={handleEditClick} 
+                handleEditClick={handleEditClick}
                 handleDeleteClick={handleDeleteClick}
               />
-
-          )))}
-         
+            ))
+          )}
         </tbody>
       </table>
     </div>
