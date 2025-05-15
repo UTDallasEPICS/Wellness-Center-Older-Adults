@@ -1,3 +1,4 @@
+// app\api\deleteVolunteer\[id]\route.ts
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
@@ -13,7 +14,10 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   try {
     const existingVolunteer = await prisma.volunteerInfo.findUnique({
       where: {
-        VolunteerID: volunteerId,
+        id: volunteerId, // Use 'id' to match your schema
+      },
+      include: {
+        user: true, // Include the associated user for easier access
       },
     });
 
@@ -23,19 +27,26 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
     await prisma.volunteerInfo.delete({
       where: {
-        VolunteerID: volunteerId,
+        id: volunteerId, // Use 'id'
       },
     });
 
-    // Optionally, archive the associated user
-    if (existingVolunteer.userID) {
-      await prisma.user.update({
-        where: { id: existingVolunteer.userID },
-        data: { isArchived: true },
-      });
+    // Archive the associated user if it exists
+    if (existingVolunteer.user) {
+      try {
+        await prisma.user.update({
+          where: { id: existingVolunteer.user.id },
+          data: { isArchived: true },
+        });
+      } catch (userUpdateError: any) {
+        console.error('Error archiving user:', userUpdateError);
+        // Optionally, you could decide whether to consider the overall operation a failure
+        // if user archiving fails. For now, we'll log the error and continue.
+      }
     }
 
     return NextResponse.json({ status: 200, message: 'Volunteer deleted successfully' });
+
   } catch (error: any) {
     console.error('Error deleting volunteer:', error);
     if (error.code === 'P2025') {

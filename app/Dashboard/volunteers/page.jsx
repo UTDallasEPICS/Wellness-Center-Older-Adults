@@ -59,7 +59,7 @@ export default function Page() {
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [volunteerToDelete, setVolunteerToDelete] = useState(null);
+  const [volunteerToDelete, setVolunteerToDelete] = useState(null); // Changed to store only ID
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const fetchVolunteers = async () => {
@@ -198,15 +198,14 @@ export default function Page() {
 
   const handleDeleteClick = (VolunteerID) => {
     console.log("Delete button clicked for VolunteerID:", VolunteerID);
-    const volunteer = volunteersData.find((v) => v.VolunteerID === VolunteerID);
-    setVolunteerToDelete(volunteer);
-    console.log("volunteerToDelete state:", volunteer);
+    setVolunteerToDelete(VolunteerID); // Store only the ID
+    console.log("volunteerToDelete state:", VolunteerID);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
     console.log("handleConfirmDelete called. volunteerToDelete:", volunteerToDelete);
-    const volunteerIdToDelete = volunteerToDelete?.VolunteerID;
+    const volunteerIdToDelete = volunteerToDelete; // Directly use the ID
     console.log("volunteerIdToDelete:", volunteerIdToDelete);
     const previousVolunteersData = [...volunteersData];
 
@@ -361,7 +360,7 @@ export default function Page() {
 
       {showDeleteModal && (
         <DeleteConfirmationModal
-          volunteerName={`${volunteerToDelete?.firstName} ${volunteerToDelete?.lastName}`}
+          volunteerName={volunteersData.find(v => v.VolunteerID === volunteerToDelete)?.firstName + " " + volunteersData.find(v => v.VolunteerID === volunteerToDelete)?.lastName}
           handleConfirmDelete={handleConfirmDelete}
           handleCancelDelete={handleCancelDelete}
         />
