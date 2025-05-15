@@ -48,14 +48,14 @@ const ReportHoursForm = ({
         <div className="flex justify-between space-x-4">
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+            className="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-[#419902] transition"
           >
             Confirm
           </button>
           <button
             type="button"
             onClick = {handleReportHoursCancel}
-            className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+            className="w-full px-4 py-2 bg-[#e2dbd0] text-white rounded-md hover:bg-red-600 transition"
           >
             Cancel
           </button>

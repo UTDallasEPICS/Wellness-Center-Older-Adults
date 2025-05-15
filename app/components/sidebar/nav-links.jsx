@@ -36,7 +36,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Dashboard
             </a>
@@ -44,7 +44,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard/rides"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Rides
             </a>
@@ -52,7 +52,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard/volunteers"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Volunteers
             </a>
@@ -60,7 +60,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard/client"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Clients
             </a>
@@ -68,7 +68,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard/admin"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Admin
             </a>
@@ -81,7 +81,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Dashboard
             </a>
@@ -89,7 +89,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard/rides-volunteer"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Rides
             </a>
@@ -97,7 +97,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard/hours"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Hours
             </a>
@@ -105,7 +105,7 @@ export default function NavLinks({ isCollapsed }) {
           <li>
             <a
               href="/Dashboard/settings"
-              className="block px-4 py-2 rounded hover:bg-gray-100 transition"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
               Settings
             </a>
@@ -116,7 +116,7 @@ export default function NavLinks({ isCollapsed }) {
       <li>
         <button
           onClick={handleLogout}
-          className="w-full text-left px-4 py-2 rounded hover:bg-red-500 hover:text-white transition mt-2"
+          className="w-full text-left px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition mt-2"
         >
           Log Out
         </button>

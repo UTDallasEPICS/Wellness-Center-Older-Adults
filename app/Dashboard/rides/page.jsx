@@ -358,7 +358,7 @@ export default function Page() {
   ];
 
   return (
-    <div className="h-full w-full bg-white relative">
+    <div className="h-full w-full bg-[#fffdf5] relative">
       <style jsx>
         {`
           .main-container {
@@ -373,7 +373,7 @@ export default function Page() {
 
       <button
         type="button"
-        className="h-[45px] w-[45px] rounded-full text-white bg-black border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
+        className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] hover: bg-[#378300] border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
         onClick={() => setIsModalOpen(true)}
       >
         <span className="material-symbols-rounded">add</span>

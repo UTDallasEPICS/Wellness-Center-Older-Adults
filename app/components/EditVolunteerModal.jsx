@@ -61,7 +61,7 @@ const EditVolunteerModal = ({
             </button>
             <button
               type="submit"
-              className="bg-green-600 text-white py-2 px-4 rounded-md"
+              className="bg-[#419902] text-white py-2 px-4 rounded-md"
             >
               Save
             </button>

@@ -66,7 +66,7 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
 
       <td className="text-center">
         <button
-          className="text-white bg-green-600 border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-green-700"
+          className="text-white bg-[#419902] border-none p-2 m-1 rounded-md cursor-pointer transition duration-300 hover:bg-green-700"
           type="submit"
         >
           <span className="material-symbols-rounded">done</span>

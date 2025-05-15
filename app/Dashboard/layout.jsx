@@ -50,7 +50,7 @@ export default function DashboardLayout({ children }) {
       <div className="flex bg-white">
         <SideNav toggleCollapse={() => setIsCollapsed(!isCollapsed)} isCollapsed={isCollapsed} />
         <div 
-          className={`flex-1 h-[calc(100vh-70px)] transition-all ease-in-out duration-300 ${isCollapsed ? "ml-[70px]" : "ml-0"} md:${isCollapsed ? "ml-[70px]" : "ml-[250px]"}`}
+          className={`flex-1 h-[calc(100vh-70px)] bg-[#fffdf5] transition-all ease-in-out duration-300 ${isCollapsed ? "ml-[70px]" : "ml-0"} md:${isCollapsed ? "ml-[70px]" : "ml-[250px]"}`}
           style={{
             paddingLeft: typeof window !== "undefined" && window.innerWidth > 768 ? (isCollapsed ? '70px' : '250px') : '0',
           }}

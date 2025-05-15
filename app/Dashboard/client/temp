@@ -91,7 +91,7 @@ export default function Page() {
       {/* Floating Add Button */}
       <button
         type="button"
-        className="h-[45px] w-[45px] rounded-full text-white bg-black border-none absolute top-2 right-4 z-40 flex items-center justify-center shadow-md"
+        className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none absolute top-2 right-4 z-40 flex items-center justify-center shadow-md"
         onClick={() => setIsAddCustomerModalOpen(true)}
       >
         <span className="material-symbols-rounded">add</span>
