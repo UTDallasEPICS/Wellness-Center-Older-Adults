@@ -248,15 +248,20 @@ export default function Page() {
   };
 
   return (
-    <div className="h-full w-full bg-white px-6">
-      <div className="flex justify-end items-center mb-4">
-        <button
-          type="button"
-          className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center"
-          onClick={handleOpenAddModal}
-        >
-          <span className="material-symbols-rounded">add</span>
-        </button>
+    <div className="w-full min-h-screen bg-[#fffdf5] flex flex-col relative"> {/* Main container */}
+            <div className="flex flex-row items-center bg-[#fffdf5] py-8 px-8"> {/* Header */}
+                <div className="text-black text-left font-light text-[30px]">
+                    <h1>Volunteers</h1>
+                </div>
+        <div className="ml-auto flex pr-6 pr-4 pt-4">
+                    <button
+                        type="button"
+                        className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
+                        onClick={() => setIsAddCustomerModalOpen(true)}
+                    >
+                        <span className="material-symbols-rounded">add</span>
+                    </button>
+                </div>
       </div>
       <div className="mt-8">
         <AddVolunteersTable
@@ -338,7 +343,7 @@ export default function Page() {
 
               <div className="w-full flex justify-end mt-4">
                 <button
-                  className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
+                  className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-[#419902]"
                   type="submit"
                 >
                   Add

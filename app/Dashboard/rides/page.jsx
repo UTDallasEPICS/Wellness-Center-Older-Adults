@@ -230,7 +230,7 @@ export default function Page() {
   } else if (rideDetails?.status === 'Reserved') {
     actionButton = (
       <button
-        className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
+        className="px-5 py-2 bg-green-500 hover:bg-[#419902] text-white rounded"
         onClick={handleCompleteRide}
       >
         Completed
@@ -358,7 +358,10 @@ export default function Page() {
   ];
 
   return (
-    <div className="h-full w-full bg-[#fffdf5] relative">
+    <div className="w-full min-h-screen bg-[#fffdf5] flex flex-col relative">
+  <div className="px-8 pt-8"> {/* Header */}
+    <h1 className="text-black font-light text-[30px] text-left mb-4">Rides</h1>
+  </div>
       <style jsx>
         {`
           .main-container {
@@ -370,7 +373,7 @@ export default function Page() {
       {notification && (
         <div className="absolute top-4 right-4 z-50">{notification}</div>
       )}
-
+      <div className="pr-6 pr-4">
       <button
         type="button"
         className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] hover: bg-[#378300] border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
@@ -392,6 +395,7 @@ export default function Page() {
           </Tab>
         ))}
       </SimpleTab>
+    </div>
     </div>
   );
 }

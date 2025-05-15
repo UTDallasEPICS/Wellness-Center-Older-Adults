@@ -122,14 +122,15 @@ export default function Page() {
     ];
 
     return (
-        <div className="h-full w-full bg-white relative">
-            <button
-                type="button"
-                className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
-                onClick={() => setIsModalOpen(true)}
-            >
-                <span className="material-symbols-rounded">add</span>
-            </button>
+        <div className="h-full w-full bg-[#fffdf5]">
+      <div className="flex justify-end items-center mb-4 pr-4 pt-4">
+        <button
+          type="button"
+          className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center"
+          onClick={handleOpenAddModal}
+        >
+          <span className="material-symbols-rounded">add</span>
+        </button>
 
             <AddRideForm
                 isOpen={isModalOpen}
@@ -144,6 +145,7 @@ export default function Page() {
                     </Tab>
                 ))}
             </SimpleTab>
+        </div>
         </div>
     );
 }

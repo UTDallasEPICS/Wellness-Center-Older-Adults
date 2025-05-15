@@ -158,11 +158,12 @@ export default function AdminPage() {
     return (
         <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', display: 'flex', flexDirection: 'column', position: 'relative' }}>
             <Header />
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '32px' }}>
-                <div style={{ color: 'black', textAlign: 'left', fontWeight: '300', fontSize: '30px' }}>
-                    <h1>Admin Page</h1>
+              <div className="flex flex-row items-center bg-[#fffdf5] py-8 px-8"> {/* Header */}
+                <div className="text-black text-left font-light text-[30px]">
+                    <h1>Admins</h1>
                 </div>
                 <div style={{ marginLeft: 'auto', paddingRight: '24px' }}>
+                  
                     <button
                         type="button"
                         style={{ height: '45px', width: '45px', borderRadius: '50%', color: 'white', backgroundColor: 'black', border: 'none', zIndex: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}

@@ -97,7 +97,7 @@ const AdminInputForm = ({ onSubmit, onClose }) => {
             Cancel
           </button>
           <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-green-500 hover:bg-[#419902] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Add Admin
