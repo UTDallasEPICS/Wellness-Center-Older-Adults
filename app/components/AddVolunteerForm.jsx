@@ -103,7 +103,7 @@ const VolunteerForm = ({
 
       <div className="w-full flex justify-end mt-4">
         <button
-          className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
+          className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
           type="submit"
         >
           Add

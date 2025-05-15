@@ -36,7 +36,7 @@ const DisplayReservedRidesTable = ({ initialContacts }) => {
 
     return (
 
-      <div className="p-5 md:p-10 mt-10 mx-auto bg-grey-100 w-full max-w-6xl rounded-2xl shadow-md">
+      <div className="p-5 md:p-10 mt-10 mx-auto  w-full max-w-6xl rounded-2xl shadow-md">
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full p-2.5">
           {contacts.filter((contact) => contact.status === "Reserved").length > 0 ?
             contacts

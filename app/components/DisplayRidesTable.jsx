@@ -5,7 +5,7 @@ import ViewOnlyRow from "./ViewOnlyRow";
 const DisplayRidesTable = ({ ridesData }) => {
   return (
 
-    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-white">
+    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-[#fffdf5]">
       <h2 className="text-center text-[1.2rem] font-light text-gray-500 mt-4 mb-2">
         Available Rides
       </h2>

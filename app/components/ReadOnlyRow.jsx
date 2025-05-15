@@ -9,25 +9,25 @@ const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status }) =>
   };
 
   return (
-    <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200">
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+    <tr onClick={handleRowClick} className="cursor-pointer bg-[#fffdf5] hover:bg-[#e2dbd0]/50 transition-colors duration-200">
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {contact.clientName}
       </td>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {contact.phoneNumber}
       </td>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {contact.address}
       </td>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {contact.startTime}
       </td>
       {status === "Reserved" || status === "Completed" ? (
-        <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+        <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
           {contact.volunteerName}
         </td>
       ) : null}
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         <div className="flex justify-center">
           <button
             className="text-white bg-[#419902] cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-[#2b6701]"

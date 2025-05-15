@@ -160,7 +160,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                         <h2 className="text-left font-light text-2xl">Add a Ride</h2>
                         <button
                             type="submit"
-                            className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
+                            className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-[#378300]"
                         >
                             Add
                         </button>
@@ -399,7 +399,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                     </div>
                     <div className="flex justify-end mt-4 space-x-2">
                         <button
-                            className="bg-gray-300 text-gray-700 px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-gray-400"
+                            className="bg-[#e2dbd0]/70 text-[gray-700] px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-[#e2dbd0]"
                             type="button"
                             onClick={onClose}
                         >

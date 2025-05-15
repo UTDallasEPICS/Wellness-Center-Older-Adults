@@ -181,7 +181,7 @@ export default function Page() {
                 <div className="ml-auto flex pr-6">
                     <button
                         type="button"
-                        className="h-[45px] w-[45px] rounded-full text-white bg-black border-none flex items-center justify-center shadow-md mr-2"
+                        className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
                         onClick={() => setIsAddCustomerModalOpen(true)}
                     >
                         <span className="material-symbols-rounded">add</span>
@@ -234,7 +234,7 @@ export default function Page() {
                             <button onClick={handleCancelDelete} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded mr-2">
                                 Cancel
                             </button>
-                            <button onClick={handleConfirmDelete} className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                            <button onClick={handleConfirmDelete} className="bg-[#e2dbd0] hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
                                 Delete
                             </button>
                         </div>

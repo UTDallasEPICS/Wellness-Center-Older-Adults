@@ -125,7 +125,7 @@ export default function Page() {
         <div className="h-full w-full bg-white relative">
             <button
                 type="button"
-                className="h-[45px] w-[45px] rounded-full text-white bg-black border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
+                className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
                 onClick={() => setIsModalOpen(true)}
             >
                 <span className="material-symbols-rounded">add</span>

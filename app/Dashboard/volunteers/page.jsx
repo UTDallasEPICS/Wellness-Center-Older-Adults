@@ -252,7 +252,7 @@ export default function Page() {
       <div className="flex justify-end items-center mb-4">
         <button
           type="button"
-          className="h-[45px] w-[45px] rounded-full text-white bg-black border-none flex items-center justify-center"
+          className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center"
           onClick={handleOpenAddModal}
         >
           <span className="material-symbols-rounded">add</span>
@@ -338,7 +338,7 @@ export default function Page() {
 
               <div className="w-full flex justify-end mt-4">
                 <button
-                  className="bg-green-600 text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
+                  className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-green-700"
                   type="submit"
                 >
                   Add

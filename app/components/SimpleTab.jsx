@@ -15,8 +15,8 @@ const SimpleTab = ({ activeKey, children, onTabAdd }) => {
   };
 
   return (
-    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-white">
-      <div className="flex relative border-b border-gray-300">
+    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-[#fffdf5]">
+      <div className="flex relative bg-[#fffdf5] border-b border-gray-300">
         {childArray.map((item) => (
           <div
             key={item.props.aKey}
@@ -31,11 +31,11 @@ const SimpleTab = ({ activeKey, children, onTabAdd }) => {
           </div>
         ))}
       </div>
-      <div className="p-2.5 border-none">
+      <div className="p-2.5 border-none bg-[#fffdf5]">
         {childArray.map((item) => (
           <div
             key={item.props.aKey}
-            className={`${key === item.props.aKey ? 'block' : 'hidden'} text-gray-800 font-light`}
+            className={`${key === item.props.aKey ? 'block' : 'hidden'} bg-[#fffdf5] text-gray-800 font-light`}
           >
             {item.props.children}
           </div>
