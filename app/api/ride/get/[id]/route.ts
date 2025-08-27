@@ -98,6 +98,7 @@ export async function GET(
             //waitTime: ride.waitTime,
             waitime: 'N/A',
             notes: ride.specialNote,
+            date: ride.date,
         };
 
         return NextResponse.json(formattedRide);

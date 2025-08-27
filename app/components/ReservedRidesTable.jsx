@@ -2,7 +2,7 @@ import { useState, Fragment, useEffect } from "react";
 import ReadOnlyRow from "./ReadOnlyRow";
 import EditableRow from "./EditableRow";
 
-const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated }) => {
+const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, convertTime }) => {
   const [contacts, setContacts] = useState(initialContacts);
   const [editContactId, setEditContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -24,7 +24,7 @@ const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated }) =
       clientName: contact.clientName,
       phoneNumber: contact.phoneNumber,
       address: contact.address,
-      startTime: contact.startTime,
+      startTime: convertTime ? convertTime(contact.startTime) : contact.startTime,
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
@@ -128,6 +128,7 @@ const handleCancelClick = async (contactId) => {
                       handleEditClick={handleEditClick}
                       handleDeleteClick={handleCancelClick} // Now correctly calling the delete function
                       status={contact.status}
+                      convertTime={convertTime}
                     />
                   )}
                 </Fragment>

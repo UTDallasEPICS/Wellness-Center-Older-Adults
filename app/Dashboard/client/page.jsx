@@ -7,8 +7,40 @@ import AddClientsTable from "/app/components/AddClientsTable.jsx"; // Import the
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// ... (rest of your modal styles remain the same)
+const modalOverlayStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+};
 
+const modalContentStyle = {
+    backgroundColor: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    width: '80%',
+    maxWidth: '500px',
+    position: 'relative',
+};
+
+const modalCloseButtonStyle = {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#333',
+    cursor: 'pointer',
+    border: 'none',
+    background: 'none',
+    padding: 0,
+};
 export default function Page() {
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -134,30 +166,34 @@ export default function Page() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-5 text-black px-6 py-4 font-light text-[15px] bg-[#fffdf5] border-b border-gray-300 w-full">
-                <p>Name</p>
-                <p>Address</p>
-                <p>Phone</p>
-                <div></div> {/* Empty column for potential actions */}
-            </div>
-
-            {/* Client List Table */}
-            <div className="w-full flex flex-col text-black bg-white border-t border-b border-gray-300">
-                {customers.map((customer, index) => (
-                    <div key={index} className="grid grid-cols-5 py-4 border-b bg-[#fffdf5] border-gray-300 px-6">
-                        <p>{`${customer.firstName} ${customer.lastName}`}</p>
-                        <p>{`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}</p>
-                        <p>{customer.customerPhone}</p>
-                        <div className="flex justify-end">
-                            <button
-                                onClick={() => handleDeleteClick(customer.id)}
-                                className="text-red-500 hover:text-red-700"
-                            >
-                                <span className="material-symbols-rounded">delete</span>
-                            </button>
-                        </div>
-                    </div>
-                ))}
+            <div className="w-full overflow-x-auto">
+                <table className="min-w-full border border-gray-300 bg-white">
+                    <thead>
+                        <tr className="bg-[#fffdf5] text-black text-left font-light text-[15px] border-b border-gray-300">
+                            <th className="p-4">Name</th>
+                            <th className="p-4">Address</th>
+                            <th className="p-4">Phone</th>
+                            <th className="p-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {customers.map((customer, index) => (
+                            <tr key={index} className="bg-[#fffdf5] border-b border-gray-300">
+                                <td className="p-4">{`${customer.firstName} ${customer.lastName}`}</td>
+                                <td className="p-4">{`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}</td>
+                                <td className="p-4">{customer.customerPhone}</td>
+                                <td className="p-4 flex justify-end">
+                                    <button
+                                        onClick={() => handleDeleteClick(customer.id)}
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        <span className="material-symbols-rounded">delete</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
 
             {isAddCustomerModalOpen && (

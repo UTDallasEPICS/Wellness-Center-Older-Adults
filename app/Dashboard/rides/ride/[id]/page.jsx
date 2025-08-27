@@ -250,8 +250,7 @@ const handleSaveClick = async () => {
       <div className="w-1/2 p-5 bg-[#fffdf5] font-sans">
         <div className="flex justify-between mb-5">
           <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
-          <p className="m-0">Date: {formatTime(new Date(rideDetails.date).toLocaleTimeString('en-US'))}
-            </p>
+          <p className="m-0">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available'}</p>
         </div>
 
         {isEditing ? (

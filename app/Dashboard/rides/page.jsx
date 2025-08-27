@@ -91,7 +91,7 @@ export default function Page() {
 
     const handleAddRide = async (newRideData) => {
         try {
-            const response = await fetch('/api/addRide', { // Replace with your actual API endpoint
+            const response = await fetch('/api/createRide', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -170,7 +170,8 @@ export default function Page() {
     };
 
     const handleAddFormSubmit = (formData) => {
-        handleAddRide(formData);
+    setIsModalOpen(false);
+    window.location.reload();
     };
 
     function formatTime(timeString) {

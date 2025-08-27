@@ -2,7 +2,7 @@
 import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { GoogleMap, useLoadScript, DirectionsRenderer } from '@react-google-maps/api';
 
-const RideMap = ({ pickupAddress, dropoffAddress }) => {
+const RideMap = ({ pickupAddress, dropoffAddress, date }) => {
     const [directions, setDirections] = useState(null);
     const mapRef = useRef(null);
 
@@ -45,6 +45,11 @@ const RideMap = ({ pickupAddress, dropoffAddress }) => {
 
     return (
         <div style={{ height: '100%', width: '100%' }}>
+            {date && (
+                <div style={{ padding: '10px', fontWeight: 'bold', fontSize: '16px' }}>
+                    Date: {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>
+            )}
             <GoogleMap
                 mapContainerStyle={{ height: '100%', width: '100%' }}
                 options={options}

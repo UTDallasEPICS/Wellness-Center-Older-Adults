@@ -69,9 +69,9 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
                             </label>
                             <input
                                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-                                name="clientFirstName"
-                                value={clientInfo.clientFirstName}
-                                placeholder="first name"
+                                name="firstName"
+                                value={clientInfo.firstName}
+                                placeholder="First Name"
                                 onChange={handleChange}
                             />
                         </div>
@@ -84,9 +84,9 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
                             <input
                                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
                                 type="text"
-                                name="clientMiddleName"
-                                placeholder="middle name"
-                                value={clientInfo.clientMiddleName}
+                                name="middleName"
+                                placeholder="Middle Name"
+                                value={clientInfo.middleName}
                                 onChange={handleChange}
                             />
                         </div>
@@ -99,8 +99,8 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
                             <input
                                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
                                 type="text"
-                                name="clientLastName"
-                                placeholder="last name"
+                                name="lastName"
+                                placeholder="Last Name"
                                 value={clientInfo.lastName}
                                 onChange={handleChange}
                             />
@@ -114,8 +114,8 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
                             <input
                                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
                                 type="text"
-                                name="streetAddress"
-                                placeholder="street address"
+                                name="address"
+                                placeholder="Street Address"
                                 value={clientInfo.address}
                                 onChange={handleChange}
                             />
@@ -130,23 +130,26 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
                                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
                                 type="text"
                                 name="city"
-                                placeholder="city"
+                                placeholder="City"
                                 value={clientInfo.city}
                                 onChange={handleChange}
                             />
                         </div>
 
-                        {/* State */}
+                        {/* Phone */}
                         <div>
-                            <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-                                State
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                                Phone
                             </label>
                             <input
                                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-                                type="text"
-                                name="state"
-                                placeholder="state"
-                                value={clientInfo.state}
+                                type="tel"
+                                name="phone"
+                                placeholder="Phone Number"
+                                value={clientInfo.phone}
+                                pattern="[0-9]{10}"
+                                maxLength={10}
+                                inputMode="numeric"
                                 onChange={handleChange}
                             />
                         </div>
@@ -159,27 +162,16 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
                             <input
                                 className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
                                 type="text"
-                                name="zipCode"
-                                placeholder="zip code"
-                                value={clientInfo.zipCode}
+                                name="zipcode"
+                                placeholder="Zip Code"
+                                value={clientInfo.zipcode}
+                                pattern="[0-9]{5}"
+                                maxLength={5}
+                                inputMode="numeric"
                                 onChange={handleChange}
                             />
                         </div>
 
-                        {/* Phone Number */}
-                        <div>
-                            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                                Phone Number
-                            </label>
-                            <input
-                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-                                type="text"
-                                name="phoneNumber"
-                                placeholder="phone number"
-                                value={clientInfo.phoneNumber}
-                                onChange={handleChange}
-                            />
-                        </div>
                     </div>
                     <div className="flex justify-end mt-4 space-x-2">
                         <button
