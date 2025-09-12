@@ -263,7 +263,7 @@ export default function Page() {
                     <button
                         type="button"
                         className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
-                        onClick={() => setIsAddCustomerModalOpen(true)}
+                        onClick={() => setIsAddModalOpen(true)}
                     >
                         <span className="material-symbols-rounded">add</span>
                     </button>
