@@ -4,28 +4,88 @@ import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
 import EditableRow from "/app/components/EditableRow.jsx";
 
-const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide }) => {
+const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide, customers, addresses, volunteers }) => {
   const [contacts, setContacts] = useState(initialContacts);
   const [editContactId, setEditContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({
-    customerID: "",
+    customerName: "",
+    phoneNumber: "",
     date: "",
-    startAddressID: "",
+    startAddress: "", 
     pickupTime: "",
+    volunteerName: "",
   });
 
   useEffect(() => {
     setContacts(initialContacts);
   }, [initialContacts]);
 
+  // Helper function to get customer name from ID
+  const getCustomerNameById = (customerID) => {
+    const customer = customers?.find(c => c.id === customerID);
+    return customer ? `${customer.firstName} ${customer.lastName}` : '';
+  };
+
+  // Helper function to get customer phone from ID
+  const getCustomerPhoneById = (customerID) => {
+    const customer = customers?.find(c => c.id === customerID);
+    return customer?.customerPhone || '';
+  };
+
+  // Helper function to get address string from ID
+  const getAddressById = (addressID) => {
+    const address = addresses?.find(a => a.id === addressID);
+    return address ? `${address.street}, ${address.city}, ${address.state} ${address.postalCode}` : '';
+  };
+
+  // Helper function to get volunteer name from ID
+  const getVolunteerNameById = (volunteerID) => {
+    const volunteer = volunteers?.find(v => v.id === volunteerID);
+    if (volunteer && volunteer.user) {
+      return `${volunteer.user.firstName} ${volunteer.user.lastName}`;
+    }
+    return '';
+  };
+
+  // Helper function to find customer ID by name
+  const getCustomerIdByName = (customerName) => {
+    const customer = customers?.find(c => 
+      `${c.firstName} ${c.lastName}`.toLowerCase() === customerName.toLowerCase()
+    );
+    return customer?.id || null;
+  };
+
+  // Helper function to find address ID by address string
+  const getAddressIdByString = (addressString) => {
+    const address = addresses?.find(a => {
+      const fullAddress = `${a.street}, ${a.city}, ${a.state} ${a.postalCode}`;
+      return fullAddress.toLowerCase() === addressString.toLowerCase();
+    });
+    return address?.id || null;
+  };
+
+  // Helper function to find volunteer ID by name
+  const getVolunteerIdByName = (volunteerName) => {
+    const volunteer = volunteers?.find(v => {
+      if (v.user) {
+        const fullName = `${v.user.firstName} ${v.user.lastName}`;
+        return fullName.toLowerCase() === volunteerName.toLowerCase();
+      }
+      return false;
+    });
+    return volunteer?.id || null;
+  };
+
   const handleEditClick = (event, contact) => {
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
-      customerID: contact.customerID,
-      date: contact.date ? contact.date.split('T')[0] : '', // Format date for input
-      startAddressID: contact.startAddressID,
-      pickupTime: contact.startTime  ? contact.startTime .slice(0, 5) : '', // Format time for input (HH:MM)
+      customerName: contact.customerName || '',
+      phoneNumber: contact.customerPhone || '',
+      date: contact.date ? contact.date.split('T')[0] : '', 
+      startAddress: contact.startLocation || '',
+      pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : '', 
+      volunteerName: getVolunteerNameById(contact.volunteerID),
     };
     setEditFormData(formValues);
   };
@@ -47,7 +107,6 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide 
     if (editFormData.date && editFormData.pickupTime) {
       const [hours, minutes] = editFormData.pickupTime.split(':');
       const dateObj = new Date(editFormData.date);
-      // Set the time on the date object
       dateObj.setHours(parseInt(hours, 10));
       dateObj.setMinutes(parseInt(minutes, 10));
       dateObj.setSeconds(0);
@@ -55,16 +114,77 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide 
       pickupDateTimeISO = dateObj.toISOString();
     }
 
-const editedContact = {
-    id: editContactId,
-    customerID: editFormData.customerID ? parseInt(editFormData.customerID) : null,
-    date: editFormData.date ? new Date(editFormData.date).toISOString() : null,
-    startAddressID: editFormData.startAddressID ? parseInt(editFormData.startAddressID) : null,
-    endAddressID: editFormData.endAddressID ? parseInt(editFormData.endAddressID) : null,
-    pickupTime: pickupDateTimeISO, // Now a full ISO 8601 DateTime
-    volunteerID: editFormData.volunteerID ? parseInt(editFormData.volunteerID) : null,
-    status: contacts.find((contact) => contact.id === editContactId)?.status || 'Unreserved',
-};
+    // Get the original contact to preserve the existing IDs
+    const originalContact = contacts.find((contact) => contact.id === editContactId);
+
+    // Parse customer name and phone changes
+    let customerUpdates = null;
+    const currentCustomerName = originalContact.customerName;
+    const currentCustomerPhone = originalContact.customerPhone;
+    
+    console.log("=== CUSTOMER CHANGE DETECTION ===");
+    console.log("Current name:", currentCustomerName);
+    console.log("New name:", editFormData.customerName);
+    console.log("Current phone:", currentCustomerPhone);
+    console.log("New phone:", editFormData.phoneNumber);
+    
+    if (editFormData.customerName !== currentCustomerName || editFormData.phoneNumber !== currentCustomerPhone) {
+      const [firstName, ...lastNameParts] = editFormData.customerName.split(' ');
+      customerUpdates = {
+        id: originalContact.customerID,
+        firstName: firstName || '',
+        lastName: lastNameParts.join(' ') || '',
+        customerPhone: editFormData.phoneNumber || currentCustomerPhone
+      };
+      
+      console.log("=== CUSTOMER UPDATES CREATED ===");
+      console.log("Customer updates object:", customerUpdates);
+    }
+
+    // Parse address changes
+    let addressUpdates = null;
+    if (editFormData.startAddress && editFormData.startAddress !== originalContact.startLocation) {
+      const addressParts = editFormData.startAddress.split(',').map(part => part.trim());
+      if (addressParts.length >= 3) {
+        const street = addressParts[0];
+        const city = addressParts[1];
+        const stateAndZip = addressParts[2].split(' ');
+        const state = stateAndZip[0];
+        const postalCode = stateAndZip.slice(1).join(' ');
+        
+        addressUpdates = {
+          id: originalContact.startAddressID,
+          street: street,
+          city: city,
+          state: state,
+          postalCode: postalCode
+        };
+      }
+    }
+
+    // Parse volunteer changes
+    let volunteerUpdates = null;
+    const currentVolunteerName = getVolunteerNameById(originalContact.volunteerID);
+    if (editFormData.volunteerName && editFormData.volunteerName !== currentVolunteerName) {
+      const volunteerID = getVolunteerIdByName(editFormData.volunteerName);
+      volunteerUpdates = {
+        volunteerID: volunteerID
+      };
+    }
+
+    const editedContact = {
+      id: editContactId,
+      customerID: originalContact.customerID, 
+      date: editFormData.date ? new Date(editFormData.date).toISOString() : null,
+      startAddressID: originalContact.startAddressID, 
+      endAddressID: originalContact.endAddressID,
+      pickupTime: pickupDateTimeISO,
+      volunteerID: volunteerUpdates?.volunteerID || originalContact.volunteerID,
+      status: originalContact.status || 'Unreserved',
+      customerUpdates: customerUpdates,
+      addressUpdates: addressUpdates,
+      volunteerUpdates: volunteerUpdates
+    };
 
     onEditRide(editedContact);
     setEditContactId(null);
@@ -75,7 +195,7 @@ const editedContact = {
   };
 
   const handleDeleteClick = (contactId) => {
-    onDeleteRide(contactId); // Call the onDeleteRide prop to delete the data
+    onDeleteRide(contactId);
   };
 
   return (
@@ -102,6 +222,9 @@ const editedContact = {
                     handleEditFormChange={handleEditFormChange}
                     handleCancelClick={handleCancelClick}
                     convertTime={convertTime}
+                    customers={customers}
+                    addresses={addresses}
+                    status={contact.status}
                   />
                 ) : (
                   <ReadOnlyRow
@@ -111,6 +234,7 @@ const editedContact = {
                     handleDeleteClick={handleDeleteClick}
                     convertTime={convertTime}
                     status={contact.status}
+                    startAddress={contact.startLocation} // Pass startLocation directly
                   />
                 )
               ))}

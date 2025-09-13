@@ -47,3 +47,4 @@ package-lock.json
 cypress.env.json
 
 mydb.db
+prisma/dev.db
