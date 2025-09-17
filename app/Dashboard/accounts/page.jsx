@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useAuth } from "../../providers/Auth"; // Import the useAuth hook
+import { useAuth } from "../../providers/Auth";
 
 export default function AccountPage() {
-  const { handleLogout } = useAuth(); // Destructure handleLogout from the hook
+  const { handleLogout } = useAuth();
 
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     username: '',
@@ -25,15 +26,18 @@ export default function AccountPage() {
       try {
         setLoading(true);
         const response = await fetch('/api/user/profile');
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }
 
         const data = await response.json();
-        
+        const [firstName, ...lastNameParts] = data.user.fullName.split(' ');
+        const lastName = lastNameParts.join(' ');
+
         setFormData({
-          fullName: data.user.fullName,
+          firstName: firstName || '',
+          lastName: lastName || '',
           email: data.user.email,
           phone: data.user.phone,
           username: data.user.username,
@@ -49,22 +53,31 @@ export default function AccountPage() {
       }
     }
     fetchUserData();
-  }, []); 
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      const updateData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        username: formData.username,
+      };
+
       const response = await fetch('/api/user/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updateData),
       });
+
       if (!response.ok) {
         throw new Error('Failed to update account information');
       }
@@ -84,10 +97,10 @@ export default function AccountPage() {
         setProfilePic(reader.result);
       };
       reader.readAsDataURL(file);
-      
+
       const formData = new FormData();
       formData.append('profilePic', file);
-      
+
       try {
         const response = await fetch('/api/upload/profile-pic', {
           method: 'POST',
@@ -97,7 +110,7 @@ export default function AccountPage() {
           throw new Error('Failed to upload profile picture');
         }
         const result = await response.json();
-        setProfilePic(result.url); 
+        setProfilePic(result.url);
       } catch (err) {
         console.error('Upload error:', err);
       }
@@ -119,7 +132,7 @@ export default function AccountPage() {
   return (
     <div className="max-w-xl mx-auto my-10 p-8 bg-white shadow-lg rounded-xl">
       <h1 className="text-center text-3xl font-bold text-gray-800 mb-8">Volunteer Account</h1>
-      
+
       <div className="flex flex-col items-center mb-8">
         <label htmlFor="profile-pic-upload" className="cursor-pointer">
           <div className="w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden hover:bg-gray-100 transition-colors">
@@ -141,17 +154,28 @@ export default function AccountPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
+          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
           <input
             type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
             onChange={handleInputChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
-        
+        <div>
+          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
           <input
@@ -188,7 +212,7 @@ export default function AccountPage() {
           />
         </div>
 
-        
+
         <button
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -196,7 +220,7 @@ export default function AccountPage() {
           Save Changes
         </button>
       </form>
-      
+
       {formData.isVolunteer && (
         <div className="mt-8 pt-6 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Volunteer Information</h2>
@@ -239,4 +263,4 @@ export default function AccountPage() {
       </div>
     </div>
   );
-} 
+}
