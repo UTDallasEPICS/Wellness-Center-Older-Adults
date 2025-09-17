@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useAuth } from "../../providers/Auth"; // Import the useAuth hook
 
 export default function AccountPage() {
+  const { handleLogout } = useAuth(); // Destructure handleLogout from the hook
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -103,10 +106,6 @@ export default function AccountPage() {
 
   const handlePasswordChange = () => {
     alert('Password change functionality is not configured.');
-  };
-
-  const handleLogout = () => {
-    alert('Logout functionality is not configured.');
   };
 
   if (loading) {
@@ -240,4 +239,4 @@ export default function AccountPage() {
       </div>
     </div>
   );
-}
+} 
