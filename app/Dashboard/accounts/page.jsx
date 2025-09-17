@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useAuth } from "../../providers/Auth"; // Import the useAuth hook
+import { useAuth } from "../../providers/Auth";
 
 export default function AccountPage() {
-  const { handleLogout } = useAuth(); // Destructure handleLogout from the hook
+  const { handleLogout } = useAuth();
 
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     username: '',
     isVolunteer: false,
     volunteerStatus: '',
     assignedRides: [],
->>>>>>> 66c4a98 (the account page is working)
   });
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,41 +26,18 @@ export default function AccountPage() {
       try {
         setLoading(true);
         const response = await fetch('/api/user/profile');
-<<<<<<< HEAD
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-        const data = await response.json();
-        const user = data.user;
-        let firstName = user.firstName || '';
-        let lastName = user.lastName || '';
-        // If firstName/lastName not present, split fullName
-        if ((!firstName || !lastName) && user.fullName) {
-          const [f, ...l] = user.fullName.split(' ');
-          firstName = f;
-          lastName = l.join(' ');
-        }
-        setFormData({
-          firstName,
-          lastName,
-          email: user.email || '',
-          phone: user.phone || '',
-          isVolunteer: user.isVolunteer || false,
-          volunteerStatus: user.volunteerStatus || '',
-          assignedRides: user.assignedRides || [],
-          birthdate: user.birthdate || '',
-        });
-        setProfilePic(user.profilePicUrl || null);
-=======
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }
 
         const data = await response.json();
-        
+        const [firstName, ...lastNameParts] = data.user.fullName.split(' ');
+        const lastName = lastNameParts.join(' ');
+
         setFormData({
-          fullName: data.user.fullName,
+          firstName: firstName || '',
+          lastName: lastName || '',
           email: data.user.email,
           phone: data.user.phone,
           username: data.user.username,
@@ -69,7 +46,6 @@ export default function AccountPage() {
           assignedRides: data.user.assignedRides,
         });
         setProfilePic(data.user.profilePicUrl);
->>>>>>> 66c4a98 (the account page is working)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -77,32 +53,23 @@ export default function AccountPage() {
       }
     }
     fetchUserData();
-<<<<<<< HEAD
   }, []);
-=======
-  }, []); 
->>>>>>> 66c4a98 (the account page is working)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 66c4a98 (the account page is working)
   const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-<<<<<<< HEAD
       const updateData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
-        volunteerStatus: formData.volunteerStatus,
+        username: formData.username,
       };
 
       const response = await fetch('/api/user/update', {
@@ -111,13 +78,6 @@ export default function AccountPage() {
         body: JSON.stringify(updateData),
       });
 
-=======
-      const response = await fetch('/api/user/update', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
->>>>>>> 66c4a98 (the account page is working)
       if (!response.ok) {
         throw new Error('Failed to update account information');
       }
@@ -137,17 +97,10 @@ export default function AccountPage() {
         setProfilePic(reader.result);
       };
       reader.readAsDataURL(file);
-<<<<<<< HEAD
 
       const formData = new FormData();
       formData.append('profilePic', file);
 
-=======
-      
-      const formData = new FormData();
-      formData.append('profilePic', file);
-      
->>>>>>> 66c4a98 (the account page is working)
       try {
         const response = await fetch('/api/upload/profile-pic', {
           method: 'POST',
@@ -157,11 +110,7 @@ export default function AccountPage() {
           throw new Error('Failed to upload profile picture');
         }
         const result = await response.json();
-<<<<<<< HEAD
         setProfilePic(result.url);
-=======
-        setProfilePic(result.url); 
->>>>>>> 66c4a98 (the account page is working)
       } catch (err) {
         console.error('Upload error:', err);
       }
@@ -172,7 +121,6 @@ export default function AccountPage() {
     alert('Password change functionality is not configured.');
   };
 
->>>>>>> 66c4a98 (the account page is working)
   if (loading) {
     return <div className="text-center mt-20 text-gray-500">Loading user data...</div>;
   }
@@ -184,11 +132,7 @@ export default function AccountPage() {
   return (
     <div className="max-w-xl mx-auto my-10 p-8 bg-white shadow-lg rounded-xl">
       <h1 className="text-center text-3xl font-bold text-gray-800 mb-8">Volunteer Account</h1>
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> 66c4a98 (the account page is working)
       <div className="flex flex-col items-center mb-8">
         <label htmlFor="profile-pic-upload" className="cursor-pointer">
           <div className="w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden hover:bg-gray-100 transition-colors">
@@ -210,26 +154,16 @@ export default function AccountPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         <div>
-<<<<<<< HEAD
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
           <input
             type="text"
             id="firstName"
             name="firstName"
             value={formData.firstName}
-=======
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
->>>>>>> 66c4a98 (the account page is working)
             onChange={handleInputChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
-<<<<<<< HEAD
         <div>
           <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
           <input
@@ -237,8 +171,11 @@ export default function AccountPage() {
             id="lastName"
             name="lastName"
             value={formData.lastName}
-=======
-        
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
           <input
@@ -246,7 +183,6 @@ export default function AccountPage() {
             id="username"
             name="username"
             value={formData.username}
->>>>>>> 66c4a98 (the account page is working)
             onChange={handleInputChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
@@ -276,10 +212,7 @@ export default function AccountPage() {
           />
         </div>
 
-<<<<<<< HEAD
-=======
-        
->>>>>>> 66c4a98 (the account page is working)
+
         <button
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -287,28 +220,7 @@ export default function AccountPage() {
           Save Changes
         </button>
       </form>
-<<<<<<< HEAD
 
-      {formData.isVolunteer && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Volunteer Information</h2>
-          <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-            <div>
-              <label htmlFor="volunteerStatus" className="block text-sm font-medium text-gray-700">Status</label>
-              <select
-                id="volunteerStatus"
-                name="volunteerStatus"
-                value={formData.volunteerStatus}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              >
-                <option value="available">Available</option>
-                <option value="unavailable">Unavailable</option>
-                <option value="in drive">In Drive</option>
-              </select>
-            </div>
-=======
-      
       {formData.isVolunteer && (
         <div className="mt-8 pt-6 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Volunteer Information</h2>
@@ -316,7 +228,6 @@ export default function AccountPage() {
             <p className="text-gray-600">
               **Status:** <span className="font-bold">{formData.volunteerStatus}</span>
             </p>
->>>>>>> 66c4a98 (the account page is working)
             {formData.assignedRides.length > 0 && (
               <div className="mt-4">
                 <h3 className="font-medium text-gray-700">Assigned Rides</h3>
@@ -352,4 +263,4 @@ export default function AccountPage() {
       </div>
     </div>
   );
-} 
+}

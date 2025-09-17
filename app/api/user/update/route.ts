@@ -1,87 +1,47 @@
-import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/auth0.ts";
 
-const prisma = new PrismaClient();
+// You will need to import your database client here
+// For example:
+// import prisma from '@/path/to/your/db'; 
 
-export async function PUT(req) {
+export async function PUT(request) {
   try {
-    const { firstName, lastName, email, phone, status } = await req.json();
-    const userEmail = email;
-
-    if (!userEmail) {
-      return new NextResponse(
-        JSON.stringify({ message: "User email is required." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    // Find the user and include their volunteer info
-    const existingUser = await prisma.user.findUnique({
-      where: { email: userEmail },
-      include: {
-        volunteer: true, // This is key to accessing the volunteer info
+    const body = await request.json();
+    const { firstName, lastName, email, phone, username } = body; 
+
+    // Find the user's record using the session email to ensure it's the correct user
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+
+    // Update the user's record with the new data
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id }, 
+      data: {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        username: username,
       },
     });
 
-    if (!existingUser) {
-      return new NextResponse(
-        JSON.stringify({ message: "User not found." }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    console.log("Updated user:", updatedUser);
 
-    const userData = {};
-    if (firstName) userData.firstName = firstName;
-    if (lastName) userData.lastName = lastName;
-    if (phone) userData.phone = phone;
-  
-
-    let updatedUser = null;
-    if (Object.keys(userData).length > 0) {
-      updatedUser = await prisma.user.update({
-        where: { email: userEmail },
-        data: userData,
-        include: {
-          volunteer: true, // Also include volunteer data in the response
-        },
-      });
-    }
-
-    // Check if a 'status' was provided and update the VolunteerInfo model
-    let updatedVolunteer = null;
-    if (status) {
-      updatedVolunteer = await prisma.volunteerInfo.update({
-        where: { userID: existingUser.id },
-        data: {
-          status: status,
-        },
-      });
-    }
-
-    // Prepare the final response object.
-    // Use the updated user data if available, otherwise use the existing user.
-    // Combine with the updated volunteer info if it was updated.
-    const finalUser = updatedUser ? updatedUser : existingUser;
-    
-    // Replace the old volunteer info with the updated one if it exists
-    if (updatedVolunteer) {
-      finalUser.volunteer = updatedVolunteer;
-    }
-
-    return new NextResponse(
-      JSON.stringify({
-        message: "Account information updated successfully.",
-        user: finalUser,
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    return NextResponse.json({ message: 'User updated successfully' }, { status: 200 });
   } catch (error) {
-    console.error("Error updating user information:", error);
-    return new NextResponse(
-      JSON.stringify({ message: "Internal server error." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  } finally {
-    await prisma.$disconnect();
+    console.error('Update error:', error);
+    return NextResponse.json({ message: 'Failed to update account' }, { status: 500 });
   }
 }
