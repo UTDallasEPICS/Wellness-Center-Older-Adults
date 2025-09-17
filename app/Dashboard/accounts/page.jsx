@@ -2,24 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-<<<<<<< HEAD
-import { useAuth } from "../../providers/Auth";
+import { useAuth } from "../../providers/Auth"; // Import the useAuth hook
 
 export default function AccountPage() {
-  const { handleLogout } = useAuth();
+  const { handleLogout } = useAuth(); // Destructure handleLogout from the hook
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    isVolunteer: false,
-    volunteerStatus: '',
-    assignedRides: [],
-    birthdate: '',
-=======
-
-export default function AccountPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -183,12 +170,6 @@ export default function AccountPage() {
 
   const handlePasswordChange = () => {
     alert('Password change functionality is not configured.');
-  };
-
-<<<<<<< HEAD
-=======
-  const handleLogout = () => {
-    alert('Logout functionality is not configured.');
   };
 
 >>>>>>> 66c4a98 (the account page is working)
@@ -371,4 +352,4 @@ export default function AccountPage() {
       </div>
     </div>
   );
-}
+} 
