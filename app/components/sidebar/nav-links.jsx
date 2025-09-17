@@ -104,10 +104,10 @@ export default function NavLinks({ isCollapsed }) {
           </li>
           <li>
             <a
-              href="/Dashboard/settings"
+              href="/Dashboard/accounts"
               className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >
-              Settings
+              Accounts
             </a>
           </li>
         </>

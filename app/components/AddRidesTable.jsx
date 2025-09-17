@@ -1,4 +1,3 @@
-// app/components/AddRidesTable.jsx
 "use client";
 import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
@@ -11,7 +10,9 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide 
     customerID: "",
     date: "",
     startAddressID: "",
+    endAddressID: "", // Added functionality: field for end address ID
     pickupTime: "",
+    volunteerID: "", // Added functionality: field for volunteer ID
   });
 
   useEffect(() => {
@@ -22,10 +23,12 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide 
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
-      customerID: contact.customerID,
+      customerID: contact.customerID || "",
       date: contact.date ? contact.date.split('T')[0] : '', // Format date for input
-      startAddressID: contact.startAddressID,
-      pickupTime: contact.startTime  ? contact.startTime .slice(0, 5) : '', // Format time for input (HH:MM)
+      startAddressID: contact.startAddressID || "",
+      endAddressID: contact.endAddressID || "", // Added functionality: populate endAddressID
+      pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : '', // Format time for input (HH:MM)
+      volunteerID: contact.volunteerID || "", // Added functionality: populate volunteerID
     };
     setEditFormData(formValues);
   };
@@ -55,16 +58,16 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide 
       pickupDateTimeISO = dateObj.toISOString();
     }
 
-const editedContact = {
-    id: editContactId,
-    customerID: editFormData.customerID ? parseInt(editFormData.customerID) : null,
-    date: editFormData.date ? new Date(editFormData.date).toISOString() : null,
-    startAddressID: editFormData.startAddressID ? parseInt(editFormData.startAddressID) : null,
-    endAddressID: editFormData.endAddressID ? parseInt(editFormData.endAddressID) : null,
-    pickupTime: pickupDateTimeISO, // Now a full ISO 8601 DateTime
-    volunteerID: editFormData.volunteerID ? parseInt(editFormData.volunteerID) : null,
-    status: contacts.find((contact) => contact.id === editContactId)?.status || 'Unreserved',
-};
+    const editedContact = {
+      id: editContactId,
+      customerID: editFormData.customerID ? parseInt(editFormData.customerID) : null,
+      date: editFormData.date ? new Date(editFormData.date).toISOString() : null,
+      startAddressID: contacts.find(contact => contact.id === editContactId)?.startAddressID || null, // Ensure correct address ID
+      endAddressID: editFormData.endAddressID ? parseInt(editFormData.endAddressID) : null, // Added functionality: send endAddressID
+      pickupTime: pickupDateTimeISO, // Now a full ISO 8601 DateTime
+      volunteerID: editFormData.volunteerID ? parseInt(editFormData.volunteerID) : null, // Added functionality: send volunteerID
+      status: contacts.find((contact) => contact.id === editContactId)?.status || 'Unreserved',
+    };
 
     onEditRide(editedContact);
     setEditContactId(null);

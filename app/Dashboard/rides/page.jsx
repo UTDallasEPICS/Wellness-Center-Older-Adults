@@ -138,7 +138,13 @@ export default function Page() {
             window.location.reload(); // Reload the page after successful edit
         } catch (error) {
             console.error("Error updating ride:", error);
-            toast.error(`Failed to update ride: ${error.message}`);
+            if (error instanceof Response) {
+                const errorData = await error.json();
+                console.error("Backend error details:", errorData);
+                toast.error(`Failed to update ride: ${errorData?.message || error.statusText}`);
+            } else {
+                toast.error(`Failed to update ride: ${error.message}`);
+            }
         }
     };
 

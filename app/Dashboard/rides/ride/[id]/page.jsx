@@ -88,23 +88,23 @@ export default function Ride() {
     setIsEditing(true);
   };
 
-const handleSaveClick = async () => {
-  try {
-    const response = await fetch(`/api/rides/${rideDetails.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        pickupAddress,
-        dropoffAddress,
-        pickupTime,
-        driveTimeAB,
-        mileage,
-        waitTime,
-        notes,
-      }),
-    });
+  const handleSaveClick = async () => {
+    try {
+      const response = await fetch(`/api/rides/${rideDetails.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pickupAddress,
+          dropoffAddress,
+          pickupTime,
+          driveTimeAB,
+          mileage,
+          waitTime,
+          notes,
+        }),
+      });
       if (!response.ok) {
         throw new Error(`Failed to update ride details: ${response.status}`);
       }
@@ -139,7 +139,6 @@ const handleSaveClick = async () => {
   };
 
   const handleAcceptRide = async () => {
-    // ... (rest of your handleAcceptRide function - no changes needed for editing)
     if (rideDetails) {
       try {
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
@@ -164,7 +163,6 @@ const handleSaveClick = async () => {
   };
 
   const handleUnreserveRide = async () => {
-    // ... (rest of your handleUnreserveRide function - no changes needed for editing)
     if (rideDetails) {
       try {
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
@@ -189,7 +187,6 @@ const handleSaveClick = async () => {
   };
 
   const handleCompleteRide = async () => {
-    // ... (rest of your handleCompleteRide function - no changes needed for editing)
     if (rideDetails) {
       try {
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
@@ -213,115 +210,131 @@ const handleSaveClick = async () => {
       }
     }
   };
-
-  let actionButton;
-  if (rideDetails?.status === 'AVAILABLE' || rideDetails?.status === 'Added' || rideDetails?.status === 'Unreserved') {
-    actionButton = (
-      <button
-        className="px-5 py-2 bg-[#419902] text-white rounded mr-2"
-        onClick={handleAcceptRide}
-      >
-        Accept?
-      </button>
-    );
-  } else if (rideDetails?.status === 'Reserved') {
-    actionButton = (
-      <>
-        <button
-          className="px-5 py-2 bg-yellow-500 hover:bg-yellow-700 text-white rounded mr-2"
-          onClick={handleUnreserveRide}
-        >
-          Unreserve
-        </button>
-        <button
-          className="px-5 py-2 bg-green-500 hover:bg-[#419902] text-white rounded"
-          onClick={handleCompleteRide}
-        >
-          Completed
-        </button>
-      </>
-    );
-  } else if (rideDetails?.status === 'Completed') {
-    actionButton = null;
-  }
-
+ 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/2 p-5 bg-[#fffdf5] font-sans">
-        <div className="flex justify-between mb-5">
-          <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
-          <p className="m-0">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available'}</p>
-        </div>
-
-        {isEditing ? (
-          <div>
-            <div className="mb-5">
-              <p className="my-1 font-semibold"><strong>Trip</strong></p>
-              <label className="block my-1">A: <input type="text" name="pickupAddress" value={pickupAddress} onChange={handleInputChange} className="w-full border rounded py-1 px-2" /></label>
-              <label className="block my-1">B: <input type="text" name="dropoffAddress" value={dropoffAddress} onChange={handleInputChange} className="w-full border rounded py-1 px-2" /></label>
-            </div>
-
-            <div className="flex justify-between mb-5">
-              <label>
-                <strong>Pick-up Time</strong><br />
-                <input type="text" name="pickupTime" value={pickupTime} onChange={handleInputChange} className="border rounded py-1 px-2" />
-              </label>
-            </div>
-
-            <div className="flex justify-between mb-5">
-              <p className="m-0"><strong>Client</strong><br />{rideDetails.customer?.name}</p>
-              <label><strong>Drive Time</strong><br />A-B: <input type="text" name="driveTimeAB" value={driveTimeAB} onChange={handleInputChange} className="border rounded py-1 px-2" /></label>
-            </div>
-
-            <div className="flex justify-between mb-5">
-              <label><strong>Total Mileage</strong><br /><input type="text" name="mileage" value={mileage} onChange={handleInputChange} className="border rounded py-1 px-2" /></label>
-              <label><strong>Wait Time</strong><br /><input type="text" name="waitTime" value={waitTime} onChange={handleInputChange} className="border rounded py-1 px-2" /></label>
-            </div>
-
-            <div className="mb-5">
-              <label className="block"><strong>Notes</strong><br /><textarea name="notes" value={notes} onChange={handleInputChange} className="w-full border rounded py-1 px-2"></textarea></label>
-            </div>
-
-            <div className="flex justify-start mb-5">
-              <button className="px-5 py-2 bg-green-500 text-white rounded mr-2" onClick={handleSaveClick}>Save</button>
-              <button className="px-5 py-2 bg-gray-300 text-gray-700 rounded" onClick={handleCancelEdit}>Cancel</button>
-            </div>
+    <div className="flex h-screen bg-gray-100">
+      {/* Left Side: Details and Actions */}
+      <div className="w-1/2 p-10 bg-[#fffdf5] shadow-lg flex flex-col justify-between">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-4xl font-bold text-gray-800">Ride #{rideDetails.id}</h2>
+            <p className="text-gray-600">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
           </div>
-        ) : (
-          <div>
-            <div className="flex justify-between mb-5">
+
+          {/* Details Section */}
+          {isEditing ? (
+            <div className="space-y-4">
+              {/* Trip Edit */}
               <div>
-                <p className="my-1 font-semibold"><strong>Trip</strong></p>
-                <p className="my-1">A: {rideDetails.pickupAddress}</p>
-                <p className="my-1">B: {rideDetails.dropoffAddress}</p>
+                <p className="font-semibold text-gray-700 mb-2">Trip</p>
+                <div className="space-y-2">
+                  <label className="block text-sm">
+                    <span className="font-medium text-gray-500">A:</span>
+                    <input type="text" name="pickupAddress" value={pickupAddress} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
+                  </label>
+                  <label className="block text-sm">
+                    <span className="font-medium text-gray-500">B:</span>
+                    <input type="text" name="dropoffAddress" value={dropoffAddress} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
+                  </label>
+                </div>
               </div>
-              <p className="m-0">
-                <strong>Pick-up Time</strong><br />
-                {rideDetails.pickupTime
-                  ? formatTime(new Date(rideDetails.pickupTime).toLocaleTimeString('en-US', { hour12: false }))
-                  : 'N/A'}
-              </p>
-            </div>
 
-            <div className="flex justify-between mb-5">
-              <p className="m-0"><strong>Client</strong><br />{rideDetails.customer?.name}</p>
-              <p className="m-0"><strong>Drive Time</strong><br />A-B: {rideDetails.driveTimeAB}</p>
-            </div>
+              {/* Other Edit Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <label>
+                  <span className="font-semibold text-gray-700">Pick-up Time</span>
+                  <input type="text" name="pickupTime" value={pickupTime} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
+                </label>
+                <div className="flex flex-col">
+                  <p className="font-semibold text-gray-700">Client</p>
+                  <p className="mt-1 text-gray-800">{rideDetails.customer?.name}</p>
+                </div>
+                <label>
+                  <span className="font-semibold text-gray-700">Drive Time</span>
+                  <input type="text" name="driveTimeAB" value={driveTimeAB} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
+                </label>
+                <label>
+                  <span className="font-semibold text-gray-700">Total Mileage</span>
+                  <input type="text" name="mileage" value={mileage} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
+                </label>
+                <label>
+                  <span className="font-semibold text-gray-700">Wait Time</span>
+                  <input type="text" name="waitTime" value={waitTime} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
+                </label>
+                <label className="col-span-2">
+                  <span className="font-semibold text-gray-700">Notes</span>
+                  <textarea name="notes" value={notes} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors"></textarea>
+                </label>
+              </div>
 
-            <div className="flex justify-between mb-5">
-              <p className="m-0"><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
-              <p className="m-0"><strong>Wait Time</strong><br />{rideDetails.waitTime || 'N/A'}</p>
+              {/* Edit Action Buttons */}
+              <div className="flex gap-4">
+                <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleSaveClick}>Save</button>
+                <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-lg hover:bg-gray-300 transition-colors" onClick={handleCancelEdit}>Cancel</button>
+              </div>
             </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Trip Details */}
+              <div>
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-gray-700">Trip</p>
+                    <p className="text-gray-600">A: {rideDetails.pickupAddress}</p>
+                    <p className="text-gray-600">B: {rideDetails.dropoffAddress}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-700">Pick-up Time</p>
+                    <p className="text-gray-600">{rideDetails.pickupTime ? formatTime(rideDetails.pickupTime) : 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
 
-            <div className="flex justify-between mb-5">
-              {actionButton}
-              <p className="m-0"><strong>Notes</strong><br />{rideDetails.notes || 'N/A'}</p>
+              {/* Other Details */}
+              <div className="grid grid-cols-2 gap-6">
+                <div className="flex flex-col">
+                  <p className="font-semibold text-gray-700">Client</p>
+                  <p className="text-gray-600">{rideDetails.customer?.name}</p>
+                </div>
+                <div className="flex flex-col text-right">
+                  <p className="font-semibold text-gray-700">Drive Time</p>
+                  <p className="text-gray-600">{rideDetails.driveTimeAB}</p>
+                </div>
+                <div className="flex flex-col">
+                  <p className="font-semibold text-gray-700">Total Mileage</p>
+                  <p className="text-gray-600">{rideDetails.mileage}</p>
+                </div>
+                <div className="flex flex-col text-right">
+                  <p className="font-semibold text-gray-700">Wait Time</p>
+                  <p className="text-gray-600">{rideDetails.waitTime || 'N/A'}</p>
+                </div>
+                <div className="flex flex-col col-span-2">
+                  <p className="font-semibold text-gray-700">Notes</p>
+                  <p className="text-gray-600">{rideDetails.notes || 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 mt-6">
+                {rideDetails.status === 'AVAILABLE' || rideDetails.status === 'Added' || rideDetails.status === 'Unreserved' ? (
+                  <>
+                    <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleAcceptRide}>Accept?</button>
+                    <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-lg hover:bg-gray-300 transition-colors" onClick={handleEditClick}>Edit</button>
+                  </>
+                ) : rideDetails.status === 'Reserved' ? (
+                  <>
+                    <button className="flex-grow px-5 py-3 bg-yellow-500 text-white font-semibold rounded-md shadow-lg hover:bg-yellow-600 transition-colors" onClick={handleUnreserveRide}>Unreserve</button>
+                    <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleCompleteRide}>Completed</button>
+                  </>
+                ) : null}
+              </div>
             </div>
-
-            <button className="px-5 py-2 bg-blue-500 text-white rounded" onClick={handleEditClick}>Edit</button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+      
+      {/* Right Side: Map */}
       <div className="w-1/2 h-screen">
         {console.log({ rideDetails: rideDetails })}
         {rideDetails?.pickupAddress && rideDetails?.dropoffAddress && (
