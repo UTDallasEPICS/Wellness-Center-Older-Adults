@@ -37,31 +37,35 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         console.log("Address Updates:", updateData.addressUpdates);
         console.log("Full updateData:", updateData);
 
-        const ride = await prisma.ride.findUnique({
-            where: {
-                id: parseInt(id, 10),
-            },
+        const rideId = parseInt(id, 10);
+        if (isNaN(rideId)) {
+            return NextResponse.json({ error: 'Invalid ride ID' }, { status: 400 });
+        }
+
+        const existingRide = await prisma.ride.findUnique({
+            where: { id: rideId },
         });
 
-        if (!ride) {
+        if (!existingRide) {
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
 
+        // Handle address updates if provided
         if (updateData.pickupAddress || updateData.dropoffAddress) {
             console.log("=== PARSING ADDRESS STRINGS ===");
             console.log("Pickup address string:", updateData.pickupAddress);
             console.log("Dropoff address string:", updateData.dropoffAddress);
-            console.log("Ride startAddressID:", ride.startAddressID);
-            console.log("Ride endAddressID:", ride.endAddressID);
+            console.log("Ride startAddressID:", existingRide.startAddressID);
+            console.log("Ride endAddressID:", existingRide.endAddressID);
             
             // Parse pickup address
-            if (updateData.pickupAddress && ride.startAddressID) {
+            if (updateData.pickupAddress && existingRide.startAddressID) {
                 console.log("Processing pickup address...");
                 const pickupParts = parseAddressString(updateData.pickupAddress);
                 console.log("Parsed pickup parts:", pickupParts);
                 if (pickupParts) {
                     const updatedPickup = await prisma.address.update({
-                        where: { id: ride.startAddressID },
+                        where: { id: existingRide.startAddressID },
                         data: pickupParts
                     });
                     console.log("Updated pickup address in DB:", updatedPickup);
@@ -69,13 +73,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
             
             // Parse dropoff address  
-            if (updateData.dropoffAddress && ride.endAddressID) {
+            if (updateData.dropoffAddress && existingRide.endAddressID) {
                 console.log("Processing dropoff address...");
                 const dropoffParts = parseAddressString(updateData.dropoffAddress);
                 console.log("Parsed dropoff parts:", dropoffParts);
                 if (dropoffParts) {
                     const updatedDropoff = await prisma.address.update({
-                        where: { id: ride.endAddressID },
+                        where: { id: existingRide.endAddressID },
                         data: dropoffParts
                     });
                     console.log("Updated dropoff address in DB:", updatedDropoff);
@@ -112,6 +116,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
 
+        // Handle address updates
         if (updateData.addressUpdates) {
             console.log("=== ADDRESS UPDATE ===");
             console.log("Address ID:", updateData.addressUpdates.id);
@@ -203,10 +208,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             prismaUpdateData.volunteer = { connect: { id: parseInt(volunteerID as string, 10) } };
         }
 
-        let updatedRide;
-
+        console.log("Data to update:", prismaUpdateData);
+        
         if (Object.keys(prismaUpdateData).length > 0) {
-            updatedRide = await prisma.ride.update({
+            const updatedRide = await prisma.ride.update({
                 where: {
                     id: parseInt(id, 10),
                 },

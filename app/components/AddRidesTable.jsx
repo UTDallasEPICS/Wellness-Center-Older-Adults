@@ -1,4 +1,3 @@
-// app/components/AddRidesTable.jsx
 "use client";
 import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
