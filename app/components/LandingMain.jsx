@@ -1,5 +1,7 @@
 "use client";
 
+import carImage from "../../public/images/croppedCarImage.png";
+
 import React from "react";
 import { useAuth } from "../providers/Auth";
 import Header from "/app/components/Header.jsx";
@@ -46,7 +48,7 @@ const LandingPage = () => {
 
         <Image
           className="w-[50%] mt-[50px]"
-          src="/images/croppedCarImage.png"
+          src={carImage}
           alt="Image of car with location icon"
           width={500}
           height={600}
