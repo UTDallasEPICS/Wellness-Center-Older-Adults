@@ -7,12 +7,20 @@ import { useAuth } from "../providers/Auth";
 import Header from "/app/components/Header.jsx";
 import Footer from "/app/components/Footer.jsx";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const LandingPage = () => {
   const { isAuthenticated, handleLogin, handleLogout } = useAuth();
+  const router = useRouter();
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/Dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <div className="flex flex-col h-full w-full bg-[#fbfcf8]">
+      const router = useRouter();
       <Header />
       <div className="flex flex-row w-[95%] h-[calc(100%-280px)] mx-auto">
         <div className="flex flex-col mt-[10%] ml-[7%] mb-[5%]">
