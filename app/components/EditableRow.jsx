@@ -7,9 +7,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     type="text"
-                    name="customerID" // Changed from "clientName"
-                    placeholder="Enter client's ID..."
-                    value={editFormData.customerID || ''}
+                    name="customerName"
+                    placeholder="Enter client's Name..."
+                    value={editFormData.customerName || ''}
                     onChange={handleEditFormChange}
                 />
             </td>
@@ -18,7 +18,7 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     type="text"
-                    name="phoneNumber" // Keep this if it maps correctly to your data
+                    name="phoneNumber"
                     placeholder="Enter contact number..."
                     value={editFormData.phoneNumber || ''}
                     onChange={handleEditFormChange}
@@ -29,9 +29,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     type="text"
-                    name="startAddressID" // Changed from "address"
-                    placeholder="Enter start address ID"
-                    value={editFormData.startAddressID || ''}
+                    name="startAddress"
+                    placeholder="Enter start address"
+                    value={editFormData.startAddress || ''}
                     onChange={handleEditFormChange}
                 />
             </td>
@@ -39,8 +39,8 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
             <td className="p-2">
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
-                    type="time" // Changed from "text" to "time" for better UX
-                    name="pickupTime" // Changed from "startTime"
+                    type="time"
+                    name="pickupTime"
                     value={editFormData.pickupTime || ''}
                     onChange={handleEditFormChange}
                 />
@@ -51,7 +51,7 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                     <input
                         className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                         type="text"
-                        name="volunteerName" // Keep this if it maps correctly
+                        name="volunteerName"
                         placeholder="Enter volunteer name"
                         value={editFormData.volunteerName || ''}
                         onChange={handleEditFormChange}
