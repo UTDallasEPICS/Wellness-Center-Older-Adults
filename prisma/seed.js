@@ -14,15 +14,15 @@ async function main() {
     },
   });
 
-  const volunteerUser = await prisma.user.create({
-    data: {
-      email: "volunteer@volunteer.org",
-      firstName: "Volly",
-      lastName: "Ball",
-      phone: "2345678901",
-      role: "VOLUNTEER",
-    },
-  });
+  //const volunteerUser = await prisma.user.create({
+  //  data: {
+  //    email: "volunteer@volunteer.org",
+  //    firstName: "Volly",
+  //    lastName: "Ball",
+  //    phone: "2345678901",
+  //    role: "VOLUNTEER",
+  //  },
+  //});
 
   // Seed VolunteerInfo for volunteer user
   const volunteerInfo = await prisma.volunteerInfo.create({

@@ -70,6 +70,7 @@ export default function AccountPage() {
         email: formData.email,
         phone: formData.phone,
         username: formData.username,
+        volunteerStatus: formData.volunteerStatus,
       };
 
       const response = await fetch('/api/user/update', {
@@ -212,7 +213,6 @@ export default function AccountPage() {
           />
         </div>
 
-
         <button
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -224,10 +224,21 @@ export default function AccountPage() {
       {formData.isVolunteer && (
         <div className="mt-8 pt-6 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Volunteer Information</h2>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600">
-              **Status:** <span className="font-bold">{formData.volunteerStatus}</span>
-            </p>
+          <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+            <div>
+              <label htmlFor="volunteerStatus" className="block text-sm font-medium text-gray-700">Status</label>
+              <select
+                id="volunteerStatus"
+                name="volunteerStatus"
+                value={formData.volunteerStatus}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              >
+                <option value="available">Available</option>
+                <option value="unavailable">Unavailable</option>
+                <option value="in drive">In Drive</option>
+              </select>
+            </div>
             {formData.assignedRides.length > 0 && (
               <div className="mt-4">
                 <h3 className="font-medium text-gray-700">Assigned Rides</h3>
