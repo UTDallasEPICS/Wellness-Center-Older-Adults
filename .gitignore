@@ -48,3 +48,5 @@ cypress.env.json
 
 mydb.db
 prisma/dev.db
+
+consolidated.txt
