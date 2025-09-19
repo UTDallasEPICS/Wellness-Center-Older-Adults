@@ -104,10 +104,10 @@ export async function POST(
         return ret;
       }
 
-      let redirectTo = `/Dashboard`;
-      if (user.isAdmin) {
-        redirectTo = "/Dashboard/dashboardEmployee/rides/page";
-      }
+      const redirectTo = `/Dashboard`;
+      // if (user.isAdmin) {
+      //   redirectTo = "/Dashboard";
+      // }
 
       const maxAge = 60 * 60 * 24;
       const redirectResponse = NextResponse.redirect(
