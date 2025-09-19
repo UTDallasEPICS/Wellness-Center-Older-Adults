@@ -20,7 +20,6 @@ const LandingPage = () => {
 
   return (
     <div className="flex flex-col h-full w-full bg-[#fbfcf8]">
-      const router = useRouter();
       <Header />
       <div className="flex flex-row w-[95%] h-[calc(100%-280px)] mx-auto">
         <div className="flex flex-col mt-[10%] ml-[7%] mb-[5%]">
