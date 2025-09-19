@@ -38,15 +38,17 @@ model Ride {
 }
 
 model User {
-  id         Int            @id @default(autoincrement())
-  email      String         @unique
-  firstName  String
-  lastName   String
-  phone      String?        @unique
-  role       String
-  isAdmin    Boolean        @default(false)
-  isArchived Boolean        @default(false)
-  volunteer  VolunteerInfo?
+  id              Int            @id @default(autoincrement())
+  email           String         @unique
+  firstName       String
+  lastName        String
+  phone           String?        @unique
+  username        String?
+  role            String
+  isAdmin         Boolean        @default(false)
+  isArchived      Boolean        @default(false)
+  volunteerStatus String?
+  volunteer       VolunteerInfo?
 }
 
 model Customer {
