@@ -1,88 +1,87 @@
-// This file is a Next.js API route that handles a PUT request
-// to update the user's information using Prisma.
-
-// Import the Prisma client.
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-// Initialize the Prisma client.
 const prisma = new PrismaClient();
 
-// Handler for the PUT request.
 export async function PUT(req) {
   try {
-    // Parse the request body to get all the data sent from the frontend.
-    const { firstName, lastName, email, phone, username, volunteerStatus } = await req.json();
-
-    // The frontend sends the user's email as 'email'
-    // but the backend expects it to be called 'userEmail'.
-    // You should use the 'email' variable directly from the payload.
+    const { firstName, lastName, email, phone, status } = await req.json();
     const userEmail = email;
 
-    // Validate that a user email is present.
     if (!userEmail) {
-      await prisma.$disconnect();
       return new NextResponse(
         JSON.stringify({ message: "User email is required." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Check if the user exists.
+    // Find the user and include their volunteer info
     const existingUser = await prisma.user.findUnique({
       where: { email: userEmail },
+      include: {
+        volunteer: true, // This is key to accessing the volunteer info
+      },
     });
 
-    // If no user is found, return a 404 Not Found error.
     if (!existingUser) {
-      await prisma.$disconnect();
       return new NextResponse(
         JSON.stringify({ message: "User not found." }),
         { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Create a data object with only the fields that were provided
-    // in the request body. This prevents overwriting fields with null or undefined.
-    const updateData = {};
-    if (firstName) updateData.firstName = firstName;
-    if (lastName) updateData.lastName = lastName;
-    if (phone) updateData.phone = phone;
-    if (username) updateData.username = username;
-    if (volunteerStatus) updateData.volunteerStatus = volunteerStatus;
-    
-    // If the request payload is empty, return an error.
-    if (Object.keys(updateData).length === 0) {
-      await prisma.$disconnect();
-      return new NextResponse(
-        JSON.stringify({ message: "No valid fields provided for update." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    const userData = {};
+    if (firstName) userData.firstName = firstName;
+    if (lastName) userData.lastName = lastName;
+    if (phone) userData.phone = phone;
+  
+
+    let updatedUser = null;
+    if (Object.keys(userData).length > 0) {
+      updatedUser = await prisma.user.update({
+        where: { email: userEmail },
+        data: userData,
+        include: {
+          volunteer: true, // Also include volunteer data in the response
+        },
+      });
     }
 
-    // Update the user's information.
-    const updatedUser = await prisma.user.update({
-      where: { email: userEmail },
-      data: updateData,
-    });
+    // Check if a 'status' was provided and update the VolunteerInfo model
+    let updatedVolunteer = null;
+    if (status) {
+      updatedVolunteer = await prisma.volunteerInfo.update({
+        where: { userID: existingUser.id },
+        data: {
+          status: status,
+        },
+      });
+    }
 
-    // Disconnect the Prisma client.
-    await prisma.$disconnect();
+    // Prepare the final response object.
+    // Use the updated user data if available, otherwise use the existing user.
+    // Combine with the updated volunteer info if it was updated.
+    const finalUser = updatedUser ? updatedUser : existingUser;
+    
+    // Replace the old volunteer info with the updated one if it exists
+    if (updatedVolunteer) {
+      finalUser.volunteer = updatedVolunteer;
+    }
 
-    // Send a success response with the updated user information.
     return new NextResponse(
       JSON.stringify({
         message: "Account information updated successfully.",
-        user: updatedUser,
+        user: finalUser,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error updating user information:", error);
-    await prisma.$disconnect();
     return new NextResponse(
       JSON.stringify({ message: "Internal server error." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

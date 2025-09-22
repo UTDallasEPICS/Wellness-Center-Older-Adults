@@ -96,7 +96,7 @@ export default function Ride() {
           pickupTime,
           driveTimeAB,
           mileage,
-          notes,
+           notes,
         }),
       });
       if (!response.ok) {
@@ -204,7 +204,7 @@ export default function Ride() {
   };
  
   return (
-    <div className="flex h-screen bg-gray-100">
+  <div className="flex h-screen bg-gray-100">
       {/* Left Side: Details and Actions */}
       <div className="w-1/2 p-10 bg-[#fffdf5] shadow-lg flex flex-col justify-between">
         <div className="space-y-6">
@@ -250,10 +250,6 @@ export default function Ride() {
                   <span className="font-semibold text-gray-700">Total Mileage</span>
                   <input type="text" name="mileage" value={mileage} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
                 </label>
-                <label>
-                  <span className="font-semibold text-gray-700">Wait Time</span>
-                  <input type="text" name="waitTime" value={waitTime} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
-                </label>
                 <label className="col-span-2">
                   <span className="font-semibold text-gray-700">Notes</span>
                   <textarea name="notes" value={notes} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors"></textarea>
@@ -297,19 +293,14 @@ export default function Ride() {
                   <p className="font-semibold text-gray-700">Total Mileage</p>
                   <p className="text-gray-600">{rideDetails.mileage}</p>
                 </div>
-                <div className="flex flex-col text-right">
-                  <p className="font-semibold text-gray-700">Wait Time</p>
-                  <p className="text-gray-600">{rideDetails.waitTime || 'N/A'}</p>
-                </div>
                 <div className="flex flex-col col-span-2">
                   <p className="font-semibold text-gray-700">Notes</p>
                   <p className="text-gray-600">{rideDetails.notes || 'N/A'}</p>
                 </div>
               </div>
-
               {/* Action Buttons */}
               <div className="flex gap-4 mt-6">
-                {rideDetails.status === 'AVAILABLE' || rideDetails.status === 'Added' || rideDetails.status === 'Unreserved' ? (
+                {(rideDetails.status === 'AVAILABLE' || rideDetails.status === 'Added' || rideDetails.status === 'Unreserved') ? (
                   <>
                     <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleAcceptRide}>Accept?</button>
                     <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-lg hover:bg-gray-300 transition-colors" onClick={handleEditClick}>Edit</button>
