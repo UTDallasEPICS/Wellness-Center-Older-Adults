@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
-const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status, convertTime }) => {
+const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status, convertTime, startAddress }) => {
   const router = useRouter();
 
   const handleRowClick = () => {
@@ -17,7 +17,7 @@ const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status, conv
         {contact.phoneNumber}
       </td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
-        {contact.startAddressID}
+        {startAddress}
       </td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {typeof convertTime === 'function' ? convertTime(contact.startTime) : contact.startTime}

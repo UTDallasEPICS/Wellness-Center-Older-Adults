@@ -1,13 +1,22 @@
 "use client";
 
+import carImage from "../../public/images/croppedCarImage.png";
+
 import React from "react";
 import { useAuth } from "../providers/Auth";
 import Header from "/app/components/Header.jsx";
 import Footer from "/app/components/Footer.jsx";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const LandingPage = () => {
   const { isAuthenticated, handleLogin, handleLogout } = useAuth();
+  const router = useRouter();
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/Dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <div className="flex flex-col h-full w-full bg-[#fbfcf8]">
@@ -46,7 +55,7 @@ const LandingPage = () => {
 
         <Image
           className="w-[50%] mt-[50px]"
-          src="/images/croppedCarImage.png"
+          src={carImage}
           alt="Image of car with location icon"
           width={500}
           height={600}
