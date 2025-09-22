@@ -247,7 +247,7 @@ const handleSaveClick = async () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 p-5 bg-[#fffdf5] font-sans">
+      <div className="w-1/2 p-5 bg-[#f4f1f0] font-sans">
         <div className="flex justify-between mb-5">
           <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
           <p className="m-0">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available'}</p>
