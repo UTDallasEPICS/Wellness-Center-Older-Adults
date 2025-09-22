@@ -43,7 +43,7 @@ export default function NavLinks({ isCollapsed }) {
         className={`flex items-center gap-3 px-6 py-3 text-green-900 rounded-lg hover:bg-green-100 transition ${isCollapsed ? "justify-center" : "gap-3"}`}
       >
         <Icon className="size-5" />
-        <span>{label}</span>
+        {!isCollapsed && <span>{label}</span>}
       </Link>
     </li>
   );
