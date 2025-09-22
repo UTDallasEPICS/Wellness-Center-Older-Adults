@@ -12,7 +12,6 @@ export default function AccountPage() {
     lastName: '',
     email: '',
     phone: '',
-    username: '',
     isVolunteer: false,
     volunteerStatus: '',
     assignedRides: [],
@@ -40,7 +39,6 @@ export default function AccountPage() {
           lastName: lastName || '',
           email: data.user.email,
           phone: data.user.phone,
-          username: data.user.username,
           isVolunteer: data.user.isVolunteer,
           volunteerStatus: data.user.volunteerStatus,
           assignedRides: data.user.assignedRides,
@@ -69,7 +67,6 @@ export default function AccountPage() {
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
-        username: formData.username,
         volunteerStatus: formData.volunteerStatus,
       };
 
@@ -172,18 +169,6 @@ export default function AccountPage() {
             id="lastName"
             name="lastName"
             value={formData.lastName}
-            onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
             onChange={handleInputChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />

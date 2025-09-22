@@ -314,7 +314,6 @@ export default function Page() {
 
                     <div className="flex justify-between mb-5">
                         <p className="m-0"><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
-                        <p className="m-0"><strong>Wait Time</strong><br />{rideDetails.waitTime || 'N/A'}</p>
                     </div>
 
                     <div className="flex justify-between mb-5">

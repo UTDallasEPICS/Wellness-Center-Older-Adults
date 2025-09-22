@@ -95,8 +95,6 @@ export async function GET(
             mileage,
             status: ride.status,
             driveTimeAB,
-            //waitTime: ride.waitTime,
-            waitime: 'N/A',
             notes: ride.specialNote,
             date: ride.date,
         };
