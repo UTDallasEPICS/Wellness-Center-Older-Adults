@@ -202,7 +202,29 @@ export default function Ride() {
       }
     }
   };
- 
+
+  let actionButton;
+  if (rideDetails?.status === 'Reserved') {
+    actionButton = (
+      <>
+        <button
+          className="px-5 py-2 bg-yellow-500 hover:bg-yellow-700 text-white rounded mr-2"
+          onClick={handleUnreserveRide}
+        >
+          Unreserve
+        </button>
+        <button
+          className="px-5 py-2 bg-green-500 hover:bg-[#419902] text-white rounded"
+          onClick={handleCompleteRide}
+        >
+          Completed
+        </button>
+      </>
+    );
+  } else if (rideDetails?.status === 'Completed') {
+    actionButton = null;
+  }
+
   return (
   <div className="flex h-screen bg-gray-100">
       {/* Left Side: Details and Actions */}
