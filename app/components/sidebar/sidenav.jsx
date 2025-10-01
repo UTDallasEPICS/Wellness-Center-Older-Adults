@@ -11,7 +11,7 @@ const SideNav = ({ toggleCollapse, isCollapsed }) => {
     >
       <div className="flex items-center justify-between h-[70px] px-4 border-b border-gray-200">
           <div className="flex items-center space-x-2 overflow-hidden">
-          <Image src="/icon.png" width={30} height={30} />
+          <Image src="/logo.png" alt="Logo" width={30} height={30} />
             {!isCollapsed && (
               <span className="font-semibold text-lg text-green-800">WCOA</span>
             )}

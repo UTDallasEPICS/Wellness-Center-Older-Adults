@@ -263,33 +263,14 @@ export default function AdminPage() {
     }
 
     return (
-        // Outermost div for the page background
-        <div style={{ width: '100%', minHeight: '100vh', backgroundColor: backgroundOffWhite }}>
-            {/* The Header component is external to this layout calculation */}
-            <Header /> 
-
-            {/* Main Content Wrapper - Handles alignment next to the fixed sidebar */}
-            <div style={{
-                // Padding adjusted to shift content right (104px = 80px sidebar + 24px inner padding)
-                padding: '0 24px 24px 104px', 
-                width: '100%', 
-                minHeight: '100vh',
-                margin: 0, 
-            }}>
-                
-                {/* Page Title and Add Button Row (Header section) */}
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    padding: '32px 0 24px 0', 
-                    // This negative margin pulls the title left to visually align with the sidebar
-                    marginLeft: '-80px', 
-                }}>
-                    <div style={{ color: headerTextColor, fontSize: '30px', fontWeight: fontLight }}>
-                        <h1>Admins</h1>
-                    </div>
-                    {/* Add button, positioned on the top right */}
+        <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            <Header />
+              <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
+                <div className="text-black text-left font-light text-[30px]">
+                    <h1>Admins</h1>
+                </div>
+                <div style={{ marginLeft: 'auto', paddingRight: '24px' }}>
+                  
                     <button
                         type="button"
                         style={addButtonStyles}

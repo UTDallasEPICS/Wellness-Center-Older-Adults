@@ -226,14 +226,46 @@ export default function Ride() {
   }
 
   return (
-  <div className="flex h-screen bg-gray-100">
-      {/* Left Side: Details and Actions */}
-      <div className="w-1/2 p-10 bg-[#fffdf5] shadow-lg flex flex-col justify-between">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-4xl font-bold text-gray-800">Ride #{rideDetails.id}</h2>
-            <p className="text-gray-600">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
+    <div className="flex h-screen">
+      <div className="w-1/2 p-5 bg-[#f4f1f0] font-sans">
+        <div className="flex justify-between mb-5">
+          <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
+          <p className="m-0">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available'}</p>
+        </div>
+
+        {isEditing ? (
+          <div>
+            <div className="mb-5">
+              <p className="my-1 font-semibold"><strong>Trip</strong></p>
+              <label className="block my-1">A: <input type="text" name="pickupAddress" value={pickupAddress} onChange={handleInputChange} className="w-full border rounded py-1 px-2" /></label>
+              <label className="block my-1">B: <input type="text" name="dropoffAddress" value={dropoffAddress} onChange={handleInputChange} className="w-full border rounded py-1 px-2" /></label>
+            </div>
+
+            <div className="flex justify-between mb-5">
+              <label>
+                <strong>Pick-up Time</strong><br />
+                <input type="text" name="pickupTime" value={pickupTime} onChange={handleInputChange} className="border rounded py-1 px-2" />
+              </label>
+            </div>
+
+            <div className="flex justify-between mb-5">
+              <p className="m-0"><strong>Client</strong><br />{rideDetails.customer?.name}</p>
+              <label><strong>Drive Time</strong><br />A-B: <input type="text" name="driveTimeAB" value={driveTimeAB} onChange={handleInputChange} className="border rounded py-1 px-2" /></label>
+            </div>
+
+            <div className="flex justify-between mb-5">
+              <label><strong>Total Mileage</strong><br /><input type="text" name="mileage" value={mileage} onChange={handleInputChange} className="border rounded py-1 px-2" /></label>
+              <label><strong>Wait Time</strong><br /><input type="text" name="waitTime" value={waitTime} onChange={handleInputChange} className="border rounded py-1 px-2" /></label>
+            </div>
+
+            <div className="mb-5">
+              <label className="block"><strong>Notes</strong><br /><textarea name="notes" value={notes} onChange={handleInputChange} className="w-full border rounded py-1 px-2"></textarea></label>
+            </div>
+
+            <div className="flex justify-start mb-5">
+              <button className="px-5 py-2 bg-green-500 text-white rounded mr-2" onClick={handleSaveClick}>Save</button>
+              <button className="px-5 py-2 bg-gray-300 text-gray-700 rounded" onClick={handleCancelEdit}>Cancel</button>
+            </div>
           </div>
 
           {/* Details Section */}
