@@ -215,16 +215,7 @@ const handleSaveClick = async () => {
   };
 
   let actionButton;
-  if (rideDetails?.status === 'AVAILABLE' || rideDetails?.status === 'Added' || rideDetails?.status === 'Unreserved') {
-    actionButton = (
-      <button
-        className="px-5 py-2 bg-[#419902] text-white rounded mr-2"
-        onClick={handleAcceptRide}
-      >
-        Accept?
-      </button>
-    );
-  } else if (rideDetails?.status === 'Reserved') {
+  if (rideDetails?.status === 'Reserved') {
     actionButton = (
       <>
         <button
