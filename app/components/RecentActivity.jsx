@@ -83,12 +83,12 @@ const RecentActivity = () => {
   }
 
   return (
-    <div className="p-5 md:p-10 mt-10 mx-auto bg-[#fffdf5] w-full max-w-6xl rounded-2xl shadow-md">
+    <div className="p-5 md:p-10 mt-10 mx-auto bg-[#f4f1f0] w-full max-w-6xl rounded-2xl shadow-md">
       <h2>Recent Activity</h2>
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full p-2.5">
         {activities.length > 0 ? (
           activities.map((activity) => (
-            <li key={activity.id} className="border border-gray-300 p-4 mb-4 rounded-2xl bg-[#e2dbd0]/70 grid grid-cols-[1fr_auto] gap-2.5 items-start"
+            <li key={activity.id} className="border border-gray-300 p-4 mb-4 rounded-2xl bg-[#ffffff]/70 grid grid-cols-[1fr_auto] gap-2.5 items-start"
             style={{
     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.25)",
   }}>

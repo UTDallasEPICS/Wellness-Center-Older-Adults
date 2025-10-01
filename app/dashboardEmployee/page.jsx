@@ -122,7 +122,7 @@ export default function Page() {
     ];
 
     return (
-        <div className="h-full w-full bg-[#fffdf5]">
+        <div className="h-full w-full bg-[#f4f1f0]">
       <div className="flex justify-end items-center mb-4 pr-4 pt-4">
         <button
           type="button"
