@@ -317,7 +317,11 @@ export default function AdminPage() {
     return (
         <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', display: 'flex', flexDirection: 'column', position: 'relative' }}>
             <Header />
+<<<<<<< HEAD
               <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8">
+=======
+              <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
+>>>>>>> abb81ef (Merge pull request #375 from UTDallasEPICS/348-change-dashboard-UI-elements)
                 <div className="text-black text-left font-light text-[30px]">
                     <h1>Admins</h1>
                 </div>
