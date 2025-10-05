@@ -15,6 +15,7 @@ export default function AccountPage() {
     isVolunteer: false,
     volunteerStatus: '',
     assignedRides: [],
+    birthdate: '',
   });
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,25 +26,30 @@ export default function AccountPage() {
       try {
         setLoading(true);
         const response = await fetch('/api/user/profile');
-
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }
-
         const data = await response.json();
-        const [firstName, ...lastNameParts] = data.user.fullName.split(' ');
-        const lastName = lastNameParts.join(' ');
-
+        const user = data.user;
+        let firstName = user.firstName || '';
+        let lastName = user.lastName || '';
+        // If firstName/lastName not present, split fullName
+        if ((!firstName || !lastName) && user.fullName) {
+          const [f, ...l] = user.fullName.split(' ');
+          firstName = f;
+          lastName = l.join(' ');
+        }
         setFormData({
-          firstName: firstName || '',
-          lastName: lastName || '',
-          email: data.user.email,
-          phone: data.user.phone,
-          isVolunteer: data.user.isVolunteer,
-          volunteerStatus: data.user.volunteerStatus,
-          assignedRides: data.user.assignedRides,
+          firstName,
+          lastName,
+          email: user.email || '',
+          phone: user.phone || '',
+          isVolunteer: user.isVolunteer || false,
+          volunteerStatus: user.volunteerStatus || '',
+          assignedRides: user.assignedRides || [],
+          birthdate: user.birthdate || '',
         });
-        setProfilePic(data.user.profilePicUrl);
+        setProfilePic(user.profilePicUrl || null);
       } catch (err) {
         setError(err.message);
       } finally {
