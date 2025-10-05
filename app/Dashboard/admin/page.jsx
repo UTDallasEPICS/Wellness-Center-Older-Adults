@@ -146,7 +146,16 @@ export default function AdminPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+<<<<<<< HEAD
                 body: JSON.stringify(newAdmin),
+=======
+                body: JSON.stringify({
+                    email: newAdmin.email,
+                    firstName: newAdmin.firstName,
+                    lastName: newAdmin.lastName,
+                    phone: newAdmin.phone,
+                }),
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
             });
 
             if (!response.ok) {
@@ -155,8 +164,12 @@ export default function AdminPage() {
             }
 
             toast.success('Admin created successfully!');
+<<<<<<< HEAD
             // Only reload on success to ensure the list is refreshed
             window.location.reload(); 
+=======
+            window.location.reload();
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
         } catch (error) {
             console.error('Error adding admin:', error);
             toast.error(error.message || 'Failed to add admin.');
@@ -172,17 +185,30 @@ export default function AdminPage() {
         setIsEditAdminModalOpen(false);
 
         try {
+<<<<<<< HEAD
             // Ensure ID is passed correctly, assuming updatedAdmin already contains the ID if edited within the form,
             // otherwise use adminToEdit.id
             const adminId = updatedAdmin.id || adminToEdit.id;
             
             const response = await fetch(`/api/admin/updateAdmin/${adminId}`, {
+=======
+            const response = await fetch(`/api/admin/updateAdmin/${adminToEdit.id}`, {
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+<<<<<<< HEAD
                 // Pass the updated data
                 body: JSON.stringify(updatedAdmin), 
+=======
+                body: JSON.stringify({
+                    email: updatedAdmin.email,
+                    firstName: updatedAdmin.firstName,
+                    lastName: updatedAdmin.lastName,
+                    phone: updatedAdmin.phone,
+                }),
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
             });
 
             if (!response.ok) {
@@ -191,7 +217,10 @@ export default function AdminPage() {
             }
 
             toast.success('Admin updated successfully!');
+<<<<<<< HEAD
             // Only reload on success to ensure the list is refreshed
+=======
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
             window.location.reload();
         } catch (error) {
             console.error('Error updating admin:', error);
@@ -226,7 +255,10 @@ export default function AdminPage() {
             }
 
             toast.success("Admin deleted successfully!");
+<<<<<<< HEAD
             // Only reload on success to ensure the list is refreshed
+=======
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
             window.location.reload();
         } catch (error) {
             console.error('Error deleting admin:', error);
@@ -265,12 +297,11 @@ export default function AdminPage() {
     return (
         <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', display: 'flex', flexDirection: 'column', position: 'relative' }}>
             <Header />
-              <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
+              <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8">
                 <div className="text-black text-left font-light text-[30px]">
                     <h1>Admins</h1>
                 </div>
                 <div style={{ marginLeft: 'auto', paddingRight: '24px' }}>
-                  
                     <button
                         type="button"
                         style={addButtonStyles}
@@ -279,6 +310,7 @@ export default function AdminPage() {
                         <span className="material-symbols-rounded">add</span>
                     </button>
                 </div>
+<<<<<<< HEAD
 
                 {/* Admin List Container (The main white card-like section) */}
                 <div style={{ 
@@ -307,6 +339,41 @@ export default function AdminPage() {
                         <p style={{ fontWeight: '500' }}>Email</p>
                         <p style={{ fontWeight: '500' }}>Phone</p>
                         <div style={{ textAlign: 'right', fontWeight: '500' }}>Actions</div>
+=======
+            </div>
+
+            {/* Header row - Changed gridTemplateColumns from 'repeat(3, minmax(0, 1fr)) auto' to '1fr 1fr 1fr auto' for better alignment */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', color: 'black', padding: '24px', fontSize: '15px', fontWeight: '300', backgroundColor: 'white', borderBottom: '1px solid #ccc', width: '100%' }}>
+                <p>Name</p>
+                <p>Email</p>
+                <p>Phone</p>
+                {/* Added fixed width to match button column below */}
+                <div style={{ width: '80px' }}></div>
+            </div>
+
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', color: 'black', backgroundColor: 'white', borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
+                {admins.map((admin, index) => (
+                    // Changed gridTemplateColumns to match header row for proper alignment
+                    <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', padding: '16px 24px', borderBottom: '1px solid #ccc', alignItems: 'center' }}>
+                        <p>{`${admin.firstName} ${admin.lastName}`}</p>
+                        <p>{admin.email}</p>
+                        <p>{admin.phone || 'N/A'}</p>
+                        {/* Added fixed width of 80px to button container for consistent alignment */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', width: '80px' }}>
+                            <button
+                                onClick={() => handleEditClick(admin)}
+                                style={{ color: 'blue', cursor: 'pointer' }}
+                            >
+                                <span className="material-symbols-rounded">edit</span>
+                            </button>
+                            <button
+                                onClick={() => handleDeleteClick(admin.id)}
+                                style={{ color: 'red', cursor: 'pointer' }}
+                            >
+                                <span className="material-symbols-rounded">delete</span>
+                            </button>
+                        </div>
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
                     </div>
 
                     {/* Admin List Rows */}
@@ -374,8 +441,13 @@ export default function AdminPage() {
                     <div style={modalContentStyle}>
                         <button style={modalCloseButtonStyle} onClick={() => setIsEditAdminModalOpen(false)}>&times;</button>
                         <h2 style={{ textAlign: 'left', fontWeight: '300', fontSize: '24px', marginBottom: '16px' }}>Edit Admin</h2>
+<<<<<<< HEAD
                         <AddAdminForm
                             onSubmit={handleEditAdminSubmit}
+=======
+                        <AddAdminForm 
+                            onSubmit={handleEditAdminSubmit} 
+>>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
                             onClose={() => setIsEditAdminModalOpen(false)}
                             initialData={adminToEdit}
                         />
