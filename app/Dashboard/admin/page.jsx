@@ -165,11 +165,15 @@ export default function AdminPage() {
 
             toast.success('Admin created successfully!');
 <<<<<<< HEAD
+<<<<<<< HEAD
             // Only reload on success to ensure the list is refreshed
             window.location.reload(); 
 =======
             window.location.reload();
 >>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
+=======
+            window.location.reload();
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
         } catch (error) {
             console.error('Error adding admin:', error);
             toast.error(error.message || 'Failed to add admin.');
@@ -186,6 +190,7 @@ export default function AdminPage() {
 
         try {
 <<<<<<< HEAD
+<<<<<<< HEAD
             // Ensure ID is passed correctly, assuming updatedAdmin already contains the ID if edited within the form,
             // otherwise use adminToEdit.id
             const adminId = updatedAdmin.id || adminToEdit.id;
@@ -194,21 +199,30 @@ export default function AdminPage() {
 =======
             const response = await fetch(`/api/admin/updateAdmin/${adminToEdit.id}`, {
 >>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
+=======
+            const response = await fetch(`/api/admin/updateAdmin/${adminToEdit.id}`, {
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
 <<<<<<< HEAD
+<<<<<<< HEAD
                 // Pass the updated data
                 body: JSON.stringify(updatedAdmin), 
 =======
+=======
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
                 body: JSON.stringify({
                     email: updatedAdmin.email,
                     firstName: updatedAdmin.firstName,
                     lastName: updatedAdmin.lastName,
                     phone: updatedAdmin.phone,
                 }),
+<<<<<<< HEAD
 >>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
+=======
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
             });
 
             if (!response.ok) {
@@ -218,9 +232,12 @@ export default function AdminPage() {
 
             toast.success('Admin updated successfully!');
 <<<<<<< HEAD
+<<<<<<< HEAD
             // Only reload on success to ensure the list is refreshed
 =======
 >>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
+=======
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
             window.location.reload();
         } catch (error) {
             console.error('Error updating admin:', error);
@@ -256,9 +273,12 @@ export default function AdminPage() {
 
             toast.success("Admin deleted successfully!");
 <<<<<<< HEAD
+<<<<<<< HEAD
             // Only reload on success to ensure the list is refreshed
 =======
 >>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
+=======
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
             window.location.reload();
         } catch (error) {
             console.error('Error deleting admin:', error);
@@ -311,6 +331,7 @@ export default function AdminPage() {
                     </button>
                 </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
 
                 {/* Admin List Container (The main white card-like section) */}
                 <div style={{ 
@@ -340,6 +361,8 @@ export default function AdminPage() {
                         <p style={{ fontWeight: '500' }}>Phone</p>
                         <div style={{ textAlign: 'right', fontWeight: '500' }}>Actions</div>
 =======
+=======
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
             </div>
 
             {/* Header row - Changed gridTemplateColumns from 'repeat(3, minmax(0, 1fr)) auto' to '1fr 1fr 1fr auto' for better alignment */}
@@ -442,12 +465,17 @@ export default function AdminPage() {
                         <button style={modalCloseButtonStyle} onClick={() => setIsEditAdminModalOpen(false)}>&times;</button>
                         <h2 style={{ textAlign: 'left', fontWeight: '300', fontSize: '24px', marginBottom: '16px' }}>Edit Admin</h2>
 <<<<<<< HEAD
+<<<<<<< HEAD
                         <AddAdminForm
                             onSubmit={handleEditAdminSubmit}
 =======
                         <AddAdminForm 
                             onSubmit={handleEditAdminSubmit} 
 >>>>>>> 17d6573 (fixed phone number not being added to database. Made edit button for admin page to edit name, email, and number)
+=======
+                        <AddAdminForm 
+                            onSubmit={handleEditAdminSubmit} 
+>>>>>>> a04a831 (Merge pull request #384 from UTDallasEPICS/379-bug-admin-side-admin-page-edit-functionality)
                             onClose={() => setIsEditAdminModalOpen(false)}
                             initialData={adminToEdit}
                         />
