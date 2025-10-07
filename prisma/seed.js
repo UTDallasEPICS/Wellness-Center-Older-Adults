@@ -1,8 +1,14 @@
-// prisma/seed.js
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
+  // Clear existing data to prevent conflicts on re-seeding
+  await prisma.ride.deleteMany({});
+  await prisma.customer.deleteMany({});
+  await prisma.volunteerInfo.deleteMany({});
+  await prisma.user.deleteMany({});
+  await prisma.address.deleteMany({});
+
   // Seed Users
   const adminUser = await prisma.user.create({
     data: {
@@ -11,6 +17,7 @@ async function main() {
       lastName: "User",
       phone: "012346789",
       role: "ADMIN",
+      isAdmin: true,
     },
   });
 
@@ -32,22 +39,22 @@ async function main() {
     },
   });
 
-  // Seed Addresses
+  // Seed Addresses with real locations in Plano, TX
   const address1 = await prisma.address.create({
     data: {
-      street: "123 Main St",
-      city: "Townsville",
-      state: "TS",
-      postalCode: "12345",
+      street: "401 W 16th St",
+      city: "Plano",
+      state: "TX",
+      postalCode: "75075", // Sam Johnson Recreation Center for Older Adults
     },
   });
 
   const address2 = await prisma.address.create({
     data: {
-      street: "456 Elm St",
-      city: "Villagetown",
-      state: "VT",
-      postalCode: "67890",
+      street: "4700 Alliance Blvd",
+      city: "Plano",
+      state: "TX",
+      postalCode: "75093", // Texas Health Presbyterian Hospital Plano
     },
   });
 
@@ -70,18 +77,18 @@ async function main() {
       pickupTime: new Date(new Date().getTime() + 15 * 60000), // 15 mins from now
       startAddressID: address1.id,
       endAddressID: address2.id,
-      specialNote: "Customer needs assistance",
+      specialNote: "Customer needs assistance getting into the vehicle.",
       status: "AVAILABLE",
       volunteerID: volunteerInfo.id,
     },
   });
 
-  console.log("Seeding completed.");
+  console.log("Seeding completed successfully with real addresses.");
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("An error occurred during seeding:", e);
     process.exit(1);
   })
   .finally(async () => {

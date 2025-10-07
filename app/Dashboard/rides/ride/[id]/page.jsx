@@ -202,17 +202,36 @@ export default function Ride() {
       }
     }
   };
- 
+
+  let actionButton;
+  if (rideDetails?.status === 'Reserved') {
+    actionButton = (
+      <>
+        <button
+          className="px-5 py-2 bg-yellow-500 hover:bg-yellow-700 text-white rounded mr-2"
+          onClick={handleUnreserveRide}
+        >
+          Unreserve
+        </button>
+        <button
+          className="px-5 py-2 bg-green-500 hover:bg-[#419902] text-white rounded"
+          onClick={handleCompleteRide}
+        >
+          Completed
+        </button>
+      </>
+    );
+  } else if (rideDetails?.status === 'Completed') {
+    actionButton = null;
+  }
+
   return (
-  <div className="flex h-screen bg-gray-100">
-      {/* Left Side: Details and Actions */}
-      <div className="w-1/2 p-10 bg-[#fffdf5] shadow-lg flex flex-col justify-between">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-4xl font-bold text-gray-800">Ride #{rideDetails.id}</h2>
-            <p className="text-gray-600">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
-          </div>
+    <div className="flex h-screen">
+      <div className="w-1/2 p-5 bg-[#f4f1f0] font-sans">
+        <div className="flex justify-between mb-5">
+          <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
+          <p className="m-0">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available'}</p>
+        </div>
 
           {/* Details Section */}
           {isEditing ? (

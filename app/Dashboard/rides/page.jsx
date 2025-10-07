@@ -7,7 +7,7 @@ import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
 import AddRideForm from "/app/components/AddRideForm.jsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSearchParams, useRouter, useParams } from 'next/navigation'; // Import useSearchParams and useRouter
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import RideMap from '../../components/RideMap';
 
 export default function Page() {
@@ -15,12 +15,14 @@ export default function Page() {
     const router = useRouter();
     const [rideDetails, setRideDetails] = useState(null);
     const [ridesData, setRidesData] = useState([]);
+    const [customers, setCustomers] = useState([]);
+    const [addresses, setAddresses] = useState([]);
     const [notification, setNotification] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const searchParams = useSearchParams(); // Get access to URL query parameters
-    const [activeTab, setActiveTab] = useState('available'); // Default active tab
+    const searchParams = useSearchParams();
+    const [activeTab, setActiveTab] = useState('available');
 
     const convertTo12Hour = (time24) => {
         if (!time24) return "";
@@ -35,33 +37,60 @@ export default function Page() {
         return `${hours12}:${minutes} ${ampm}`;
     };
 
-    const fetchRides = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch("/api/getAvailableRides");
-            if (!response.ok) {
-                throw new Error(`Failed to fetch rides: ${response.status}`);
-            }
-            const rawData = await response.json();
+const fetchRides = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+        const response = await fetch("/api/getAvailableRides");
+        if (!response.ok) {
+            throw new Error(`Failed to fetch rides: ${response.status}`);
+        }
+        const rawData = await response.json();
 
-            const formattedData = rawData.map((ride) => ({
-                id: ride.id,
-                customerID: ride.customerID,
-                customerName: ride.customerName,
-                phoneNumber: ride.customerPhone,
-                startAddressID: ride.startLocation,
-                endLocation: ride.endLocation,
-                date: ride.date,
-                startTime: ride.startTime,
-                status: ride.status || "Unreserved",
-            }));
-            setRidesData(formattedData);
+        const formattedData = rawData.map((ride) => ({
+            id: ride.id,
+            customerID: ride.customerID,
+            customerName: ride.customerName,
+            customerPhone: ride.customerPhone, // Updated field name
+            phoneNumber: ride.customerPhone, // Keep for backward compatibility
+            startAddressID: ride.startAddressID,
+            endAddressID: ride.endAddressID,
+            startLocation: ride.startLocation,
+            endLocation: ride.endLocation,
+            date: ride.date,
+            startTime: ride.startTime,
+            status: ride.status || "Unreserved",
+        }));
+        setRidesData(formattedData);
+    } catch (error) {
+        setError(error.message);
+        toast.error("Failed to load rides. Please check your network connection.");
+    } finally {
+        setLoading(false);
+    }
+};
+
+    const fetchCustomers = async () => {
+        try {
+            const response = await fetch("/api/customer/getCustomer");
+            if (response.ok) {
+                const data = await response.json();
+                setCustomers(data);
+            }
         } catch (error) {
-            setError(error.message);
-            toast.error("Failed to load rides. Please check your network connection.");
-        } finally {
-            setLoading(false);
+            console.error("Error fetching customers:", error);
+        }
+    };
+
+    const fetchAddresses = async () => {
+        try {
+            const response = await fetch("/api/addresses");
+            if (response.ok) {
+                const data = await response.json();
+                setAddresses(data);
+            }
+        } catch (error) {
+            console.error("Error fetching addresses:", error);
         }
     };
 
@@ -84,6 +113,8 @@ export default function Page() {
             setActiveTab(tabFromQuery);
         }
         fetchRides();
+        fetchCustomers();
+        fetchAddresses();
         if (rideIdFromParams) {
             fetchRideDetails(rideIdFromParams);
         }
@@ -138,13 +169,7 @@ export default function Page() {
             window.location.reload(); // Reload the page after successful edit
         } catch (error) {
             console.error("Error updating ride:", error);
-            if (error instanceof Response) {
-                const errorData = await error.json();
-                console.error("Backend error details:", errorData);
-                toast.error(`Failed to update ride: ${errorData?.message || error.statusText}`);
-            } else {
-                toast.error(`Failed to update ride: ${error.message}`);
-            }
+            toast.error(`Failed to update ride: ${error.message}`);
         }
     };
 
@@ -176,8 +201,8 @@ export default function Page() {
     };
 
     const handleAddFormSubmit = (formData) => {
-    setIsModalOpen(false);
-    window.location.reload();
+        setIsModalOpen(false);
+        window.location.reload();
     };
 
     function formatTime(timeString) {
@@ -241,16 +266,7 @@ export default function Page() {
         }
     };
 
-    if (rideDetails?.status === 'AVAILABLE' || rideDetails?.status === 'Added' || rideDetails?.status === 'Unreserved') {
-        actionButton = (
-            <button
-                className="px-5 py-2 bg-[#419902] text-white rounded mr-2"
-                onClick={handleAcceptRide}
-            >
-                Accept?
-            </button>
-        );
-    } else if (rideDetails?.status === 'Reserved') {
+    if (rideDetails?.status === 'Reserved') {
         actionButton = (
             <button
                 className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
@@ -288,7 +304,7 @@ export default function Page() {
                 <div className="w-1/2 p-5 ride-details-container">
                     <div className="flex justify-between mb-5">
                         <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
-                        {console.log("rideDetails.date:", rideDetails.date)} {/* This will log to the console */}
+                        {console.log("rideDetails.date:", rideDetails.date)}
                         <p className="m-0">
                             Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString() : 'Date not available'}
                         </p>
@@ -350,6 +366,8 @@ export default function Page() {
                     convertTime={convertTo12Hour}
                     onEditRide={handleEditRide}
                     onDeleteRide={handleDeleteRide} // Passing the delete handler
+                    customers={customers}
+                    addresses={addresses}
                 />
             ),
         },
@@ -372,7 +390,6 @@ export default function Page() {
                 <CompletedRidesTable
                     initialContacts={ridesData.filter((ride) => ride.status === "Completed")}
                     convertTime={convertTo12Hour}
-                    // You might not want delete/edit on completed rides, adjust as needed
                     onDeleteRide={handleDeleteRide}
                 />
             ),
@@ -380,12 +397,11 @@ export default function Page() {
     ];
 
     return (
-        <div className="h-full w-full bg-[#fffdf5] relative">
+        <div className="h-full w-full bg-[#f4f1f0] relative">
             <style jsx>
                 {`
                     .main-container {
-                        /* Add your global styles for this page here */
-                        font-family: sans-serif; /* Example */
+                        font-family: sans-serif;
                     }
                 `}
             </style>

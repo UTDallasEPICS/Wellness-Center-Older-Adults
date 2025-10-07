@@ -150,8 +150,8 @@ export default function Page() {
     }
 
     return (
-        <div className="w-full min-h-screen bg-[#fffdf5] flex flex-col relative"> {/* Main container */}
-            <div className="flex flex-row items-center bg-[#fffdf5] py-8 px-8"> {/* Header */}
+        <div className="w-full min-h-screen bg-[#f4f1f0] flex flex-col relative"> {/* Main container */}
+            <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
                 <div className="text-black text-left font-light text-[30px]">
                     <h1>Clients</h1>
                 </div>
@@ -169,7 +169,7 @@ export default function Page() {
             <div className="w-full overflow-x-auto">
                 <table className="min-w-full border border-gray-300 bg-white">
                     <thead>
-                        <tr className="bg-[#fffdf5] text-black text-left font-light text-[15px] border-b border-gray-300">
+                        <tr className="bg-[#f4f1f0] text-black text-left font-light text-[15px] border-b border-gray-300">
                             <th className="p-4">Name</th>
                             <th className="p-4">Address</th>
                             <th className="p-4">Phone</th>
@@ -178,7 +178,7 @@ export default function Page() {
                     </thead>
                     <tbody>
                         {customers.map((customer, index) => (
-                            <tr key={index} className="bg-[#fffdf5] border-b border-gray-300">
+                            <tr key={index} className="bg-[#f4f1f0] border-b border-gray-300">
                                 <td className="p-4">{`${customer.firstName} ${customer.lastName}`}</td>
                                 <td className="p-4">{`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}</td>
                                 <td className="p-4">{customer.customerPhone}</td>

@@ -254,8 +254,8 @@ export default function Page() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#fffdf5] flex flex-col relative"> {/* Main container */}
-            <div className="flex flex-row items-center bg-[#fffdf5] py-8 px-8"> {/* Header */}
+    <div className="w-full min-h-screen bg-[#f4f1f0] flex flex-col relative"> {/* Main container */}
+            <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
                 <div className="text-black text-left font-light text-[30px]">
                     <h1>Volunteers</h1>
                 </div>
@@ -263,7 +263,7 @@ export default function Page() {
                     <button
                         type="button"
                         className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
-                        onClick={() => setIsAddCustomerModalOpen(true)}
+                        onClick={() => setIsAddModalOpen(true)}
                     >
                         <span className="material-symbols-rounded">add</span>
                     </button>

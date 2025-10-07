@@ -15,15 +15,15 @@ const SimpleTab = ({ activeKey, children, onTabAdd }) => {
   };
 
   return (
-    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-[#fffdf5]">
-      <div className="flex relative bg-[#fffdf5] border-b border-gray-300">
+    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-[#f4f1f0]">
+      <div className="flex relative bg-[#f4f1f0] border-b border-gray-300">
         {childArray.map((item) => (
           <div
             key={item.props.aKey}
-            className={`min-w-[80px] px-5 py-4 text-gray-600 opacity-60 bg-[#fffdf5] text-xl text-center font-light cursor-pointer transition-all ease-in-out ${
+            className={`min-w-[80px] px-5 py-4 text-gray-600 opacity-60 bg-[#f4f1f0] text-xl text-center font-light cursor-pointer transition-all ease-in-out ${
               key === item.props.aKey
-                ? 'opacity-100 bg-[#fffdf5] text-black border-b-4 border-black'
-                : 'hover:opacity-100 hover:[#e2dbd0]/70'
+                ? 'opacity-100 bg-[#f4f1f0] text-black border-b-4 border-black'
+                : 'hover:opacity-100 hover:[#ffffff]/70'
             }`}
             onClick={() => handleTabClick(item.props.aKey)}
           >
@@ -31,11 +31,11 @@ const SimpleTab = ({ activeKey, children, onTabAdd }) => {
           </div>
         ))}
       </div>
-      <div className="p-2.5 border-none bg-[#fffdf5]">
+      <div className="p-2.5 border-none bg-[#f4f1f0]">
         {childArray.map((item) => (
           <div
             key={item.props.aKey}
-            className={`${key === item.props.aKey ? 'block' : 'hidden'} bg-[#fffdf5] text-gray-800 font-light`}
+            className={`${key === item.props.aKey ? 'block' : 'hidden'} bg-[#f4f1f0] text-gray-800 font-light`}
           >
             {item.props.children}
           </div>
