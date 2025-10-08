@@ -62,7 +62,6 @@ export default function NavLinks({ isCollapsed }) {
 
       {role === "VOLUNTEER" && (
         <>
-<<<<<<< HEAD
           <li>
             <a
               href="/Dashboard"
@@ -95,12 +94,6 @@ export default function NavLinks({ isCollapsed }) {
               Accounts
             </a>
           </li>
-=======
-          {navItem("/Dashboard", "Dashboard", LayoutDashboard)}
-          {navItem("/Dashboard/rides-volunteer", "Rides", Car)}
-          {navItem("/Dashboard/hours", "Hours", Clock)}
-          {navItem("/Dashboard/settings", "Settings", Settings)}
->>>>>>> workingNonChatbot
         </>
       )}
 
