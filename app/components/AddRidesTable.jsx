@@ -10,16 +10,10 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     customerName: "",
     phoneNumber: "",
     date: "",
-<<<<<<< HEAD
     startAddressID: "",
     endAddressID: "", // Added functionality: field for end address ID
     pickupTime: "",
     volunteerID: "", // Added functionality: field for volunteer ID
-=======
-    startAddress: "", 
-    pickupTime: "",
-    volunteerName: "",
->>>>>>> workingNonChatbot
   });
 
   useEffect(() => {
@@ -86,21 +80,12 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
-<<<<<<< HEAD
       customerID: contact.customerID || "",
       date: contact.date ? contact.date.split('T')[0] : '', // Format date for input
       startAddressID: contact.startAddressID || "",
       endAddressID: contact.endAddressID || "", // Added functionality: populate endAddressID
       pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : '', // Format time for input (HH:MM)
       volunteerID: contact.volunteerID || "", // Added functionality: populate volunteerID
-=======
-      customerName: contact.customerName || '',
-      phoneNumber: contact.customerPhone || '',
-      date: contact.date ? contact.date.split('T')[0] : '', 
-      startAddress: contact.startLocation || '',
-      pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : '', 
-      volunteerName: getVolunteerNameById(contact.volunteerID),
->>>>>>> workingNonChatbot
     };
     setEditFormData(formValues);
   };
@@ -129,7 +114,6 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
       pickupDateTimeISO = dateObj.toISOString();
     }
 
-<<<<<<< HEAD
     const editedContact = {
       id: editContactId,
       customerID: editFormData.customerID ? parseInt(editFormData.customerID) : null,
@@ -139,78 +123,6 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
       pickupTime: pickupDateTimeISO, // Now a full ISO 8601 DateTime
       volunteerID: editFormData.volunteerID ? parseInt(editFormData.volunteerID) : null, // Added functionality: send volunteerID
       status: contacts.find((contact) => contact.id === editContactId)?.status || 'Unreserved',
-=======
-    // Get the original contact to preserve the existing IDs
-    const originalContact = contacts.find((contact) => contact.id === editContactId);
-
-    // Parse customer name and phone changes
-    let customerUpdates = null;
-    const currentCustomerName = originalContact.customerName;
-    const currentCustomerPhone = originalContact.customerPhone;
-    
-    console.log("=== CUSTOMER CHANGE DETECTION ===");
-    console.log("Current name:", currentCustomerName);
-    console.log("New name:", editFormData.customerName);
-    console.log("Current phone:", currentCustomerPhone);
-    console.log("New phone:", editFormData.phoneNumber);
-    
-    if (editFormData.customerName !== currentCustomerName || editFormData.phoneNumber !== currentCustomerPhone) {
-      const [firstName, ...lastNameParts] = editFormData.customerName.split(' ');
-      customerUpdates = {
-        id: originalContact.customerID,
-        firstName: firstName || '',
-        lastName: lastNameParts.join(' ') || '',
-        customerPhone: editFormData.phoneNumber || currentCustomerPhone
-      };
-      
-      console.log("=== CUSTOMER UPDATES CREATED ===");
-      console.log("Customer updates object:", customerUpdates);
-    }
-
-    // Parse address changes
-    let addressUpdates = null;
-    if (editFormData.startAddress && editFormData.startAddress !== originalContact.startLocation) {
-      const addressParts = editFormData.startAddress.split(',').map(part => part.trim());
-      if (addressParts.length >= 3) {
-        const street = addressParts[0];
-        const city = addressParts[1];
-        const stateAndZip = addressParts[2].split(' ');
-        const state = stateAndZip[0];
-        const postalCode = stateAndZip.slice(1).join(' ');
-        
-        addressUpdates = {
-          id: originalContact.startAddressID,
-          street: street,
-          city: city,
-          state: state,
-          postalCode: postalCode
-        };
-      }
-    }
-
-    // Parse volunteer changes
-    let volunteerUpdates = null;
-    const currentVolunteerName = getVolunteerNameById(originalContact.volunteerID);
-    if (editFormData.volunteerName && editFormData.volunteerName !== currentVolunteerName) {
-      const volunteerID = getVolunteerIdByName(editFormData.volunteerName);
-      volunteerUpdates = {
-        volunteerID: volunteerID
-      };
-    }
-
-    const editedContact = {
-      id: editContactId,
-      customerID: originalContact.customerID, 
-      date: editFormData.date ? new Date(editFormData.date).toISOString() : null,
-      startAddressID: originalContact.startAddressID, 
-      endAddressID: originalContact.endAddressID,
-      pickupTime: pickupDateTimeISO,
-      volunteerID: volunteerUpdates?.volunteerID || originalContact.volunteerID,
-      status: originalContact.status || 'Unreserved',
-      customerUpdates: customerUpdates,
-      addressUpdates: addressUpdates,
-      volunteerUpdates: volunteerUpdates
->>>>>>> workingNonChatbot
     };
 
     onEditRide(editedContact);
