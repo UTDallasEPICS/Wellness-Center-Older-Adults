@@ -1,4 +1,3 @@
-// app/components/AddRidesTable.jsx
 "use client";
 import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
@@ -11,9 +10,16 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     customerName: "",
     phoneNumber: "",
     date: "",
+<<<<<<< HEAD
+    startAddressID: "",
+    endAddressID: "", // Added functionality: field for end address ID
+    pickupTime: "",
+    volunteerID: "", // Added functionality: field for volunteer ID
+=======
     startAddress: "", 
     pickupTime: "",
     volunteerName: "",
+>>>>>>> workingNonChatbot
   });
 
   useEffect(() => {
@@ -80,12 +86,21 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
+<<<<<<< HEAD
+      customerID: contact.customerID || "",
+      date: contact.date ? contact.date.split('T')[0] : '', // Format date for input
+      startAddressID: contact.startAddressID || "",
+      endAddressID: contact.endAddressID || "", // Added functionality: populate endAddressID
+      pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : '', // Format time for input (HH:MM)
+      volunteerID: contact.volunteerID || "", // Added functionality: populate volunteerID
+=======
       customerName: contact.customerName || '',
       phoneNumber: contact.customerPhone || '',
       date: contact.date ? contact.date.split('T')[0] : '', 
       startAddress: contact.startLocation || '',
       pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : '', 
       volunteerName: getVolunteerNameById(contact.volunteerID),
+>>>>>>> workingNonChatbot
     };
     setEditFormData(formValues);
   };
@@ -114,6 +129,17 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
       pickupDateTimeISO = dateObj.toISOString();
     }
 
+<<<<<<< HEAD
+    const editedContact = {
+      id: editContactId,
+      customerID: editFormData.customerID ? parseInt(editFormData.customerID) : null,
+      date: editFormData.date ? new Date(editFormData.date).toISOString() : null,
+      startAddressID: contacts.find(contact => contact.id === editContactId)?.startAddressID || null, // Ensure correct address ID
+      endAddressID: editFormData.endAddressID ? parseInt(editFormData.endAddressID) : null, // Added functionality: send endAddressID
+      pickupTime: pickupDateTimeISO, // Now a full ISO 8601 DateTime
+      volunteerID: editFormData.volunteerID ? parseInt(editFormData.volunteerID) : null, // Added functionality: send volunteerID
+      status: contacts.find((contact) => contact.id === editContactId)?.status || 'Unreserved',
+=======
     // Get the original contact to preserve the existing IDs
     const originalContact = contacts.find((contact) => contact.id === editContactId);
 
@@ -184,6 +210,7 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
       customerUpdates: customerUpdates,
       addressUpdates: addressUpdates,
       volunteerUpdates: volunteerUpdates
+>>>>>>> workingNonChatbot
     };
 
     onEditRide(editedContact);

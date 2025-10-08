@@ -62,10 +62,45 @@ export default function NavLinks({ isCollapsed }) {
 
       {role === "VOLUNTEER" && (
         <>
+<<<<<<< HEAD
+          <li>
+            <a
+              href="/Dashboard"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
+            >
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/rides-volunteer"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
+            >
+              Rides
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/hours"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
+            >
+              Hours
+            </a>
+          </li>
+          <li>
+            <a
+              href="/Dashboard/accounts"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
+            >
+              Accounts
+            </a>
+          </li>
+=======
           {navItem("/Dashboard", "Dashboard", LayoutDashboard)}
           {navItem("/Dashboard/rides-volunteer", "Rides", Car)}
           {navItem("/Dashboard/hours", "Hours", Clock)}
           {navItem("/Dashboard/settings", "Settings", Settings)}
+>>>>>>> workingNonChatbot
         </>
       )}
 

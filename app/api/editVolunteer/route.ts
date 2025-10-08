@@ -1,3 +1,4 @@
+// C:\Users\Deethya Janjanam\temp\Wellness-Center-Older-Adults\app\api\editVolunteer\route.ts
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -18,76 +19,49 @@ export async function PUT(req: Request) {
     });
   }
 
+  let requestBody;
   try {
-    const { id, firstName, lastName, email, phone } = (await req.json()) as EditVolunteerParams;
+    requestBody = await req.json();
+  } catch (error) {
+    console.error('Failed to parse request body as JSON:', error);
+    return Response.json({
+      status: 400,
+      message: 'Invalid JSON body in request',
+    });
+  }
+try {
+    const { id, firstName, lastName, email, phone } = requestBody as EditVolunteerParams;
+
+    // Convert the ID to a number
+    const volunteerId = Number(id);
+
+    if (isNaN(volunteerId) || !firstName || !lastName || !email || !phone) {
+        return Response.json({
+            status: 400,
+            message: 'Missing or invalid required fields',
+        });
+    }
 
     const existingVolunteer = await prisma.volunteerInfo.findUnique({
-      where: {
-        id,
-      },
+        where: {
+            id: volunteerId, // Use the converted number here
+        },
     });
 
     if (!existingVolunteer) {
-      return Response.json({
-        status: 404,
-        message: 'Volunteer not found',
-      });
+        return Response.json({
+            status: 404,
+            message: 'Volunteer not found',
+        });
     }
 
-    const existingEmailUser = await prisma.user.findFirst({
-      where: {
-        email,
-        NOT: {
-          id: existingVolunteer.userID,
-        },
-      },
-    });
+    // ... (rest of the code for updating the user)
 
-    if (existingEmailUser) {
-      return Response.json({
-        status: 409,
-        message: 'Email is already in use by another user',
-      });
-    }
-
-    const existingPhoneUser = await prisma.user.findFirst({
-      where: {
-        phone,
-        NOT: {
-          id: existingVolunteer.userID,
-        },
-      },
-    });
-
-    if (existingPhoneUser) {
-      return Response.json({
-        status: 409,
-        message: 'Phone number is already in use by another user',
-      });
-    }
-
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: existingVolunteer.userID,
-      },
-      data: {
-        firstName,
-        lastName,
-        email,
-        phone,
-      },
-    });
-
-    return Response.json({
-      status: 200,
-      message: 'Volunteer updated successfully',
-      user: updatedUser,
-    });
-  } catch (error) {
+} catch (error) {
     console.error('Error updating volunteer:', error);
     return Response.json({
-      status: 500,
-      message: 'Internal Server Error',
+        status: 500,
+        message: 'Internal Server Error',
     });
-  }
+}
 }

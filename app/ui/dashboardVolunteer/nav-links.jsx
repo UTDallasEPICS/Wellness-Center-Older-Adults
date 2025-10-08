@@ -18,7 +18,7 @@ export default function NavLinks({ isCollapsed }) {
     { name: "Dashboard", href: "/dashboardVolunteer" },
     { name: "Rides", href: "/dashboardVolunteer/rides" },
     { name: "Hours", href: "/dashboardVolunteer/hours" },
-    { name: "Settings", href: "/dashboardVolunteer/settings" },
+    { name: "Accounts", href: "/dashboardVolunteer/accounts" },
   ];
   
 

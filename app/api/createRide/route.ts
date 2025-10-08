@@ -14,9 +14,7 @@ interface RideRequestBody {
     destinationZip: string;
     pickUpTime: string;
     date: string;
-    ways: string;
     extraInfo: string;
-    // isTwoWayChecked?: boolean; // If you sent it from the front-end
 }
 
 export async function POST(req: Request) {
@@ -37,9 +35,7 @@ export async function POST(req: Request) {
             destinationZip,
             pickUpTime,
             date,
-            ways,
             extraInfo,
-            // isTwoWayChecked,
         } = (await req.json()) as RideRequestBody;
 
         // 1.  Find the Customer ID.
@@ -88,8 +84,6 @@ export async function POST(req: Request) {
                     startAddressID: startAddress.id,
                     endAddressID: endAddress.id,
                     specialNote: extraInfo,
-                    // isTwoWay: isTwoWayChecked,
-                    // waitTime: ways ? parseInt(ways) : null,
                     volunteerID: 1, // Replace with your dynamic logic
                 },
             });

@@ -26,9 +26,6 @@ const LandingPage = () => {
           <h1 className="font-light text-left text-[75px] font-montserrat">
             Driving towards change
           </h1>
-          <p className="font-light text-left text-gray-500 text-[35px] font-montserrat">
-            Admin sign in page
-          </p>
           {isAuthenticated ? (
             <>
               <a href="/Dashboard">
