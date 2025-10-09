@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import CancelRidesModel from "/app/components/CancelRidesModel.jsx"
 import { format } from 'date-fns';
 
-function formatDateTime(rideDate, startTime, endTime) {
+function formatDateTime(rideDate, startTime) {
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -25,16 +25,15 @@ function formatDateTime(rideDate, startTime, endTime) {
         dateTime = `${rideDate.split('T')[0]}T${timeString}`;
       }
       const date = new Date(dateTime);
-      return isNaN(date.getTime()) ? 'Invalid Time' : format(date, 'h:mm a');
+      return isNaN(date.getTime()) ? 'No time specified' : format(date, 'h:mm a');
     } catch (e) {
-      return 'Invalid Time';
+      return 'No time specified';
     }
   };
 
   return {
     formattedDate: formatDate(rideDate),
-    formattedStartTime: formatTime(startTime),
-    formattedEndTime: formatTime(endTime)
+    formattedTime: formatTime(startTime),
   };
 }
 
@@ -43,38 +42,24 @@ const ViewOnlyRow = ({ contact }) => {
   const [isReserved, setIsReserved] = useState(false);
   const [isCancelModelOpen, setIsCancelModelOpen] = useState(false);
 
-  const handleDenyCancel = () => {
-    setIsCancelModelOpen(false);
-  };
-
+  const handleDenyCancel = () => setIsCancelModelOpen(false);
   const handleConfirmCancel = () => {
     setIsReserved(!isReserved);
     setIsCancelModelOpen(false);
-  }
-
-
-  const handleButtonClick = (event) => {
-    if (isReserved) {
-      setIsCancelModelOpen(true); // Show modal if cancelling
-    }
-    else{
-      setIsReserved(!isReserved);
-
-    }
+  };
+  const handleButtonClick = () => {
+    if (isReserved) setIsCancelModelOpen(true);
+    else setIsReserved(!isReserved);
   };
 
-  const { formattedDate, formattedStartTime, formattedEndTime } = formatDateTime( contact.date, contact.startTime, contact.endTime);
-
+  const { formattedDate, formattedTime } = formatDateTime(contact.date, contact.startTime);
 
   return (
     <tr>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerName}</td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerPhone}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.startLocation}</td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light" >{contact.endLocation}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedDate}</td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedStartTime}</td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedEndTime}</td>
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedTime}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         <button
           className={`text-white ${isReserved ? "bg-red-600" : "bg-[#419902]"} cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-opacity-90`}
@@ -84,15 +69,13 @@ const ViewOnlyRow = ({ contact }) => {
           {isReserved ? "Cancel" : "Reserve"}
         </button>
       </td>
-
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">No time specified</td>
       {isCancelModelOpen && (
         <CancelRidesModel
           handleConfirmCancel={handleConfirmCancel}
-          handleDenyCancel = {handleDenyCancel}
-          
+          handleDenyCancel={handleDenyCancel}
         />
       )}
-
     </tr>
   );
 };

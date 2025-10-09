@@ -1,4 +1,3 @@
-
 import React from "react";
 import ViewOnlyRow from "./ViewOnlyRow";
 
@@ -15,13 +14,12 @@ const DisplayRidesTable = ({ ridesData }) => {
         <thead>
           <tr>
           <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Client Name</th>
-          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
-          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Address</th>
-          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Drop-Off Address</th>
-          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Date</th>
-          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
-          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Drop-off Time</th>
+          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
+          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Date</th>
+          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Time</th>
           <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
+          <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Hours</th>
+
           </tr>
         </thead>
 
@@ -35,7 +33,7 @@ const DisplayRidesTable = ({ ridesData }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center p-4">
+              <td colSpan="6" className="text-center p-4">
                 No rides available
               </td>
             </tr>
