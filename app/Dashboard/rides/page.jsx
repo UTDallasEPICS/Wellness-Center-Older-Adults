@@ -144,34 +144,62 @@ const fetchRides = async () => {
         }
     };
 
-    const handleEditRide = async (updatedRideData) => {
-        try {
-            const response = await fetch(`/api/rides/${updatedRideData.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(updatedRideData),
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    `Failed to update ride: ${response.status} - ${
-                        errorData?.message || "Unknown error"
-                    }`
-                );
-            }
-            toast.success("Ride updated successfully!");
-            fetchRides();
-            if (rideDetails?.id === updatedRideData.id) {
-                fetchRideDetails(updatedRideData.id); // Update details view if it's the same ride
-            }
-            window.location.reload(); // Reload the page after successful edit
-        } catch (error) {
-            console.error("Error updating ride:", error);
-            toast.error(`Failed to update ride: ${error.message}`);
+const handleEditRide = async (updatedRideData) => {
+    try {
+        const rideResponse = await fetch(`/api/rides/${updatedRideData.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                customerID: updatedRideData.customerID,
+                date: updatedRideData.date,
+                pickupTime: updatedRideData.pickupTime,
+                startAddressID: updatedRideData.startAddressID,
+                endAddressID: updatedRideData.endAddressID,
+                volunteerID: updatedRideData.volunteerID,
+                status: updatedRideData.status,
+                // Include the updates data for customer and address
+                customerUpdates: updatedRideData.customerUpdates,
+                addressUpdates: updatedRideData.addressUpdates,
+                volunteerUpdates: updatedRideData.volunteerUpdates
+            }),
+        });
+        if (!rideResponse.ok) {
+            const errorData = await rideResponse.json();
+            throw new Error(
+                `Failed to update ride: ${rideResponse.status} - ${
+                    errorData?.message || "Unknown error"
+                }`
+            );
         }
-    };
+
+        const responseData = await rideResponse.json();
+        console.log("=== RIDE UPDATE RESPONSE ===");
+        console.log("Response data:", responseData);
+
+        // Update local state immediately with the response data
+        if (responseData.formattedData) {
+            setRidesData(currentRides => 
+                currentRides.map(ride => 
+                    ride.id === updatedRideData.id 
+                        ? { ...ride, ...responseData.formattedData }
+                        : ride
+                )
+            );
+        }
+
+        toast.success("Ride updated successfully!");
+        await fetchRides();
+        if (rideDetails?.id === updatedRideData.id) {
+            await fetchRideDetails(updatedRideData.id);
+        }
+
+    } catch (error) {
+        console.error("Error updating ride:", error);
+        toast.error(`Failed to update ride: ${error.message}`);
+    }
+};
 
     const handleDeleteRide = async (rideId) => {
         if (window.confirm("Are you sure you want to delete this ride?")) {
@@ -266,7 +294,16 @@ const fetchRides = async () => {
         }
     };
 
-    if (rideDetails?.status === 'Reserved') {
+    if (rideDetails?.status === 'AVAILABLE' || rideDetails?.status === 'Added' || rideDetails?.status === 'Unreserved') {
+        actionButton = (
+            <button
+                className="px-5 py-2 bg-[#419902] text-white rounded mr-2"
+                onClick={handleAcceptRide}
+            >
+                Accept?
+            </button>
+        );
+    } else if (rideDetails?.status === 'Reserved') {
         actionButton = (
             <button
                 className="px-5 py-2 bg-green-500 hover:bg-green-700 text-white rounded"
@@ -330,6 +367,7 @@ const fetchRides = async () => {
 
                     <div className="flex justify-between mb-5">
                         <p className="m-0"><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
+                        <p className="m-0"><strong>Wait Time</strong><br />{rideDetails.waitTime || 'N/A'}</p>
                     </div>
 
                     <div className="flex justify-between mb-5">
