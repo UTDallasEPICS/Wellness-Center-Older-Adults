@@ -397,7 +397,7 @@ const fetchRides = async () => {
     ];
 
     return (
-        <div className="h-full w-full bg-[#f4f1f0] relative">
+        <div className="h-full w-full bg-[#fffdf5] relative">
             <style jsx>
                 {`
                     .main-container {
