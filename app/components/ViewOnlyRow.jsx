@@ -39,7 +39,7 @@ function formatDateTime(rideDate, startTime, endTime) {
 }
 
 
-const ViewOnlyRow = ({ contact }) => {
+const ViewOnlyRow = ({ contact, onReserve }) => {
   const [isReserved, setIsReserved] = useState(false);
   const [isCancelModelOpen, setIsCancelModelOpen] = useState(false);
 
@@ -50,31 +50,39 @@ const ViewOnlyRow = ({ contact }) => {
   const handleConfirmCancel = () => {
     setIsReserved(!isReserved);
     setIsCancelModelOpen(false);
-  }
+  };
 
-
-  const handleButtonClick = (event) => {
+  const handleButtonClick = async (event) => {
     if (isReserved) {
       setIsCancelModelOpen(true); // Show modal if cancelling
-    }
-    else{
-      setIsReserved(!isReserved);
-
+    } else {
+      // Reserve the ride in the backend
+      try {
+        const response = await fetch(`/api/rides/${contact.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'Reserved' }),
+        });
+        if (response.ok) {
+          setIsReserved(true);
+          if (onReserve) onReserve(); // Notify parent to refresh rides
+        } else {
+          alert('Failed to reserve ride');
+        }
+      } catch (err) {
+        alert('Failed to reserve ride');
+      }
     }
   };
 
-  const { formattedDate, formattedStartTime, formattedEndTime } = formatDateTime( contact.date, contact.startTime, contact.endTime);
-
+  const { formattedDate, formattedStartTime, formattedEndTime } = formatDateTime(contact.date, contact.startTime, contact.endTime);
 
   return (
     <tr>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerName}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerPhone}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.startLocation}</td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light" >{contact.endLocation}</td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedDate}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedStartTime}</td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedEndTime}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         <button
           className={`text-white ${isReserved ? "bg-red-600" : "bg-[#419902]"} cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-opacity-90`}
@@ -84,15 +92,12 @@ const ViewOnlyRow = ({ contact }) => {
           {isReserved ? "Cancel" : "Reserve"}
         </button>
       </td>
-
       {isCancelModelOpen && (
         <CancelRidesModel
           handleConfirmCancel={handleConfirmCancel}
-          handleDenyCancel = {handleDenyCancel}
-          
+          handleDenyCancel={handleDenyCancel}
         />
       )}
-
     </tr>
   );
 };
