@@ -1,10 +1,9 @@
-// app/api/rides/[id]/route.ts
 import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Helper function to parse address string
+// Helper function to parse address string (kept for completeness, though not relevant to the panic)
 function parseAddressString(addressString: string) {
     const parts = addressString.split(', ');
     if (parts.length >= 3) {
@@ -21,10 +20,12 @@ function parseAddressString(addressString: string) {
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     const { id } = params;
+    let updateData: any = {}; // Define outside try to ensure scope for final error logging
 
     try {
-        const updateData = await request.json();
+        updateData = await request.json();
         console.log("Backend received updateData:", updateData);
+        // Payload received from the 'reserve' button is likely just: { status: 'Reserved' }
 
         const rideId = parseInt(id, 10);
         if (isNaN(rideId)) {
@@ -39,20 +40,22 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
 
-        // Prepare the data to update, converting string IDs to integers
-        const dataToUpdate: any = {};
+        // Prepare the data to update
+        const dataToUpdate: Record<string, any> = {};
         
         // Loop through the incoming data and convert relevant fields to integers
-        // This is a more robust way to handle all fields
         for (const key in updateData) {
             if (updateData.hasOwnProperty(key)) {
                 if (key === 'customerID' || key === 'startAddressID' || key === 'endAddressID' || key === 'volunteerID') {
-                    // Check if the value is not null and is a valid number
-                    if (updateData[key] !== null && !isNaN(parseInt(updateData[key], 10))) {
-                        dataToUpdate[key] = parseInt(updateData[key], 10);
-                    } else if (updateData[key] === null) {
+                    const value = updateData[key];
+                    // Check if the value is not null and is a valid number string
+                    if (value !== null && value !== undefined && !isNaN(parseInt(value, 10))) {
+                        dataToUpdate[key] = parseInt(value, 10);
+                    } else if (value === null || value === undefined) {
+                        // If the incoming ID is null or undefined, set it to null in dataToUpdate
                         dataToUpdate[key] = null;
                     }
+                    // Skip if it's not null/undefined but also not a valid number (e.g., empty string)
                 } else if (key === 'date' || key === 'pickupTime') {
                     // Handle date and time fields if needed, assuming they are sent as ISO strings
                     dataToUpdate[key] = new Date(updateData[key]);
@@ -62,13 +65,23 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
 
-        console.log("Data to update:", dataToUpdate);
+        console.log("Data to update after integer conversion:", dataToUpdate);
+
         let updatedRide;
         if (Object.keys(dataToUpdate).length > 0) {
+            
             // Validate foreign key fields
-            const validateForeignKey = async (field: string, value: number | null, model: 'customer' | 'address' | 'volunteer') => {
-                if (value === null) {
-                    console.log(`${field} is null, skipping validation.`);
+            // *** THIS IS WHERE THE FIX IS APPLIED ***
+            const validateForeignKey = async (
+                field: string, 
+                value: number | null | undefined, 
+                model: 'customer' | 'address' | 'volunteer'
+            ) => {
+                // FIX: Explicitly check for both null and undefined before using the value in a query.
+                // The original code failed because `undefined !== null` in JS, causing Prisma to panic 
+                // when it received `undefined` for the ID field.
+                if (value === null || value === undefined) {
+                    console.log(`${field} is null/undefined, skipping validation.`);
                     return;
                 }
 
@@ -91,40 +104,46 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
             try {
                 console.log('Starting validation for foreign key fields...');
+                // Pass undefined if the field isn't in dataToUpdate
                 await validateForeignKey('customerID', dataToUpdate.customerID, 'customer');
                 await validateForeignKey('startAddressID', dataToUpdate.startAddressID, 'address');
                 await validateForeignKey('endAddressID', dataToUpdate.endAddressID, 'address');
                 await validateForeignKey('volunteerID', dataToUpdate.volunteerID, 'volunteer');
                 console.log('Validation completed successfully.');
             } catch (validationError: any) {
-                console.error('Validation error:', validationError.message);
+                // This catch handles errors during the validation queries themselves (not the panic)
+                console.error('Validation error caught:', validationError.message);
                 return NextResponse.json({ error: validationError.message }, { status: 400 });
             }
 
-            // Transform foreign key fields into nested objects for Prisma
+            // Transform foreign key fields into nested objects for Prisma (Connect/Disconnect)
             if ('customerID' in dataToUpdate) {
-                dataToUpdate.customer = dataToUpdate.customerID
+                // Use a proper disconnect method if dataToUpdate.customerID is null
+                dataToUpdate.customer = dataToUpdate.customerID !== null
                     ? { connect: { id: dataToUpdate.customerID } }
-                    : { disconnect: true };
+                    : { disconnect: true }; // Use disconnect if null
                 delete dataToUpdate.customerID;
             }
+            // Repeat for other foreign keys (checking for existence in dataToUpdate)
+            
+            // ... (rest of your foreign key transformation logic remains the same)
 
             if ('startAddressID' in dataToUpdate) {
-                dataToUpdate.addrStart = dataToUpdate.startAddressID
+                dataToUpdate.addrStart = dataToUpdate.startAddressID !== null
                     ? { connect: { id: dataToUpdate.startAddressID } }
                     : { disconnect: true };
                 delete dataToUpdate.startAddressID;
             }
 
             if ('endAddressID' in dataToUpdate) {
-                dataToUpdate.addrEnd = dataToUpdate.endAddressID
+                dataToUpdate.addrEnd = dataToUpdate.endAddressID !== null
                     ? { connect: { id: dataToUpdate.endAddressID } }
                     : { disconnect: true };
                 delete dataToUpdate.endAddressID;
             }
 
             if ('volunteerID' in dataToUpdate) {
-                dataToUpdate.volunteer = dataToUpdate.volunteerID
+                dataToUpdate.volunteer = dataToUpdate.volunteerID !== null
                     ? { connect: { id: dataToUpdate.volunteerID } }
                     : { disconnect: true };
                 delete dataToUpdate.volunteerID;
@@ -140,7 +159,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 console.log('Attempting to update ride with data:', dataToUpdate);
                 updatedRide = await prisma.ride.update({
                     where: { id: rideId },
-                    data: dataToUpdate, // Ensure consistent use of dataToUpdate
+                    data: dataToUpdate,
                 });
                 console.log('Ride updated successfully:', updatedRide);
                 return NextResponse.json({ message: 'Ride updated successfully', updatedRide });
@@ -159,10 +178,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     } catch (error: any) {
         console.error('Error updating ride:', error);
+        // Log the received data, which might have caused the initial JSON parsing error
         console.error('Error details:', {
             message: error.message,
             stack: error.stack,
-            data: updateData,
+            data: updateData, // This helps debug if the error was outside the main logic block
         });
         return NextResponse.json({
             error: 'Failed to update ride',

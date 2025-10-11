@@ -2,7 +2,8 @@ import { useState, Fragment, useEffect } from "react";
 import ReadOnlyRow from "./ReadOnlyRow";
 import EditableRow from "./EditableRow";
 
-const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, convertTime }) => {
+// 1. ADD 'userRole' PROP HERE 👇
+const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, convertTime, userRole }) => {
   const [contacts, setContacts] = useState(initialContacts);
   const [editContactId, setEditContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -69,7 +70,7 @@ const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, con
     }
   };
 
-const handleCancelClick = async (contactId) => {
+  const handleCancelClick = async (contactId) => {
     try {
       const response = await fetch(`/api/deleteRides/${contactId}`, { // ENSURE THIS IS CORRECT
         method: 'DELETE',
@@ -95,6 +96,9 @@ const handleCancelClick = async (contactId) => {
     }
   };
 
+  // Helper variable for clarity
+  const showActionsColumn = userRole === 'volunteer';
+
   return (
     <div className="flex flex-col gap-2.5 p-4 font-sans overflow-x-auto max-h-[400px] overflow-y-auto">
       <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
@@ -106,7 +110,10 @@ const handleCancelClick = async (contactId) => {
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Volunteer Name</th>
-              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
+              {/* 2. CONDITIONAL ACTIONS HEADER 👇 */}
+              {showActionsColumn && (
+                <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -126,9 +133,11 @@ const handleCancelClick = async (contactId) => {
                       key={contact.id}
                       contact={contact}
                       handleEditClick={handleEditClick}
-                      handleDeleteClick={handleCancelClick} // Now correctly calling the delete function
+                      handleDeleteClick={handleCancelClick} // This will be the "Unreserve" action
                       status={contact.status}
                       convertTime={convertTime}
+                      // 3. PASS 'userRole' DOWN TO ReadOnlyRow 👇
+                      userRole={userRole}
                     />
                   )}
                 </Fragment>
