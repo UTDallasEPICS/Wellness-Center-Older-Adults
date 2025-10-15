@@ -4,7 +4,6 @@ export default function Page() {
   return (
     <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-xl bg-clip-border">
       <div className="flex w-full">
-        {/* Table Section */}
         <div className="w-3/4">
           <table className="w-full text-left table-auto min-w-max border-collapse border border-4 border-[#65b037]">
             <thead>

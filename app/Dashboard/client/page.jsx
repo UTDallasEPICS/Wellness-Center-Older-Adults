@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import ClientInputForm from "/app/components/ClientInputForm.jsx";
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
-import AddClientsTable from "/app/components/AddClientsTable.jsx"; // Import the new component
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -41,6 +40,7 @@ const modalCloseButtonStyle = {
     background: 'none',
     padding: 0,
 };
+
 export default function Page() {
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,6 +48,7 @@ export default function Page() {
     const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [customerToDelete, setCustomerToDelete] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchCustomers = async () => {
         try {
@@ -72,7 +73,7 @@ export default function Page() {
     const handleAddCustomerSubmit = (newCustomer) => {
         setIsAddCustomerModalOpen(false);
 
-        fetch('/api/createCustomerAccount', { // Updated API endpoint URL
+        fetch('/api/createCustomerAccount', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ export default function Page() {
             .then(data => {
                 console.log('Customer added successfully:', data);
                 toast.success('Client added successfully!');
-                window.location.reload(); // Reload after successful add
+                window.location.reload();
             })
             .catch(error => {
                 console.error('Error adding customer:', error);
@@ -111,20 +112,20 @@ export default function Page() {
         setCustomerToDelete(null);
 
         try {
-            const response = await fetch(`/api/customer/deleteCustomer/${customerIdToDelete}`, { // Updated API endpoint
-                method: 'DELETE', // Changed to DELETE
+            const response = await fetch(`/api/customer/deleteCustomer/${customerIdToDelete}`, {
+                method: 'DELETE',
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData?.message || 'Failed to delete client'); // Updated error message
+                throw new Error(errorData?.message || 'Failed to delete client');
             }
 
-            toast.success("Client deleted successfully!"); // Updated success message
-            window.location.reload(); // Reload after successful delete
+            toast.success("Client deleted successfully!");
+            window.location.reload();
         } catch (error) {
-            console.error('Error deleting client:', error); // Updated error message
-            toast.error(error.message || "Failed to delete client."); // Updated error message
+            console.error('Error deleting client:', error);
+            toast.error(error.message || "Failed to delete client.");
         }
     };
 
@@ -132,6 +133,15 @@ export default function Page() {
         setShowDeleteModal(false);
         setCustomerToDelete(null);
     };
+
+    // Filter customers based on search query
+    const filteredCustomers = customers.filter(customer => {
+        const fullName = `${customer.firstName} ${customer.lastName}`.toLowerCase();
+        const searchLower = searchQuery.toLowerCase();
+        return fullName.includes(searchLower) || 
+               customer.customerPhone.includes(searchQuery) ||
+               (customer.email && customer.email.toLowerCase().includes(searchLower));
+    });
 
     if (loading) {
         return (
@@ -150,50 +160,100 @@ export default function Page() {
     }
 
     return (
-        <div className="w-full min-h-screen bg-[#f4f1f0] flex flex-col relative"> {/* Main container */}
-            <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
-                <div className="text-black text-left font-light text-[30px]">
-                    <h1>Clients</h1>
-                </div>
-                <div className="ml-auto flex pr-6 pr-4 pt-4">
+        <div className="w-full min-h-screen bg-[#f4f1f0] p-6">
+            {/* Header Section */}
+            <div className="flex flex-col mb-6">
+                <h1 className="text-2xl font-light text-gray-800 mb-4">Clients</h1>
+                
+                {/* Search Bar and Add Button */}
+                <div className="flex items-center justify-between">
+                    <div className="relative w-64">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search by Client..."
+                            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    
                     <button
                         type="button"
-                        className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
+                        className="bg-[#0da000] hover:bg-[#0c8a00] text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition duration-200"
                         onClick={() => setIsAddCustomerModalOpen(true)}
                     >
-                        <span className="material-symbols-rounded">add</span>
+                        <span className="material-symbols-rounded text-xl">+</span>
                     </button>
                 </div>
             </div>
 
-            <div className="w-full overflow-x-auto">
-                <table className="min-w-full border border-gray-300 bg-white">
-                    <thead>
-                        <tr className="bg-[#f4f1f0] text-black text-left font-light text-[15px] border-b border-gray-300">
-                            <th className="p-4">Name</th>
-                            <th className="p-4">Address</th>
-                            <th className="p-4">Phone</th>
-                            <th className="p-4">Actions</th>
+            {/* Table Section */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <table className="min-w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Client Name</th>
+                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Contact Number</th>
+                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Address</th>
+                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {customers.map((customer, index) => (
-                            <tr key={index} className="bg-[#f4f1f0] border-b border-gray-300">
-                                <td className="p-4">{`${customer.firstName} ${customer.lastName}`}</td>
-                                <td className="p-4">{`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}</td>
-                                <td className="p-4">{customer.customerPhone}</td>
-                                <td className="p-4 flex justify-end">
-                                    <button
-                                        onClick={() => handleDeleteClick(customer.id)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        <span className="material-symbols-rounded">delete</span>
-                                    </button>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {filteredCustomers.map((customer, index) => (
+                            <tr key={index} className="hover:bg-gray-50 transition duration-150">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center">
+                                        <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                            <span className="text-gray-600 font-medium">
+                                                {customer.firstName?.charAt(0)}{customer.lastName?.charAt(0)}
+                                            </span>
+                                        </div>
+                                        <div className="ml-4">
+                                            <div className="text-sm font-medium text-[#103713]">
+                                                {customer.firstName} {customer.lastName}
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                @{customer.firstName?.toLowerCase()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-[#103713]">{customer.customerPhone}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-[#103713]">
+                                        {`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div className="flex items-center space-x-3">
+                                        <button className="text-green-600 hover:text-blue-900 transition duration-150">
+                                            <span className="material-symbols-rounded text-lg">edit</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteClick(customer.id)}
+                                            className="text-red-600 hover:text-red-900 transition duration-150"
+                                        >
+                                            <span className="material-symbols-rounded text-lg">delete</span>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                
+                {filteredCustomers.length === 0 && (
+                    <div className="text-center py-8">
+                        <p className="text-gray-500">No clients found.</p>
+                    </div>
+                )}
             </div>
 
             {isAddCustomerModalOpen && (
