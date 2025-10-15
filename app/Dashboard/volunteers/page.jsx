@@ -125,20 +125,15 @@ export default function Page() {
 
       const data = await response.json();
 
-      if (!response.ok || data.status === 400 || data.status === 500) {
+      if (!response.ok) {
         throw new Error(data.message || 'Failed to add volunteer');
       }
 
-      if (data.status === 200) {
-        setVolunteersData((prevData) => [
-          ...prevData,
-          { ...data.volunteer, status: "AVAILABLE" },
-        ]);
-        handleCloseAddModal();
-        toast.success("Volunteer added successfully!");
-        window.location.reload(); // Right here!
-
-      }
+      // Success (201 Created)
+      const createdUser = data.data;
+      handleCloseAddModal();
+      toast.success("Volunteer added successfully!");
+      window.location.reload();
     } catch (error) {
       console.error('Error adding volunteer:', error);
       toast.error(error.message || "Failed to add volunteer.");
