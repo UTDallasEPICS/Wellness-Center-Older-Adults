@@ -327,7 +327,6 @@ export default function Page() {
 
     return (
         <div className="h-full w-full bg-[#fffdf5] relative">
-            {/* ... (existing style and notification logic) */}
 
             {/* Hide the Add Ride button if the user is a volunteer */}
             {!isVolunteer && (
