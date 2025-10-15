@@ -28,8 +28,8 @@ export default function DashboardLayout({ children }) {
   }, []);
 
   return (
-    <div className="flex flex-col w-full min-h-screen">
-      <div className="flex bg-white">
+    <div className="flex flex-col w-full bg-[#F4F1F0] min-h-screen">
+      <div className="flex bg-[#F4F1F0]">
         <SideNav toggleCollapse={() => setIsCollapsed(!isCollapsed)} isCollapsed={isCollapsed} />
         <div 
           className={`flex-1 h-[calc(100vh-70px)] bg-[#f4f1f0] transition-all ease-in-out duration-300 ${isCollapsed ? "ml-[70px]" : "ml-0"} md:${isCollapsed ? "ml-[70px]" : "ml-[250px]"}`}
