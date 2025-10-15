@@ -1,10 +1,18 @@
+// app\Dashboard\admin\page.jsx
 "use client";
 import React, { useState, useEffect } from 'react';
-import Header from "/app/components/Header.jsx";
-import AddAdminForm from '../../components/AddAdminForm.jsx';
+import AddAdminForm from '../../components/AddAdminForm.jsx'; 
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css"; 
 
+// --- Custom Colors and Styles from Image ---
+const primaryGreen = '#419902'; 
+const backgroundOffWhite = '#f4f1f0'; 
+const cardBackground = '#ffffff'; 
+const headerTextColor = '#000000'; 
+const fontLight = '300'; 
+
+// --- Modal Styles (Kept as inline styles for simplicity) ---
 const modalOverlayStyle = {
     position: 'fixed',
     top: 0,
@@ -27,6 +35,7 @@ const modalContentStyle = {
     maxHeight: '90%',
     overflowY: 'auto',
     position: 'relative',
+    width: '400px', 
 };
 
 const modalCloseButtonStyle = {
@@ -39,6 +48,59 @@ const modalCloseButtonStyle = {
     cursor: 'pointer',
     color: 'gray',
 };
+// --- END Modal Styles ---
+
+// Style for the "Add Admin" button (plus icon)
+const addButtonStyles = {
+    height: '45px',
+    width: '45px',
+    borderRadius: '50%',
+    color: 'white',
+    backgroundColor: primaryGreen,
+    border: 'none',
+    zIndex: 40,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+    cursor: 'pointer',
+    fontSize: '20px',
+};
+
+// Style for the Edit button
+const editButtonStyles = {
+    height: '32px',
+    width: '50px',
+    borderRadius: '4px',
+    backgroundColor: primaryGreen,
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: '500',
+    fontSize: '14px',
+    padding: '0 10px',
+};
+
+// Style for the Delete button
+const deleteButtonStyles = {
+    height: '32px',
+    width: '50px',
+    borderRadius: '4px',
+    backgroundColor: '#d9534f', // Red color
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: '500',
+    fontSize: '14px',
+    padding: '0 10px',
+};
+
 
 export default function AdminPage() {
     const [admins, setAdmins] = useState([]);
@@ -54,14 +116,16 @@ export default function AdminPage() {
         try {
             const response = await fetch('/api/getAdmin');
             if (!response.ok) {
-                throw new Error(`Failed to fetch admin data: ${response.status}`);
+                // Read error message from body if available
+                const errorData = await response.json().catch(() => ({ message: `Failed to fetch admin data: ${response.status}` }));
+                throw new Error(errorData.message);
             }
             const data = await response.json();
             setAdmins(data);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching admins:', error);
-            setError('Failed to load admin data');
+            setError(error.message || 'Failed to load admin data');
             setLoading(false);
         }
     };
@@ -79,12 +143,7 @@ export default function AdminPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    email: newAdmin.email,
-                    firstName: newAdmin.firstName,
-                    lastName: newAdmin.lastName,
-                    phone: newAdmin.phone,
-                }),
+                body: JSON.stringify(newAdmin),
             });
 
             if (!response.ok) {
@@ -93,7 +152,8 @@ export default function AdminPage() {
             }
 
             toast.success('Admin created successfully!');
-            window.location.reload();
+            // Only reload on success to ensure the list is refreshed
+            window.location.reload(); 
         } catch (error) {
             console.error('Error adding admin:', error);
             toast.error(error.message || 'Failed to add admin.');
@@ -109,17 +169,17 @@ export default function AdminPage() {
         setIsEditAdminModalOpen(false);
 
         try {
-            const response = await fetch(`/api/admin/updateAdmin/${adminToEdit.id}`, {
+            // Ensure ID is passed correctly, assuming updatedAdmin already contains the ID if edited within the form,
+            // otherwise use adminToEdit.id
+            const adminId = updatedAdmin.id || adminToEdit.id;
+            
+            const response = await fetch(`/api/admin/updateAdmin/${adminId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    email: updatedAdmin.email,
-                    firstName: updatedAdmin.firstName,
-                    lastName: updatedAdmin.lastName,
-                    phone: updatedAdmin.phone,
-                }),
+                // Pass the updated data
+                body: JSON.stringify(updatedAdmin), 
             });
 
             if (!response.ok) {
@@ -128,6 +188,7 @@ export default function AdminPage() {
             }
 
             toast.success('Admin updated successfully!');
+            // Only reload on success to ensure the list is refreshed
             window.location.reload();
         } catch (error) {
             console.error('Error updating admin:', error);
@@ -136,16 +197,15 @@ export default function AdminPage() {
     };
 
     const handleDeleteClick = (adminId) => {
-        console.log("Delete button clicked for AdminID:", adminId);
         setAdminToDelete(adminId);
         setShowDeleteModal(true);
     };
 
     const handleConfirmDelete = async () => {
-        console.log("handleConfirmDelete called. adminToDelete:", adminToDelete);
         const adminIdToDelete = adminToDelete;
         const previousAdminsData = [...admins];
 
+        // Optimistic UI update
         setAdmins(admins.filter(admin => admin.id !== adminIdToDelete));
         setShowDeleteModal(false);
         setAdminToDelete(null);
@@ -156,12 +216,14 @@ export default function AdminPage() {
             });
 
             if (!response.ok) {
+                // Revert optimistic update on failure
                 setAdmins(previousAdminsData);
                 const errorData = await response.json();
                 throw new Error(errorData?.message || 'Failed to delete admin');
             }
 
             toast.success("Admin deleted successfully!");
+            // Only reload on success to ensure the list is refreshed
             window.location.reload();
         } catch (error) {
             console.error('Error deleting admin:', error);
@@ -174,9 +236,16 @@ export default function AdminPage() {
         setAdminToDelete(null);
     };
 
+    // Helper to find the full name for the delete modal
+    const getAdminFullName = (id) => {
+        const admin = admins.find(a => a.id === id);
+        return admin ? `${admin.firstName} ${admin.lastName}` : 'this admin';
+    };
+
+
     if (loading) {
         return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: backgroundOffWhite }}>
                 <p>Loading Admins...</p>
             </div>
         );
@@ -184,65 +253,125 @@ export default function AdminPage() {
 
     if (error) {
         return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'red' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'red', backgroundColor: backgroundOffWhite }}>
                 <p>Error: {error}</p>
             </div>
         );
     }
 
     return (
-        <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            <Header />
-              <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8">
-                <div className="text-black text-left font-light text-[30px]">
-                    <h1>Admins</h1>
-                </div>
-                <div style={{ marginLeft: 'auto', paddingRight: '24px' }}>
+        // Outermost div for the page background
+        <div style={{ width: '100%', minHeight: '100vh', backgroundColor: backgroundOffWhite }}>
+
+            {/* Main Content Wrapper - Adjusted for Centering */}
+            <div style={{
+                // Removed fixed left padding and added auto margins for centering
+                padding: '24px 24px 24px 24px', 
+                width: '90%', // Use a percentage width
+                maxWidth: '1200px', // Set a maximum size for the content
+                margin: '0 auto', // This centers the block horizontally
+                minHeight: '100vh',
+            }}>
+                
+                {/* Page Title and Add Button Row (Header section) */}
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    padding: '32px 0 24px 0', 
+                    // Adjusted margin to align title with new centered container
+                    marginLeft: '0', 
+                }}>
+                    <div style={{ color: headerTextColor, fontSize: '30px', fontWeight: fontLight }}>
+                        <h1>Admins</h1>
+                    </div>
+                    {/* Add button, positioned on the top right */}
                     <button
                         type="button"
-                        style={{ height: '45px', width: '45px', borderRadius: '50%', color: 'white', backgroundColor: 'black', border: 'none', zIndex: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={addButtonStyles}
                         onClick={() => setIsAddAdminModalOpen(true)}
                     >
                         <span className="material-symbols-rounded">add</span>
                     </button>
                 </div>
-            </div>
 
-            {/* Header row - Changed gridTemplateColumns from 'repeat(3, minmax(0, 1fr)) auto' to '1fr 1fr 1fr auto' for better alignment */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', color: 'black', padding: '24px', fontSize: '15px', fontWeight: '300', backgroundColor: 'white', borderBottom: '1px solid #ccc', width: '100%' }}>
-                <p>Name</p>
-                <p>Email</p>
-                <p>Phone</p>
-                {/* Added fixed width to match button column below */}
-                <div style={{ width: '80px' }}></div>
-            </div>
+                {/* Admin List Container (The main white card-like section) */}
+                <div style={{ 
+                    backgroundColor: cardBackground, 
+                    borderRadius: '12px', 
+                    padding: '0 20px', 
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)', 
+                    border: '1px solid #f0f0f0', 
+                    width: '100%', 
+                    maxWidth: 'none', 
+                }}>
+                    
+                    {/* Table Header Row with grid layout */}
+                    <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: '1fr 1fr 2fr 1fr 1fr', 
+                        padding: '16px 0', 
+                        alignItems: 'center',
+                        borderBottom: '1px solid #f0f0f0', 
+                        fontSize: '15px', 
+                    }}>
+                        <p style={{ fontWeight: '500' }}>First Name</p>
+                        <p style={{ fontWeight: '500' }}>Last Name</p>
+                        <p style={{ fontWeight: '500' }}>Email</p>
+                        <p style={{ fontWeight: '500' }}>Phone</p>
+                        <div style={{ textAlign: 'right', fontWeight: '500' }}>Actions</div>
+                    </div> 
 
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', color: 'black', backgroundColor: 'white', borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
-                {admins.map((admin, index) => (
-                    // Changed gridTemplateColumns to match header row for proper alignment
-                    <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', padding: '16px 24px', borderBottom: '1px solid #ccc', alignItems: 'center' }}>
-                        <p>{`${admin.firstName} ${admin.lastName}`}</p>
-                        <p>{admin.email}</p>
-                        <p>{admin.phone || 'N/A'}</p>
-                        {/* Added fixed width of 80px to button container for consistent alignment */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', width: '80px' }}>
-                            <button
-                                onClick={() => handleEditClick(admin)}
-                                style={{ color: 'blue', cursor: 'pointer' }}
-                            >
-                                <span className="material-symbols-rounded">edit</span>
-                            </button>
-                            <button
-                                onClick={() => handleDeleteClick(admin.id)}
-                                style={{ color: 'red', cursor: 'pointer' }}
-                            >
-                                <span className="material-symbols-rounded">delete</span>
-                            </button>
-                        </div>
+                    {/* Admin List Rows */}
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {admins.length === 0 ? (
+                            <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>No admin users found.</p>
+                        ) : (
+                            admins.map((admin, index) => (
+                                <div key={admin.id} style={{ 
+                                    display: 'grid', 
+                                    gridTemplateColumns: '1fr 1fr 2fr 1fr 1fr', 
+                                    padding: '16px 0', 
+                                    alignItems: 'center',
+                                    borderBottom: index < admins.length - 1 ? '1px solid #f0f0f0' : 'none', 
+                                    fontSize: '15px',
+                                }}>
+                                    {/* First Name */}
+                                    <p style={{ fontWeight: 'normal', color: '#333' }}>{admin.firstName}</p>
+                                    {/* Last Name */}
+                                    <p style={{ fontWeight: 'normal', color: '#333' }}>{admin.lastName}</p>
+                                    {/* Email */}
+                                    <p style={{ fontSize: '15px', color: '#333' }}>{admin.email}</p>
+                                    {/* Phone */}
+                                    <p style={{ fontSize: '15px', color: '#333' }}>{admin.phone || 'N/A'}</p>
+                                    {/* Action Buttons */}
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                                        {/* Edit Button */}
+                                        <button
+                                            onClick={() => handleEditClick(admin)}
+                                            style={editButtonStyles}
+                                            title="Edit Admin"
+                                        >
+                                            edit
+                                        </button>
+                                        
+                                        {/* Delete Button */}
+                                        <button
+                                            onClick={() => handleDeleteClick(admin.id)}
+                                            style={deleteButtonStyles}
+                                            title="Delete Admin"
+                                        >
+                                            delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
-                ))}
+                </div>
             </div>
 
+            {/* Modals - Remain the same */}
             {isAddAdminModalOpen && (
                 <div style={modalOverlayStyle}>
                     <div style={modalContentStyle}>
@@ -258,8 +387,8 @@ export default function AdminPage() {
                     <div style={modalContentStyle}>
                         <button style={modalCloseButtonStyle} onClick={() => setIsEditAdminModalOpen(false)}>&times;</button>
                         <h2 style={{ textAlign: 'left', fontWeight: '300', fontSize: '24px', marginBottom: '16px' }}>Edit Admin</h2>
-                        <AddAdminForm 
-                            onSubmit={handleEditAdminSubmit} 
+                        <AddAdminForm
+                            onSubmit={handleEditAdminSubmit}
                             onClose={() => setIsEditAdminModalOpen(false)}
                             initialData={adminToEdit}
                         />
@@ -271,12 +400,15 @@ export default function AdminPage() {
                 <div style={modalOverlayStyle}>
                     <div style={modalContentStyle}>
                         <button style={modalCloseButtonStyle} onClick={handleCancelDelete}>&times;</button>
-                        <p style={{ marginBottom: '16px' }}>Are you sure you want to delete admin: {admins.find(a => a.id === adminToDelete)?.firstName} {admins.find(a => a.id === adminToDelete)?.lastName}?</p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <button onClick={handleCancelDelete} style={{ backgroundColor: '#ccc', color: '#333', padding: '8px 16px', borderRadius: '4px', marginRight: '8px', cursor: 'pointer' }}>
+                        <p style={{ marginBottom: '20px', fontSize: '16px' }}>
+                            Are you sure you want to delete admin: 
+                            <strong style={{ marginLeft: '4px' }}>{getAdminFullName(adminToDelete)}</strong>?
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                            <button onClick={handleCancelDelete} style={{ backgroundColor: '#ccc', color: '#333', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', border: 'none' }}>
                                 Cancel
                             </button>
-                            <button onClick={handleConfirmDelete} style={{ backgroundColor: 'red', color: 'white', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
+                            <button onClick={handleConfirmDelete} style={{ backgroundColor: '#d9534f', color: 'white', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', border: 'none' }}>
                                 Delete
                             </button>
                         </div>
