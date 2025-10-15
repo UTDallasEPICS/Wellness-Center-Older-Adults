@@ -42,7 +42,6 @@ const AddVolunteersTable = ({
       </table>
     </div>
   );
-
 };
 
 export default AddVolunteersTable;

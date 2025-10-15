@@ -173,7 +173,7 @@ export default function Page() {
             </div>
 
             {/* Clients List Area: Using the imported AddClientsTable for the styled list */}
-            <div className="rounded-xl overflow-hidden shadow-lg bg-white p-6">
+            <div className="">
                 <AddClientsTable
                     customers={customers}
                     onDelete={handleDeleteClick}
