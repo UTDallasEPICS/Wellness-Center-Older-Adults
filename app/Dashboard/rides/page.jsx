@@ -118,7 +118,7 @@ export default function Page() {
 
     const fetchAddresses = async () => {
         try {
-            const response = await fetch("/api/addresses");
+            const response = await fetch("/api/getAvailableRides");
             if (response.ok) {
                 const data = await response.json();
                 setAddresses(data);
@@ -327,7 +327,11 @@ export default function Page() {
 
     return (
         <div className="h-full w-full bg-[#fffdf5] relative">
-            {/* ... (existing style and notification logic) */}
+            <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
+                <div className="text-black text-left font-light text-[30px]">
+                    <h1>Rides</h1>
+                </div>
+        </div> 
 
             {/* Hide the Add Ride button if the user is a volunteer */}
             {!isVolunteer && (
