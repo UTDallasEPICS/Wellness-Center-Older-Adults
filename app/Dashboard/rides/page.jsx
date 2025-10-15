@@ -326,7 +326,7 @@ export default function Page() {
     ];
 
     return (
-        <div className="h-full w-full bg-[#fffdf5] relative">
+        <div className="h-full w-full bg-[#f4f1f0] relative">
             <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
                 <div className="text-black text-left font-light text-[30px]">
                     <h1>Rides</h1>
