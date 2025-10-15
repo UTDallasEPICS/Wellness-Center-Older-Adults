@@ -147,8 +147,7 @@ const ClientInputForm = ({ onSubmit, onClose }) => { // Receive onSubmit and onC
                                 name="phone"
                                 placeholder="Phone Number"
                                 value={clientInfo.phone}
-                                pattern="[0-9]{10}"
-                                maxLength={10}
+                                maxLength={11}
                                 inputMode="numeric"
                                 onChange={handleChange}
                             />

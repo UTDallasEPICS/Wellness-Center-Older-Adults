@@ -14,9 +14,7 @@ interface RideRequestBody {
     destinationZip: string;
     pickUpTime: string;
     date: string;
-    ways: string;
     extraInfo: string;
-    // isTwoWayChecked?: boolean; // If you sent it from the front-end
 }
 
 export async function POST(req: Request) {
@@ -37,9 +35,7 @@ export async function POST(req: Request) {
             destinationZip,
             pickUpTime,
             date,
-            ways,
             extraInfo,
-            // isTwoWayChecked,
         } = (await req.json()) as RideRequestBody;
 
         // 1.  Find the Customer ID.
@@ -59,25 +55,51 @@ export async function POST(req: Request) {
 
         // Use a transaction to ensure atomicity
         const createdRide = await prisma.$transaction(async (tx) => {
-            // 2. Create the Pickup Address
-            const startAddress = await tx.address.create({
-                data: {
+            
+            // check address to see if it exists
+            let startAddress = await tx.address.findFirst({
+                where: {
+                  street: pickupStreet,
+                  city: pickupCity,
+                  state: pickupState,
+                  postalCode: pickupZip,
+                },
+              });
+        
+              // If the pickup address doesn't exist, create a new record
+              if (!startAddress) {
+                startAddress = await tx.address.create({
+                  data: {
                     street: pickupStreet,
                     city: pickupCity,
                     state: pickupState,
                     postalCode: pickupZip,
+                  },
+                });
+              }
+        
+              
+              // Check if the destination address already exists in the database
+              let endAddress = await tx.address.findFirst({
+                where: {
+                  street: destinationStreet,
+                  city: destinationCity,
+                  state: destinationState,
+                  postalCode: destinationZip,
                 },
-            });
-
-            // 3. Create the Destination Address
-            const endAddress = await tx.address.create({
-                data: {
+              });
+        
+              // If the destination address doesn't exist, create a new record
+              if (!endAddress) {
+                endAddress = await tx.address.create({
+                  data: {
                     street: destinationStreet,
                     city: destinationCity,
                     state: destinationState,
                     postalCode: destinationZip,
-                },
-            });
+                  },
+                });
+              }
 
             // 5. Create the Ride record, linking to the created addresses and customer
             const ride = await tx.ride.create({
@@ -88,8 +110,6 @@ export async function POST(req: Request) {
                     startAddressID: startAddress.id,
                     endAddressID: endAddress.id,
                     specialNote: extraInfo,
-                    // isTwoWay: isTwoWayChecked,
-                    // waitTime: ways ? parseInt(ways) : null,
                     volunteerID: 1, // Replace with your dynamic logic
                 },
             });

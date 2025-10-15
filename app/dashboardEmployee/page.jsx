@@ -44,7 +44,6 @@ export default function Page() {
                     destinationZip: formData.destinationZip,
                     pickUpTime: formData.pickUpTime,
                     date: formData.date,
-                    ways: formData.ways,
                     extraInfo: formData.extraInfo,
                 }),
             });
@@ -69,7 +68,6 @@ export default function Page() {
                 destinationZip: formData.destinationZip,
                 pickUpTime: formData.pickUpTime,
                 date: formData.date,
-                ways: formData.ways,
                 extraInfo: formData.extraInfo,
                 status: "Added",
                 volunteerName: "",

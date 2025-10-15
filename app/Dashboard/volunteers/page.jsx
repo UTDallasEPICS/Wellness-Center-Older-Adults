@@ -146,7 +146,7 @@ export default function Page() {
   };
 
   const handleEditClick = (volunteer) => {
-    setEditVolunteerId(volunteer.VolunteerID);
+    setEditVolunteerId(volunteer.id);
     setEditFormData({
       firstName: volunteer.firstName,
       lastName: volunteer.lastName,
@@ -171,7 +171,7 @@ export default function Page() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: editVolunteerId,
+          id: Number(editVolunteerId),
           ...editFormData
         }),
       });
@@ -180,7 +180,7 @@ export default function Page() {
 
       if (result.status === 200) {
         const updatedVolunteers = volunteersData.map((volunteer) =>
-          volunteer.VolunteerID === editVolunteerId
+          volunteer.id === editVolunteerId
             ? { ...volunteer, ...editFormData }
             : volunteer
         );
@@ -215,7 +215,7 @@ export default function Page() {
 
     // Optimistically update the UI
     setVolunteersData(volunteersData.filter(
-      (volunteer) => volunteer.VolunteerID !== volunteerIdToDelete
+      (volunteer) => volunteer.id !== volunteerIdToDelete
     ));
     setShowDeleteModal(false);
     setVolunteerToDelete(null);
@@ -371,7 +371,7 @@ export default function Page() {
 
       {showDeleteModal && (
         <DeleteConfirmationModal
-          volunteerName={volunteersData.find(v => v.VolunteerID === volunteerToDelete)?.firstName + " " + volunteersData.find(v => v.VolunteerID === volunteerToDelete)?.lastName}
+          volunteerName={volunteersData.find(v => v.id === volunteerToDelete)?.firstName + " " + volunteersData.find(v => v.id === volunteerToDelete)?.lastName}
           handleConfirmDelete={handleConfirmDelete}
           handleCancelDelete={handleCancelDelete}
         />

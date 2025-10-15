@@ -31,7 +31,7 @@ const AddVolunteersTable = ({
           ) : (
             volunteersData && volunteersData.map((volunteer) => (
               <ReadOnlyVolunteerRow
-                key={volunteer?.VolunteerID} 
+                key={volunteer?.id}
                 contact={volunteer}
                 handleEditClick={handleEditClick}
                 handleDeleteClick={handleDeleteClick}
@@ -42,6 +42,7 @@ const AddVolunteersTable = ({
       </table>
     </div>
   );
+
 };
 
 export default AddVolunteersTable;

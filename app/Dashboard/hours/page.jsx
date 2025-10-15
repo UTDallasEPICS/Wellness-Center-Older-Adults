@@ -1,160 +1,74 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 
 export default function Page() {
-  return (
-    <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-xl bg-clip-border">
-      <div className="flex w-full">
-        <div className="w-3/4">
-          <table className="w-full text-left table-auto min-w-max border-collapse border border-4 border-[#65b037]">
-            <thead>
-              <tr>
-                <th className="p-4 border-b border-r border-gray-300 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Name
-                  </p>
-                </th>
-                <th className="p-4 border-b border-r border-gray-300 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Hours
-                  </p>
-                </th>
-                <th className="p-4 border-b border-gray-300 bg-blue-gray-50">
-                  <p className="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                    Date
-                  </p>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    John Michael
-                  </p>
-                </td>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    10
-                  </p>
-                </td>
-                <td className="p-4 border-b border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    23/04/18
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Bob
-                  </p>
-                </td>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    4
-                  </p>
-                </td>
-                <td className="p-4 border-b border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    23/04/18
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Laurent Perrier
-                  </p>
-                </td>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    4
-                  </p>
-                </td>
-                <td className="p-4 border-b border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    19/09/17
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Michael Levi
-                  </p>
-                </td>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    3
-                  </p>
-                </td>
-                <td className="p-4 border-b border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    24/12/08
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Richard Gran
-                  </p>
-                </td>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    6
-                  </p>
-                </td>
-                <td className="p-4 border-b border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    04/10/21
-                  </p>
-                </td>
-              </tr>
-              {/* Additional rows */}
-              <tr>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Emma Watson
-                  </p>
-                </td>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    5
-                  </p>
-                </td>
-                <td className="p-4 border-b border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    15/02/20
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    Sarah Johnson
-                  </p>
-                </td>
-                <td className="p-4 border-b border-r border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    8
-                  </p>
-                </td>
-                <td className="p-4 border-b border-gray-300">
-                  <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                    11/05/19
-                  </p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  const [volunteerHours, setVolunteerHours] = useState([]);
+  const [totalHours, setTotalHours] = useState("");
 
-        {/* Total Hours Section */}
-        <div className="flex items-center justify-center w-1/4 mt-6">
-          <div className="text-[#65b037] text-[140px] bg-[#65b037]/30 w-[230px] h-[230px] rounded-full flex justify-center items-center mx-auto mt-[10%]">
-            4
-          </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/volunteer-hours');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setVolunteerHours(data);
+
+        // Calculate total hours from "HH:MM" strings for completed rides
+        const totalMinutes = data.reduce((sum, ride) => {
+          if (ride.status === 'COMPLETED' && ride.totalTime) {
+            const [hours, minutes] = ride.totalTime.split(':').map(Number);
+            return sum + (hours * 60) + minutes;
+          }
+          return sum;
+        }, 0);
+
+        const totalHoursVal = Math.floor(totalMinutes / 60);
+        const remainingMinutes = totalMinutes % 60;
+        const formattedTotalHours = `${totalHoursVal} hrs, ${remainingMinutes} min`;
+        setTotalHours(formattedTotalHours);
+      } catch (error) {
+        console.error("Could not fetch data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#fffdf5] flex flex-col items-center py-10">
+      <h1 className="text-3xl font-light mb-8 ml-4 self-start">Volunteer Hours</h1>
+      <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-[#fffdf5]">
+        <table className="border-collapse w-full">
+          <thead>
+            <tr>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Name</th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Hours</th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {volunteerHours && volunteerHours.length === 0 ? (
+              <tr>
+                <td colSpan="3" className="text-center text-lg font-semibold p-4">
+                  No volunteer hours available.
+                </td>
+              </tr>
+            ) : (
+              volunteerHours && volunteerHours.map((volunteer, idx) => (
+                <tr key={idx}>
+                  <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{volunteer.name}</td>
+                  <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{volunteer.hours}</td>
+                  <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{volunteer.date}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+        {/* Display formatted total hours below the table */}
+        <div className="mt-8 text-xl text-gray-700 text-center font-semibold">
+          Total Volunteer Time: {totalHours}
         </div>
       </div>
     </div>

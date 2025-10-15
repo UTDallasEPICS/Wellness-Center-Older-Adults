@@ -14,11 +14,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
         destinationZip: "",
         pickUpTime: "",
         date: "",
-        ways: "",
         extraInfo: "",
     });
 
-    const [isTwoWayChecked, setIsTwoWayChecked] = useState(false);
     const [isExtraOptionChecked, setIsExtraOptionChecked] = useState(false);
     const [customerNames, setCustomerNames] = useState([]);
     const [customers, setCustomers] = useState([]);
@@ -118,9 +116,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 destinationZip: formData.destinationZip,
                 pickUpTime: formData.pickUpTime,
                 date: formData.date,
-                ways: formData.ways,
                 extraInfo: formData.extraInfo,
-                // You might want to send isTwoWayChecked if your backend needs it
             };
 
             console.log("Data being sent:", rideDataToSend); // Add this for verification
@@ -334,37 +330,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Two way? */}
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                id="twoWay"
-                                name="twoWay"
-                                checked={isTwoWayChecked}
-                                onChange={(e) => handleCheckboxChange(e, setIsTwoWayChecked)}
-                                className="w-5 h-5"
-                            />
-                            <label htmlFor="twoWay" className="text-sm font-medium text-gray-700">
-                                Two way?
-                            </label>
-                        </div>
-
-                        {/* Wait Time (if two way is checked) */}
-                        {isTwoWayChecked && (
-                            <div>
-                                <label htmlFor="ways" className="block text-sm font-medium text-gray-700">
-                                    Wait Time
-                                </label>
-                                <input
-                                    className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-                                    type="text"
-                                    name="ways"
-                                    placeholder="Minutes"
-                                    value={formData.ways}
-                                    onChange={handleFormChange}
-                                />
-                            </div>
-                        )}
 
                         {/* Notes? */}
                         <div className="flex items-center space-x-2">
