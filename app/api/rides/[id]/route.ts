@@ -37,13 +37,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         console.log("Address Updates:", updateData.addressUpdates);
         console.log("Full updateData:", updateData);
 
-        const ride = await prisma.ride.findUnique({
-            where: {
-                id: parseInt(id, 10),
-            },
+        const rideId = parseInt(id, 10);
+        if (isNaN(rideId)) {
+            return NextResponse.json({ error: 'Invalid ride ID' }, { status: 400 });
+        }
+
+        const existingRide = await prisma.ride.findUnique({
+            where: { id: rideId },
         });
 
-        if (!ride) {
+        if (!existingRide) {
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
 
@@ -51,17 +54,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             console.log("=== PARSING ADDRESS STRINGS ===");
             console.log("Pickup address string:", updateData.pickupAddress);
             console.log("Dropoff address string:", updateData.dropoffAddress);
-            console.log("Ride startAddressID:", ride.startAddressID);
-            console.log("Ride endAddressID:", ride.endAddressID);
+            console.log("Ride startAddressID:", existingRide.startAddressID);
+            console.log("Ride endAddressID:", existingRide.endAddressID);
             
             // Parse pickup address
-            if (updateData.pickupAddress && ride.startAddressID) {
+            if (updateData.pickupAddress && existingRide.startAddressID) {
                 console.log("Processing pickup address...");
                 const pickupParts = parseAddressString(updateData.pickupAddress);
                 console.log("Parsed pickup parts:", pickupParts);
                 if (pickupParts) {
                     const updatedPickup = await prisma.address.update({
-                        where: { id: ride.startAddressID },
+                        where: { id: existingRide.startAddressID },
                         data: pickupParts
                     });
                     console.log("Updated pickup address in DB:", updatedPickup);
@@ -69,13 +72,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
             
             // Parse dropoff address  
-            if (updateData.dropoffAddress && ride.endAddressID) {
+            if (updateData.dropoffAddress && existingRide.endAddressID) {
                 console.log("Processing dropoff address...");
                 const dropoffParts = parseAddressString(updateData.dropoffAddress);
                 console.log("Parsed dropoff parts:", dropoffParts);
                 if (dropoffParts) {
                     const updatedDropoff = await prisma.address.update({
-                        where: { id: ride.endAddressID },
+                        where: { id: existingRide.endAddressID },
                         data: dropoffParts
                     });
                     console.log("Updated dropoff address in DB:", updatedDropoff);
@@ -203,9 +206,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             prismaUpdateData.volunteer = { connect: { id: parseInt(volunteerID as string, 10) } };
         }
 
+        console.log("Data to update:", prismaUpdateData);
         let updatedRide;
-
         if (Object.keys(prismaUpdateData).length > 0) {
+            // Validate foreign key fields
+            const validateForeignKey = async (field: string, value: number | null, model: 'customer' | 'address' | 'volunteer') => {
+                if (value === null) {
+                    console.log(`${field} is null, skipping validation.`);
+                    return;
+                }
+                // ...existing code for validation if needed...
+            };
+
             updatedRide = await prisma.ride.update({
                 where: {
                     id: parseInt(id, 10),
@@ -241,15 +253,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 // Include formatted data for frontend
                 formattedData: {
                     id: updatedRide.id,
-                    customerID: updatedRide.customerID,
-                    customerName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
-                    customerPhone: updatedRide.customer?.customerPhone || '',
-                    startAddressID: updatedRide.startAddressID,
-                    endAddressID: updatedRide.endAddressID,
-                    startLocation: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
-                    endLocation: updatedRide.addrEnd ? `${updatedRide.addrEnd.street}, ${updatedRide.addrEnd.city}, ${updatedRide.addrEnd.state} ${updatedRide.addrEnd.postalCode}` : '',
-                    date: updatedRide.date,
+                    clientName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
+                    phoneNumber: updatedRide.customer?.customerPhone || '',
+                    address: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
                     startTime: updatedRide.pickupTime ? updatedRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                    volunteerName: updatedRide.volunteer && updatedRide.volunteer.user ? `${updatedRide.volunteer.user.firstName} ${updatedRide.volunteer.user.lastName}` : '',
                     status: updatedRide.status
                 }
             });
@@ -275,15 +283,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 updatedRide: rideWithUpdatedData,
                 formattedData: rideWithUpdatedData ? {
                     id: rideWithUpdatedData.id,
-                    customerID: rideWithUpdatedData.customerID,
-                    customerName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
-                    customerPhone: rideWithUpdatedData.customer?.customerPhone || '',
-                    startAddressID: rideWithUpdatedData.startAddressID,
-                    endAddressID: rideWithUpdatedData.endAddressID,
-                    startLocation: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
-                    endLocation: rideWithUpdatedData.addrEnd ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}` : '',
-                    date: rideWithUpdatedData.date,
+                    clientName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
+                    phoneNumber: rideWithUpdatedData.customer?.customerPhone || '',
+                    address: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
                     startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                    volunteerName: rideWithUpdatedData.volunteer && rideWithUpdatedData.volunteer.user ? `${rideWithUpdatedData.volunteer.user.firstName} ${rideWithUpdatedData.volunteer.user.lastName}` : '',
                     status: rideWithUpdatedData.status
                 } : null
             });

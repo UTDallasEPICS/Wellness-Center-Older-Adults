@@ -12,14 +12,6 @@ const Tile = () => {
             <th className="p-2 border-b border-gray-300">Volunteer Hours</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td className="p-2 border-b border-gray-300">Jane Smith</td>
-            <td className="p-2 border-b border-gray-300">123-456-6789</td>
-            <td className="p-2 border-b border-gray-300">123 Address</td>
-            <td className="p-2 border-b border-gray-300">5 hrs</td>
-          </tr>
-        </tbody>
       </table>
 
       <div className="mt-5">
