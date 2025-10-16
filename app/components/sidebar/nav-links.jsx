@@ -80,14 +80,6 @@ export default function NavLinks({ isCollapsed }) {
           </li>
           <li>
             <a
-              href="/Dashboard/hours"
-              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
-            >
-              Hours
-            </a>
-          </li>
-          <li>
-            <a
               href="/Dashboard/accounts"
               className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >

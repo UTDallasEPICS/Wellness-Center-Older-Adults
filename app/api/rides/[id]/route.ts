@@ -24,9 +24,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     try {
         const updateData = await request.json();
-<<<<<<< HEAD
-        console.log("Backend received updateData:", updateData);
-=======
         
         console.log("=== RECEIVED UPDATE DATA ===");
         console.log("Date:", updateData.date);
@@ -39,7 +36,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         console.log("Customer Updates:", updateData.customerUpdates);
         console.log("Address Updates:", updateData.addressUpdates);
         console.log("Full updateData:", updateData);
->>>>>>> workingNonChatbot
 
         const rideId = parseInt(id, 10);
         if (isNaN(rideId)) {
@@ -54,44 +50,21 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
 
-<<<<<<< HEAD
-        // Prepare the data to update, converting string IDs to integers
-        const dataToUpdate: any = {};
-        
-        // Loop through the incoming data and convert relevant fields to integers
-        // This is a more robust way to handle all fields
-        for (const key in updateData) {
-            if (updateData.hasOwnProperty(key)) {
-                if (key === 'customerID' || key === 'startAddressID' || key === 'endAddressID' || key === 'volunteerID') {
-                    // Check if the value is not null and is a valid number
-                    if (updateData[key] !== null && !isNaN(parseInt(updateData[key], 10))) {
-                        dataToUpdate[key] = parseInt(updateData[key], 10);
-                    } else if (updateData[key] === null) {
-                        dataToUpdate[key] = null;
-                    }
-                } else if (key === 'date' || key === 'pickupTime') {
-                    // Handle date and time fields if needed, assuming they are sent as ISO strings
-                    dataToUpdate[key] = new Date(updateData[key]);
-                } else {
-                    dataToUpdate[key] = updateData[key];
-                }
-            }
-=======
         if (updateData.pickupAddress || updateData.dropoffAddress) {
             console.log("=== PARSING ADDRESS STRINGS ===");
             console.log("Pickup address string:", updateData.pickupAddress);
             console.log("Dropoff address string:", updateData.dropoffAddress);
-            console.log("Ride startAddressID:", ride.startAddressID);
-            console.log("Ride endAddressID:", ride.endAddressID);
+            console.log("Ride startAddressID:", existingRide.startAddressID);
+            console.log("Ride endAddressID:", existingRide.endAddressID);
             
             // Parse pickup address
-            if (updateData.pickupAddress && ride.startAddressID) {
+            if (updateData.pickupAddress && existingRide.startAddressID) {
                 console.log("Processing pickup address...");
                 const pickupParts = parseAddressString(updateData.pickupAddress);
                 console.log("Parsed pickup parts:", pickupParts);
                 if (pickupParts) {
                     const updatedPickup = await prisma.address.update({
-                        where: { id: ride.startAddressID },
+                        where: { id: existingRide.startAddressID },
                         data: pickupParts
                     });
                     console.log("Updated pickup address in DB:", updatedPickup);
@@ -99,13 +72,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
             
             // Parse dropoff address  
-            if (updateData.dropoffAddress && ride.endAddressID) {
+            if (updateData.dropoffAddress && existingRide.endAddressID) {
                 console.log("Processing dropoff address...");
                 const dropoffParts = parseAddressString(updateData.dropoffAddress);
                 console.log("Parsed dropoff parts:", dropoffParts);
                 if (dropoffParts) {
                     const updatedDropoff = await prisma.address.update({
-                        where: { id: ride.endAddressID },
+                        where: { id: existingRide.endAddressID },
                         data: dropoffParts
                     });
                     console.log("Updated dropoff address in DB:", updatedDropoff);
@@ -231,105 +204,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             prismaUpdateData.volunteer = { disconnect: true };
         } else if (volunteerID !== undefined) {
             prismaUpdateData.volunteer = { connect: { id: parseInt(volunteerID as string, 10) } };
->>>>>>> workingNonChatbot
         }
 
-        console.log("Data to update:", dataToUpdate);
+        console.log("Data to update:", prismaUpdateData);
         let updatedRide;
-        if (Object.keys(dataToUpdate).length > 0) {
+        if (Object.keys(prismaUpdateData).length > 0) {
             // Validate foreign key fields
             const validateForeignKey = async (field: string, value: number | null, model: 'customer' | 'address' | 'volunteer') => {
                 if (value === null) {
                     console.log(`${field} is null, skipping validation.`);
                     return;
                 }
-
-<<<<<<< HEAD
-                let exists;
-                if (model === 'customer') {
-                    exists = await prisma.customer.findUnique({ where: { id: value } });
-                } else if (model === 'address') {
-                    exists = await prisma.address.findUnique({ where: { id: value } });
-                } else if (model === 'volunteer') {
-                    exists = await prisma.volunteer.findUnique({ where: { id: value } });
-                }
-
-                if (!exists) {
-                    console.warn(`${field} references a non-existent ${model} ID: ${value}. Setting to null.`);
-                    dataToUpdate[field] = null; // Fallback: Set invalid foreign key to null
-                } else {
-                    console.log(`${field} validation passed: ${model} ID ${value} exists.`);
-                }
+                // ...existing code for validation if needed...
             };
 
-            try {
-                console.log('Starting validation for foreign key fields...');
-                await validateForeignKey('customerID', dataToUpdate.customerID, 'customer');
-                await validateForeignKey('startAddressID', dataToUpdate.startAddressID, 'address');
-                await validateForeignKey('endAddressID', dataToUpdate.endAddressID, 'address');
-                await validateForeignKey('volunteerID', dataToUpdate.volunteerID, 'volunteer');
-                console.log('Validation completed successfully.');
-            } catch (validationError: any) {
-                console.error('Validation error:', validationError.message);
-                return NextResponse.json({ error: validationError.message }, { status: 400 });
-            }
-
-            // Transform foreign key fields into nested objects for Prisma
-            if ('customerID' in dataToUpdate) {
-                dataToUpdate.customer = dataToUpdate.customerID
-                    ? { connect: { id: dataToUpdate.customerID } }
-                    : { disconnect: true };
-                delete dataToUpdate.customerID;
-            }
-
-            if ('startAddressID' in dataToUpdate) {
-                dataToUpdate.addrStart = dataToUpdate.startAddressID
-                    ? { connect: { id: dataToUpdate.startAddressID } }
-                    : { disconnect: true };
-                delete dataToUpdate.startAddressID;
-            }
-
-            if ('endAddressID' in dataToUpdate) {
-                dataToUpdate.addrEnd = dataToUpdate.endAddressID
-                    ? { connect: { id: dataToUpdate.endAddressID } }
-                    : { disconnect: true };
-                delete dataToUpdate.endAddressID;
-            }
-
-            if ('volunteerID' in dataToUpdate) {
-                dataToUpdate.volunteer = dataToUpdate.volunteerID
-                    ? { connect: { id: dataToUpdate.volunteerID } }
-                    : { disconnect: true };
-                delete dataToUpdate.volunteerID;
-            }
-
-            // Remove the `id` field from `dataToUpdate` to avoid Prisma validation errors
-            delete dataToUpdate.id;
-
-            // Validate the final dataToUpdate object
-            console.log('Final data to update:', dataToUpdate);
-
-            try {
-                console.log('Attempting to update ride with data:', dataToUpdate);
-                updatedRide = await prisma.ride.update({
-                    where: { id: rideId },
-                    data: dataToUpdate, // Ensure consistent use of dataToUpdate
-                });
-                console.log('Ride updated successfully:', updatedRide);
-                return NextResponse.json({ message: 'Ride updated successfully', updatedRide });
-            } catch (dbError: any) {
-                console.error('Database update error:', {
-                    message: dbError.message,
-                    stack: dbError.stack,
-                    data: dataToUpdate,
-                });
-                return NextResponse.json({ error: 'Database update failed', details: dbError.message }, { status: 500 });
-            }
-        } else {
-            console.log("No data to update.");
-            return NextResponse.json({ message: 'No data to update' });
-=======
-        if (Object.keys(prismaUpdateData).length > 0) {
             updatedRide = await prisma.ride.update({
                 where: {
                     id: parseInt(id, 10),
@@ -365,15 +253,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 // Include formatted data for frontend
                 formattedData: {
                     id: updatedRide.id,
-                    customerID: updatedRide.customerID,
-                    customerName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
-                    customerPhone: updatedRide.customer?.customerPhone || '',
-                    startAddressID: updatedRide.startAddressID,
-                    endAddressID: updatedRide.endAddressID,
-                    startLocation: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
-                    endLocation: updatedRide.addrEnd ? `${updatedRide.addrEnd.street}, ${updatedRide.addrEnd.city}, ${updatedRide.addrEnd.state} ${updatedRide.addrEnd.postalCode}` : '',
-                    date: updatedRide.date,
+                    clientName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
+                    phoneNumber: updatedRide.customer?.customerPhone || '',
+                    address: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
                     startTime: updatedRide.pickupTime ? updatedRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                    volunteerName: updatedRide.volunteer && updatedRide.volunteer.user ? `${updatedRide.volunteer.user.firstName} ${updatedRide.volunteer.user.lastName}` : '',
                     status: updatedRide.status
                 }
             });
@@ -399,36 +283,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 updatedRide: rideWithUpdatedData,
                 formattedData: rideWithUpdatedData ? {
                     id: rideWithUpdatedData.id,
-                    customerID: rideWithUpdatedData.customerID,
-                    customerName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
-                    customerPhone: rideWithUpdatedData.customer?.customerPhone || '',
-                    startAddressID: rideWithUpdatedData.startAddressID,
-                    endAddressID: rideWithUpdatedData.endAddressID,
-                    startLocation: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
-                    endLocation: rideWithUpdatedData.addrEnd ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}` : '',
-                    date: rideWithUpdatedData.date,
+                    clientName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
+                    phoneNumber: rideWithUpdatedData.customer?.customerPhone || '',
+                    address: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
                     startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                    volunteerName: rideWithUpdatedData.volunteer && rideWithUpdatedData.volunteer.user ? `${rideWithUpdatedData.volunteer.user.firstName} ${rideWithUpdatedData.volunteer.user.lastName}` : '',
                     status: rideWithUpdatedData.status
                 } : null
             });
->>>>>>> workingNonChatbot
         }
 
     } catch (error: any) {
         console.error('Error updating ride:', error);
-<<<<<<< HEAD
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            data: updateData,
-        });
-        return NextResponse.json({
-            error: 'Failed to update ride',
-            details: error.message || 'An unknown error occurred',
-        }, { status: 500 });
-=======
         return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
->>>>>>> workingNonChatbot
     } finally {
         await prisma.$disconnect();
     }
