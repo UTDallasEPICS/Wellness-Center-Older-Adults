@@ -118,7 +118,7 @@ export default function Page() {
 
     const fetchAddresses = async () => {
         try {
-            const response = await fetch("/api/addresses");
+            const response = await fetch("/api/getAvailableRides");
             if (response.ok) {
                 const data = await response.json();
                 setAddresses(data);
