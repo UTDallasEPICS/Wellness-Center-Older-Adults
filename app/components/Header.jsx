@@ -8,7 +8,6 @@ export default function Header() {
           <Image
             className="w-40 h-auto"
             src={logo}
-            alt="Logo"
             width={1600}
             height={800}
           />

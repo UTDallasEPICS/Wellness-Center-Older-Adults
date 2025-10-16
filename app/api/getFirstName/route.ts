@@ -54,7 +54,7 @@ export async function GET() {
       return NextResponse.json({ error: "Admin not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: `Welcome, ${admin.firstName}!` });
+    return NextResponse.json({ message: `Hello ${admin.firstName}!` });
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json(

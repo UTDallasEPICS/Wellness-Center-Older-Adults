@@ -28,16 +28,16 @@ const ReadOnlyRow = ({
 
   return (
     <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200">
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         {contact.customerName}
       </td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         {contact.phoneNumber}
       </td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         {startAddress}
       </td>
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
+      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
         {typeof convertTime === 'function' ? convertTime(contact.startTime) : contact.startTime}
       </td>
       
