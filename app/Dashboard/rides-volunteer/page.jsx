@@ -6,8 +6,6 @@ import ReservedRidesTable from "../../components/ReservedRidesTable";
 
 
 export default function Page() {
-    // 1. Get the real user object from your actual auth system
-    const { user } = useAuth(); 
   
     const [ridesData, setRidesData] = useState([]);
     const [activeTab, setActiveTab] = useState("available");
