@@ -55,52 +55,51 @@ export async function POST(req: Request) {
 
         // Use a transaction to ensure atomicity
         const createdRide = await prisma.$transaction(async (tx) => {
-            // 2. Create the Pickup Address
-
-            // Check if the pickup address already exists in the database
+            
+            // check address to see if it exists
             let startAddress = await tx.address.findFirst({
-            where: {
-                street: pickupStreet,
-                city: pickupCity,
-                state: pickupState,
-                postalCode: pickupZip,
-            },
-            });
-
-            // If the pickup address doesn't exist, create a new record
-            if (!startAddress) {
+                where: {
+                  street: pickupStreet,
+                  city: pickupCity,
+                  state: pickupState,
+                  postalCode: pickupZip,
+                },
+              });
+        
+              // If the pickup address doesn't exist, create a new record
+              if (!startAddress) {
                 startAddress = await tx.address.create({
-                data: {
+                  data: {
                     street: pickupStreet,
                     city: pickupCity,
                     state: pickupState,
                     postalCode: pickupZip,
-                },
+                  },
                 });
-            }
-
+              }
         
-            // Check if the destination address already exists in the database
-            let endAddress = await tx.address.findFirst({
-            where: {
-                street: destinationStreet,
-                city: destinationCity,
-                state: destinationState,
-                postalCode: destinationZip,
+              
+              // Check if the destination address already exists in the database
+              let endAddress = await tx.address.findFirst({
+                where: {
+                  street: destinationStreet,
+                  city: destinationCity,
+                  state: destinationState,
+                  postalCode: destinationZip,
                 },
-            });
-
-            // If the destination address doesn't exist, create a new record
-            if (!endAddress) {
+              });
+        
+              // If the destination address doesn't exist, create a new record
+              if (!endAddress) {
                 endAddress = await tx.address.create({
-                data: {
+                  data: {
                     street: destinationStreet,
                     city: destinationCity,
                     state: destinationState,
                     postalCode: destinationZip,
-                },
+                  },
                 });
-            }
+              }
 
             // 5. Create the Ride record, linking to the created addresses and customer
             const ride = await tx.ride.create({
