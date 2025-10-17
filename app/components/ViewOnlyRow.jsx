@@ -88,14 +88,14 @@ const ViewOnlyRow = ({
   const rideStatus = contact.status; 
   const isRideAvailable = rideStatus === "AVAILABLE"; 
 
-  return (
-    <tr>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{contact.customerName}</td>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{contact.customerPhone}</td>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{contact.address}</td>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{formattedDate}</td>
-      <td className="text-center bg-white text-[20px] py-4 px-2 font-light">{formattedTime}</td>
-      
+  return (
+    <tr>
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerName}</td>
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerPhone}</td>
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.startLocation}</td>
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedDate}</td>
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{formattedTime}</td>
+      
       {/* 🔑 ACTION BUTTONS COLUMN - THE CORE FIX IS HERE */}
       <td className="text-center bg-white text-[20px] py-4 px-2 font-light">
           <div className="flex justify-center">
@@ -146,6 +146,10 @@ const ViewOnlyRow = ({
                 </>
             )}
           </div>
+      </td>
+      
+      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
+          {contact.totalTime || "N/A"}
       </td>
       
       <td className="text-center bg-white text-[20px] py-4 px-2 font-light">

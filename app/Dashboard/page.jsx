@@ -57,31 +57,37 @@ export default function Page() {
         console.error('Error fetching user name:', error);
       }
     }
-
+    
     async function fetchRides() {
-      try {
-        const response = await fetch("/api/getAvailableRides");
-        if (!response.ok) throw new Error("Failed to fetch rides");
-        const data = await response.json();
+        try {
+          const response = await fetch("/api/getAvailableRides");
+          if (!response.ok) throw new Error("Failed to fetch rides");
+          const data = await response.json();
 
-        // Filter rides for current year
-        const currentYear = new Date().getFullYear();
-        const ridesThisYear = data.filter(
-          ride => new Date(ride.date).getFullYear() === currentYear
-        );
+          // Filter rides for current year
+          const currentYear = new Date().getFullYear();
+          const ridesThisYear = data.filter(
+            ride => new Date(ride.date).getFullYear() === currentYear
+          );
 
-        console.log("Rides this year:", ridesThisYear);
+          console.log("Rides this year:", ridesThisYear);
 
-        setRidesData(ridesThisYear);
+          setRidesData(ridesThisYear);
 
-        // Calculate percentage
-        const completedRides = ridesThisYear.filter(r => r.status === "Completed").length;
-        const percentage = ridesThisYear.length === 0 ? 0 : Math.round((completedRides / ridesThisYear.length) * 100);
-        setRidesPercentage(percentage);
+          // Calculate percentage
+          const completedRides = ridesThisYear.filter(r => r.status === "Completed").length;
+          const percentage = ridesThisYear.length === 0 ? 0 : Math.round((completedRides / ridesThisYear.length) * 100);
+          setRidesPercentage(percentage);
 
-      } catch (err) {
-        console.error(err);
-      }
+        } catch (err) {
+          console.error(err);
+        }
+
+    }
+
+    async function fetchUserRoleAndName() {
+      await fetchRides;
+      await fetchUserName;
     }
 
     fetchUserRoleAndName();

@@ -50,6 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
 
+        // Handle address updates if provided
         if (updateData.pickupAddress || updateData.dropoffAddress) {
             console.log("=== PARSING ADDRESS STRINGS ===");
             console.log("Pickup address string:", updateData.pickupAddress);
@@ -115,6 +116,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
 
+        // Handle address updates
         if (updateData.addressUpdates) {
             console.log("=== ADDRESS UPDATE ===");
             console.log("Address ID:", updateData.addressUpdates.id);
@@ -207,18 +209,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         console.log("Data to update:", prismaUpdateData);
-        let updatedRide;
+        
         if (Object.keys(prismaUpdateData).length > 0) {
-            // Validate foreign key fields
-            const validateForeignKey = async (field: string, value: number | null, model: 'customer' | 'address' | 'volunteer') => {
-                if (value === null) {
-                    console.log(`${field} is null, skipping validation.`);
-                    return;
-                }
-                // ...existing code for validation if needed...
-            };
-
-            updatedRide = await prisma.ride.update({
+            const updatedRide = await prisma.ride.update({
                 where: {
                     id: parseInt(id, 10),
                 },
