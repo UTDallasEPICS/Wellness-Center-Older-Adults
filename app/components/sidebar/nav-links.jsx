@@ -64,6 +64,14 @@ export default function NavLinks({ isCollapsed }) {
         <>
           <li>
             <a
+              href="/Dashboard"
+              className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
+            >
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a
               href="/Dashboard/rides-volunteer"
               className="block px-4 py-2 rounded hover:bg-[#e2dbd0]/50 transition"
             >

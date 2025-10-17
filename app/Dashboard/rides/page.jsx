@@ -167,34 +167,62 @@ export default function Page() {
     };
     // ------------------------------------
 
-
-    // --- NEW HANDLER FOR VOLUNTEERS TO RESERVE A RIDE ---
-    const handleReserveRide = async (rideId) => {
-        try {
-            const response = await fetch(`/api/reserveRide/${rideId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // The backend API should automatically assign the logged-in volunteer's ID
-                body: JSON.stringify({ status: 'Reserved' }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to reserve ride: ${response.status} - ${errorData?.message || 'Unknown error'}`);
-            }
-            
-            toast.success("Ride reserved successfully! Check the Reserved tab.");
-            // Immediately update the local state to reflect the change
-            fetchRides(); // Re-fetch the full list of rides
-            router.push('/Dashboard/rides?tab=reserved'); // Navigate to reserved tab
-        } catch (error) {
-            console.error("Error reserving ride:", error);
-            toast.error(`Failed to reserve ride: ${error.message}`);
+const handleEditRide = async (updatedRideData) => {
+    try {
+        const rideResponse = await fetch(`/api/rides/${updatedRideData.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                customerID: updatedRideData.customerID,
+                date: updatedRideData.date,
+                pickupTime: updatedRideData.pickupTime,
+                startAddressID: updatedRideData.startAddressID,
+                endAddressID: updatedRideData.endAddressID,
+                volunteerID: updatedRideData.volunteerID,
+                status: updatedRideData.status,
+                // Include the updates data for customer and address
+                customerUpdates: updatedRideData.customerUpdates,
+                addressUpdates: updatedRideData.addressUpdates,
+                volunteerUpdates: updatedRideData.volunteerUpdates
+            }),
+        });
+        if (!rideResponse.ok) {
+            const errorData = await rideResponse.json();
+            throw new Error(
+                `Failed to update ride: ${rideResponse.status} - ${
+                    errorData?.message || "Unknown error"
+                }`
+            );
         }
-    };
-    // ----------------------------------------------------
+
+        const responseData = await rideResponse.json();
+        console.log("=== RIDE UPDATE RESPONSE ===");
+        console.log("Response data:", responseData);
+
+        // Update local state immediately with the response data
+        if (responseData.formattedData) {
+            setRidesData(currentRides => 
+                currentRides.map(ride => 
+                    ride.id === updatedRideData.id 
+                        ? { ...ride, ...responseData.formattedData }
+                        : ride
+                )
+            );
+        }
+
+        toast.success("Ride updated successfully!");
+        await fetchRides();
+        if (rideDetails?.id === updatedRideData.id) {
+            await fetchRideDetails(updatedRideData.id);
+        }
+
+    } catch (error) {
+        console.error("Error updating ride:", error);
+        toast.error(`Failed to update ride: ${error.message}`);
+    }
+};
 
 
     useEffect(() => {
