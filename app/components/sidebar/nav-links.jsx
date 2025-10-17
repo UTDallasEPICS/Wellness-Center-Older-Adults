@@ -80,31 +80,6 @@ export default function NavLinks({ isCollapsed }) {
           </li>
         </>
       )}
-
-      <li>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 w-full text-left px-6 py-3 text-red-600 rounded-lg hover:bg-red-50 transition"
-        >
-        {/*}   Log Out
-        // </button>/*}*/}
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H6"
-            />
-          </svg>
-          {!isCollapsed && <span>Log Out</span>}
-        </button>
-      </li>
     </ul>
   );
 }
