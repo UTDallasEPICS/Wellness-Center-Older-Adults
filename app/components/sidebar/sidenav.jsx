@@ -11,7 +11,7 @@ const SideNav = ({ toggleCollapse, isCollapsed }) => {
     >
       <div className="flex items-center justify-between h-[70px] px-4 border-b border-gray-200">
           <div className="flex items-center space-x-2 overflow-hidden">
-            <Image src="/favicon.ico" width={30} height={30} alt="Site Favicon" />
+        <Image src="/favicon.ico" width={30} height={30} alt="Site Favicon" />
             {!isCollapsed && (
               <span className="font-semibold text-lg text-green-800">WCOA</span>
             )}

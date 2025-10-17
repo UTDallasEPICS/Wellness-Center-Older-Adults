@@ -9,6 +9,7 @@ import {
   Folder,
   Clock,
   Settings,
+  LogOut,
 } from "lucide-react";
 
 export default function NavLinks({ isCollapsed }) {
@@ -80,6 +81,22 @@ export default function NavLinks({ isCollapsed }) {
           </li>
         </>
       )}
+              {/*}   Log Out
+        // </button>/*}*/}
+{/* Log Out Button */}
+      <li>
+        <button
+          onClick={handleLogout} // Calls the logout function from useAuth
+          // Apply consistent styling, usually differentiating log out with a red hover color
+          className={`w-full flex items-center gap-3 px-6 py-3 text-green-900 rounded-lg hover:bg-red-100 hover:text-red-600 transition ${
+            isCollapsed ? "justify-center" : ""
+          }`}
+        >
+          {/* Using the LogOut icon from lucide-react for consistency */}
+          <LogOut className="size-5" />
+          {!isCollapsed && <span>Log Out</span>}
+        </button>
+      </li>
     </ul>
   );
 }
