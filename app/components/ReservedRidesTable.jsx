@@ -1,16 +1,15 @@
+// Updated ReservedRidesTable.jsx with correct field mappings
 import { useState, Fragment, useEffect } from "react";
 import ReadOnlyRow from "./ReadOnlyRow";
 import EditableRow from "./EditableRow";
 
-// NOTE: The previous full component needed 'isVolunteer' in the props. 
-// I am re-adding it here as it was logically present in the component's JSX structure.
 const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, convertTime, isVolunteer }) => {
   const [contacts, setContacts] = useState(initialContacts);
   const [editContactId, setEditContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({
-    clientName: "",
+    customerName: "",
     phoneNumber: "",
-    address: "",
+    startAddress: "",
     startTime: "",
     volunteerName: "",
   });
@@ -23,10 +22,10 @@ const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, con
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
-      clientName: contact.clientName,
+      customerName: contact.customerName,
       phoneNumber: contact.phoneNumber,
-      address: contact.address,
-      startTime: convertTime ? convertTime(contact.startTime) : contact.startTime,
+      startAddress: contact.startAddress,
+      startTime: contact.startTime,
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
@@ -43,62 +42,30 @@ const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, con
 
   const handleEditFormSubmit = async (event) => {
     event.preventDefault();
-    try {
-      const response = await fetch(`/api/rides/${editContactId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editFormData),
-      });
+    const updatedRide = {
+      id: editContactId,
+      customerName: editFormData.customerName,
+      phoneNumber: editFormData.phoneNumber,
+      startAddress: editFormData.startAddress,
+      startTime: editFormData.startTime,
+      volunteerName: editFormData.volunteerName,
+      status: contacts.find((contact) => contact.id === editContactId).status,
+    };
 
-      if (!response.ok) {
-        console.error("Failed to update ride:", response.status);
-        return;
-      }
-
-      const updatedRide = await response.json();
-      const newContacts = contacts.map((contact) =>
-        contact.id === editContactId ? updatedRide : contact
-      );
-      setContacts(newContacts);
-      setEditContactId(null);
-      if (onRideUpdated) {
-        onRideUpdated(updatedRide);
-      }
-    } catch (error) {
-      console.error("Error updating ride:", error);
-    }
-  }; // <--- CORRECTED: This brace closes handleEditFormSubmit
-
-  const handleCancelClick = async (contactId) => {
-    try {
-      const response = await fetch(`/api/deleteRides/${contactId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        console.error("Failed to cancel ride:", response.status);
-        const errorData = await response.text();
-        console.error("Error data:", errorData);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Deletion successful:", data);
-
-      if (onRideDeleted) {
-        onRideDeleted(contactId);
-      }
-      const newContacts = contacts.filter((contact) => contact.id !== contactId);
-      setContacts(newContacts);
-    } catch (error) {
-      console.error("Error deleting ride:", error);
-    }
+    const newContacts = contacts.map((contact) =>
+      contact.id === editContactId ? updatedRide : contact
+    );
+    setContacts(newContacts);
+    setEditContactId(null);
+    if (onRideUpdated) onRideUpdated(updatedRide);
   };
 
+  const handleCancelClick = async (contactId) => {
+    const newContacts = contacts.filter((contact) => contact.id !== contactId);
+    setContacts(newContacts);
+    if (onRideDeleted) onRideDeleted(contactId);
+  };
 
-  // *** MISSING RETURN STATEMENT AND JSX START HERE ***
   return (
     <div className="flex flex-col gap-2.5 p-4 font-sans overflow-x-auto max-h-[400px] overflow-y-auto">
       <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
@@ -109,11 +76,9 @@ const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, con
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
-              {/* Conditionally render Volunteer Name header */}
               {!isVolunteer && (
                 <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Volunteer Name</th>
               )}
-              {/* Conditionally render Actions header */}
               {!isVolunteer && (
                 <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
               )}
@@ -130,18 +95,18 @@ const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, con
                       handleEditFormChange={handleEditFormChange}
                       status={contact.status}
                       handleCancelClick={() => setEditContactId(null)}
-                      isVolunteer={isVolunteer} // Pass down isVolunteer
+                      isVolunteer={isVolunteer}
                     />
                   ) : (
                     <ReadOnlyRow
                       key={contact.id}
                       contact={contact}
                       handleEditClick={handleEditClick}
-                      handleDeleteClick={handleCancelClick}
+                      handleDeleteClick={() => handleCancelClick(contact.id)}
                       status={contact.status}
                       convertTime={convertTime}
-                      startAddress={contact.address}
-                      isVolunteer={isVolunteer} // Pass down isVolunteer
+                      startAddress={contact.startAddress}
+                      isVolunteer={isVolunteer}
                     />
                   )}
                 </Fragment>
@@ -151,6 +116,6 @@ const ReservedRidesTable = ({ initialContacts, onRideDeleted, onRideUpdated, con
       </form>
     </div>
   );
-}; // <--- **CRITICAL: This brace closes the ReservedRidesTable component**
+};
 
 export default ReservedRidesTable;
