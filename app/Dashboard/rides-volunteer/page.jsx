@@ -1,12 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify"; 
-
-// 🔑 ACTION REQUIRED: Replace 'path/to/your/auth/hook' with the actual path
-// to your real authentication hook (e.g., ../../hooks/useAuth).
-import { useAuth } from 'path/to/your/auth/hook'; 
-
-// Assuming DisplayRidesTable and ReservedRidesTable are wrappers around the table component
 import DisplayRidesTable from "../../components/DisplayRidesTable"; 
 import ReservedRidesTable from "../../components/ReservedRidesTable";
 
