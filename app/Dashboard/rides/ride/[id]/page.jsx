@@ -24,13 +24,26 @@ export default function Ride() {
           throw new Error(`Failed to fetch ride details: ${response.status}`);
         }
         const data = await response.json();
-        setRideDetails(data);
-        setPickupAddress(data.pickupAddress || '');
-        setDropoffAddress(data.dropoffAddress || '');
-        setPickupTime(data.pickupTime || '');
-        setDriveTimeAB(data.driveTimeAB || '');
-        setMileage(data.mileage || '');
-        setNotes(data.notes || '');
+        
+        // Ensure data fields exist, defaulting to empty strings if null/undefined
+        const enrichedData = {
+          ...data,
+          finalAddress: data.finalAddress || data.pickupAddress || '', // Assuming C is often the return to A
+          wait_time: data.wait_time || '', 
+          mileage: data.mileage || '',
+          driveTimeAB: data.driveTimeAB || '',
+          pickupTime: data.pickupTime || '',
+          customer: data.customer || { name: '' },
+          notes: data.notes || '',
+        };
+        
+        setRideDetails(enrichedData);
+        setPickupAddress(enrichedData.pickupAddress || '');
+        setDropoffAddress(enrichedData.dropoffAddress || '');
+        setPickupTime(enrichedData.pickupTime || '');
+        setDriveTimeAB(enrichedData.driveTimeAB || '');
+        setMileage(enrichedData.mileage || '');
+        setNotes(enrichedData.notes || '');
       } catch (err) {
         setError(err.message);
       }
@@ -39,43 +52,44 @@ export default function Ride() {
     fetchRideDetails();
   }, [id]);
 
-  if (error) return <div className="text-red-600">Error: {error}</div>;
-  if (!rideDetails) return <div className="animate-pulse">Loading...</div>;
+  if (error) return <div className="text-red-600 p-5">Error: {error}</div>;
+  if (!rideDetails) return <div className="animate-pulse p-5">Loading...</div>;
 
+  // Formats time from 24-hour string (e.g., "21:30") to "9:30 pm"
   function formatTime(timeString) {
     if (!timeString) return "";
-    const [hours, minutes] = timeString.split(":");
-    let formattedHours = parseInt(hours, 10);
-    const formattedMinutes = String(minutes).padStart(2, "0");
-    const ampm = formattedHours >= 12 ? 'PM' : 'AM';
-    formattedHours = formattedHours % 12;
-    formattedHours = formattedHours ? formattedHours : 12;
-    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    try {
+        const [hours, minutes] = timeString.split(":").map(n => parseInt(n, 10));
+        const date = new Date(0, 0, 0, hours, minutes);
+        const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        return formattedTime.toLowerCase();
+    } catch {
+        return timeString;
+    }
+  }
+
+  // Formats date to match the image: e.g., "7/7/25"
+  function formatDate(dateInput) {
+    if (!dateInput) return '';
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return dateInput; 
+
+    const year = date.getFullYear().toString().slice(-2);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}/${day}/${year}`;
   }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     switch (name) {
-      case 'pickupAddress':
-        setPickupAddress(value);
-        break;
-      case 'dropoffAddress':
-        setDropoffAddress(value);
-        break;
-      case 'pickupTime':
-        setPickupTime(value);
-        break;
-      case 'driveTimeAB':
-        setDriveTimeAB(value);
-        break;
-      case 'mileage':
-        setMileage(value);
-        break;
-      case 'notes':
-        setNotes(value);
-        break;
-      default:
-        break;
+      case 'pickupAddress': setPickupAddress(value); break;
+      case 'dropoffAddress': setDropoffAddress(value); break;
+      case 'pickupTime': setPickupTime(value); break;
+      case 'driveTimeAB': setDriveTimeAB(value); break;
+      case 'mileage': setMileage(value); break;
+      case 'notes': setNotes(value); break;
+      default: break;
     }
   };
 
@@ -99,18 +113,11 @@ export default function Ride() {
            notes,
         }),
       });
-      if (!response.ok) {
-        throw new Error(`Failed to update ride details: ${response.status}`);
-      }
+      if (!response.ok) { throw new Error(`Failed to update ride details: ${response.status}`); }
 
       const updatedRideDetails = {
         ...rideDetails,
-        pickupAddress,
-        dropoffAddress,
-        pickupTime,
-        driveTimeAB,
-        mileage,
-        notes,
+        pickupAddress, dropoffAddress, pickupTime, driveTimeAB, mileage, notes,
       };
       setRideDetails(updatedRideDetails);
       setIsEditing(false);
@@ -135,22 +142,13 @@ export default function Ride() {
       try {
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json', },
           body: JSON.stringify({ status: 'Reserved' }),
         });
-
-        if (!response.ok) {
-          throw new Error(`Failed to update ride status: ${response.status}`);
-        }
-
-        setRideDetails({ ...rideDetails, status: 'Reserved' }); // Update local state
+        if (!response.ok) { throw new Error(`Failed to update ride status: ${response.status}`); }
+        setRideDetails({ ...rideDetails, status: 'Reserved' });
         router.push('/Dashboard/rides?tab=reserved');
-      } catch (err) {
-        console.error("Error updating ride status:", err);
-        setError("Failed to reserve ride.");
-      }
+      } catch (err) { console.error("Error updating ride status:", err); setError("Failed to reserve ride."); }
     }
   };
 
@@ -159,22 +157,13 @@ export default function Ride() {
       try {
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status: 'AVAILABLE' }),
+          headers: { 'Content-Type': 'application/json', },
+          body: JSON.IFY({ status: 'AVAILABLE' }),
         });
-
-        if (!response.ok) {
-          throw new Error(`Failed to update ride status: ${response.status}`);
-        }
-
-        setRideDetails({ ...rideDetails, status: 'AVAILABLE' }); // Update local state
+        if (!response.ok) { throw new Error(`Failed to update ride status: ${response.status}`); }
+        setRideDetails({ ...rideDetails, status: 'AVAILABLE' });
         router.push('/Dashboard/rides?tab=available');
-      } catch (err) {
-        console.error("Error updating ride status:", err);
-        setError("Failed to unreserve ride.");
-      }
+      } catch (err) { console.error("Error updating ride status:", err); setError("Failed to unreserve ride."); }
     }
   };
 
@@ -183,47 +172,18 @@ export default function Ride() {
       try {
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json', },
           body: JSON.stringify({ status: 'Completed' }),
         });
-
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`);
         }
-
-        setRideDetails({ ...rideDetails, status: 'Completed' }); // Update local state
+        setRideDetails({ ...rideDetails, status: 'Completed' });
         router.push('/Dashboard/rides?tab=completed');
-      } catch (err) {
-        console.error("Error updating ride status to Completed:", err);
-        setError("Failed to mark ride as completed.");
-      }
+      } catch (err) { console.error("Error updating ride status to Completed:", err); setError("Failed to mark ride as completed."); }
     }
   };
-
-  let actionButton;
-  if (rideDetails?.status === 'Reserved') {
-    actionButton = (
-      <>
-        <button
-          className="px-5 py-2 bg-yellow-500 hover:bg-yellow-700 text-white rounded mr-2"
-          onClick={handleUnreserveRide}
-        >
-          Unreserve
-        </button>
-        <button
-          className="px-5 py-2 bg-green-500 hover:bg-[#419902] text-white rounded"
-          onClick={handleCompleteRide}
-        >
-          Completed
-        </button>
-      </>
-    );
-  } else if (rideDetails?.status === 'Completed') {
-    actionButton = null;
-  }
 
   return (
     <div className="flex h-screen">
@@ -372,13 +332,12 @@ export default function Ride() {
       </div>
       
       {/* Right Side: Map */}
-      <div className="w-1/2 h-screen">
-        {console.log({ rideDetails: rideDetails })}
+      <div className="w-1/2 h-full">
         {rideDetails?.pickupAddress && rideDetails?.dropoffAddress && (
           <RideMap
             pickupAddress={isEditing ? pickupAddress : rideDetails.pickupAddress}
             dropoffAddress={isEditing ? dropoffAddress : rideDetails.dropoffAddress}
-            finalAddress={isEditing ? dropoffAddress : rideDetails.dropoffAddress}
+            finalAddress={isEditing ? dropoffAddress : rideDetails.finalAddress} 
           />
         )}
       </div>

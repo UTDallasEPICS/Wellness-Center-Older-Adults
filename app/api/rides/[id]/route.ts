@@ -246,15 +246,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 // Include formatted data for frontend
                 formattedData: {
                     id: updatedRide.id,
-                    customerID: updatedRide.customerID,
-                    customerName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
-                    customerPhone: updatedRide.customer?.customerPhone || '',
-                    startAddressID: updatedRide.startAddressID,
-                    endAddressID: updatedRide.endAddressID,
-                    startLocation: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
-                    endLocation: updatedRide.addrEnd ? `${updatedRide.addrEnd.street}, ${updatedRide.addrEnd.city}, ${updatedRide.addrEnd.state} ${updatedRide.addrEnd.postalCode}` : '',
-                    date: updatedRide.date,
+                    clientName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
+                    phoneNumber: updatedRide.customer?.customerPhone || '',
+                    address: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
                     startTime: updatedRide.pickupTime ? updatedRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                    volunteerName: updatedRide.volunteer && updatedRide.volunteer.user ? `${updatedRide.volunteer.user.firstName} ${updatedRide.volunteer.user.lastName}` : '',
                     status: updatedRide.status
                 }
             });
@@ -280,15 +276,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 updatedRide: rideWithUpdatedData,
                 formattedData: rideWithUpdatedData ? {
                     id: rideWithUpdatedData.id,
-                    customerID: rideWithUpdatedData.customerID,
-                    customerName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
-                    customerPhone: rideWithUpdatedData.customer?.customerPhone || '',
-                    startAddressID: rideWithUpdatedData.startAddressID,
-                    endAddressID: rideWithUpdatedData.endAddressID,
-                    startLocation: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
-                    endLocation: rideWithUpdatedData.addrEnd ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}` : '',
-                    date: rideWithUpdatedData.date,
+                    clientName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
+                    phoneNumber: rideWithUpdatedData.customer?.customerPhone || '',
+                    address: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
                     startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                    volunteerName: rideWithUpdatedData.volunteer && rideWithUpdatedData.volunteer.user ? `${rideWithUpdatedData.volunteer.user.firstName} ${rideWithUpdatedData.volunteer.user.lastName}` : '',
                     status: rideWithUpdatedData.status
                 } : null
             });

@@ -11,7 +11,7 @@ const SideNav = ({ toggleCollapse, isCollapsed }) => {
     >
       <div className="flex items-center justify-between h-[70px] px-4 border-b border-gray-200">
           <div className="flex items-center space-x-2 overflow-hidden">
-          <Image src="/logo.png" alt="Logo" width={30} height={30} />
+          <Image src="/icon.png"  width={30} height={30} />
             {!isCollapsed && (
               <span className="font-semibold text-lg text-green-800">WCOA</span>
             )}
@@ -27,7 +27,7 @@ const SideNav = ({ toggleCollapse, isCollapsed }) => {
       {/* Nav Links */}
       <NavLinks isCollapsed={isCollapsed} />
 
-      {/* Footer: Profile */}
+      {/* Footer: Profile
       <div className="absolute bottom-4 w-full flex justify-center">
         <button className="flex items-center justify-center p-3 rounded-full border border-green-800 text-green-800 hover:bg-green-50 transition">
           <svg
@@ -45,7 +45,7 @@ const SideNav = ({ toggleCollapse, isCollapsed }) => {
             />
           </svg>
         </button>
-      </div>
+      </div>*/}
     </div>
   );
 };
