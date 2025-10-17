@@ -355,22 +355,17 @@ const handleEditRide = async (updatedRideData) => {
 
     return (
         <div className="h-full w-full bg-[#f4f1f0] relative">
-            <style jsx>
-                {`
-                    .main-container {
-                        font-family: sans-serif;
-                    }
-                `}
-            </style>
-            {notification && (
-                <div className="absolute top-4 right-4 z-50">{notification}</div>
-            )}
+            <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
+                <div className="text-black text-left font-light text-[30px]">
+                    <h1>Rides</h1>
+                </div>
+        </div> 
 
             {/* Hide the Add Ride button if the user is a volunteer */}
             {!isVolunteer && (
                 <button
                     type="button"
-                    className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] hover:bg-[#378300] border-none absolute top-[calc(10px-48px)] right-4 z-40 flex items-center justify-center"
+                    className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] hover:bg-[#378300] border-none absolute top-7 [calc(10px-48px)] right-4 z-40 flex items-center justify-center"
                     onClick={() => setIsModalOpen(true)}
                 >
                     <span className="material-symbols-rounded">add</span>
