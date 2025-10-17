@@ -14,20 +14,20 @@ const CompletedRidesTable = ({ initialContacts }) => {
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
-      clientName: contact.clientName,
+      customerName: contact.customerName,
       phoneNumber: contact.phoneNumber,
-      address: contact.address,
-      startTime: contact.startTime,
+      startAddress: contact.startAddress,
+      pickupTime: contact.pickupTime,
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
   };
 
   const [editFormData, setEditFormData] = useState({
-    clientName: "",
+    customerName: "",
     phoneNumber: "",
-    address: "",
-    startTime: "",
+    startAddress: "",
+    pickupTime: "",
     volunteerName: "",
   });
 
@@ -45,10 +45,10 @@ const CompletedRidesTable = ({ initialContacts }) => {
     event.preventDefault();
     const editedContact = {
       id: editContactId,
-      clientName: editFormData.clientName,
+      customerName: editFormData.customerName,
       phoneNumber: editFormData.phoneNumber,
-      address: editFormData.address,
-      startTime: editFormData.startTime,
+      startAddress: editFormData.startAddress,
+      pickupTime: editFormData.pickupTime,
       volunteerName: editFormData.volunteerName,
       status: contacts.find((contact) => contact.id === editContactId).status,
       hours: contacts.find((contact) => contact.id === editContactId).hours,
@@ -121,6 +121,8 @@ return (
                       handleEditClick={handleEditClick}
                       handleDeleteClick={handleDeleteClick}
                       status={contact.status}
+                      startAddress={contact.startAddress}
+                      convertTime={(time) => time}
                     />
                   )}
                 </Fragment>
