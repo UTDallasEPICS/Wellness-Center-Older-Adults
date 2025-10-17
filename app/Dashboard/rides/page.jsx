@@ -46,21 +46,33 @@ const fetchRides = async () => {
             throw new Error(`Failed to fetch rides: ${response.status}`);
         }
         const rawData = await response.json();
+        
+        // ADD THESE LOGS
+        console.log("=== RAW API DATA ===");
+        console.log("First ride from API:", rawData[0]);
+        console.log("Has volunteerName?", rawData[0]?.volunteerName);
+        console.log("Has startAddress?", rawData[0]?.startAddress);
 
         const formattedData = rawData.map((ride) => ({
             id: ride.id,
             customerID: ride.customerID,
             customerName: ride.customerName,
-            customerPhone: ride.customerPhone, // Updated field name
-            phoneNumber: ride.customerPhone, // Keep for backward compatibility
+            customerPhone: ride.customerPhone,
+            phoneNumber: ride.customerPhone,
             startAddressID: ride.startAddressID,
             endAddressID: ride.endAddressID,
             startLocation: ride.startLocation,
             endLocation: ride.endLocation,
+            startAddress: ride.startAddress, // ADD THIS
+            volunteerName: ride.volunteerName, // ADD THIS
             date: ride.date,
             startTime: ride.startTime,
             status: ride.status || "Unreserved",
         }));
+        
+        console.log("=== FORMATTED DATA ===");
+        console.log("First formatted ride:", formattedData[0]);
+        
         setRidesData(formattedData);
     } catch (error) {
         setError(error.message);
@@ -84,7 +96,7 @@ const fetchRides = async () => {
 
     const fetchAddresses = async () => {
         try {
-            const response = await fetch("/api/addresses");
+            const response = await fetch("/api/getAvailableRides");
             if (response.ok) {
                 const data = await response.json();
                 setAddresses(data);

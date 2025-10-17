@@ -13,64 +13,84 @@ export async function GET(req: Request) {
 
   try {
     const rides = await prisma.ride.findMany({
-    select: {
-      id: true,
-      customerID: true,
-      customer: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          customerPhone: true,
+      select: {
+        id: true,
+        customerID: true,
+        customer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            customerPhone: true,
+          },
         },
-      },
-      startAddressID: true,
-      addrStart: {
-        select: {
-          id: true,
-          street: true,
-          city: true,
-          state: true,
-          postalCode: true,
+        startAddressID: true,
+        addrStart: {
+          select: {
+            id: true,
+            street: true,
+            city: true,
+            state: true,
+            postalCode: true,
+          },
         },
-      },
-      endAddressID: true,
-      addrEnd: {
-        select: {
-          id: true,
-          street: true,
-          city: true,
-          state: true,
-          postalCode: true,
+        endAddressID: true,
+        addrEnd: {
+          select: {
+            id: true,
+            street: true,
+            city: true,
+            state: true,
+            postalCode: true,
+          },
         },
+        volunteerID: true,
+        volunteer: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+        date: true,
+        pickupTime: true,
+        status: true,
       },
-      date: true,
-      pickupTime: true,
-      status: true, // Include the status in the fetched data
-    },
-  });
+    });
 
-  const formattedRides = rides.map((ride) => ({
-    id: ride.id,
-  
-    //id constants
-    customerID: ride.customerID,
-    startAddressID: ride.startAddressID,
-    endAddressID: ride.endAddressID,
-  
-    // Editable data
-    customerName: `${ride.customer.firstName} ${ride.customer.lastName}`,
-    customerPhone: ride.customer.customerPhone,
-    startLocation: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
-    endLocation: `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`,
-    date: ride.date.toISOString(), // Convert Date to ISO string
-    startTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }), // Format time as HH:MM
-    status: ride.status, // Include the status in the formatted data
-  }));
+    const formattedRides = rides.map((ride) => ({
+      id: ride.id,
+    
+      // ID constants
+      customerID: ride.customerID,
+      startAddressID: ride.startAddressID,
+      endAddressID: ride.endAddressID,
+      volunteerID: ride.volunteerID,
+    
+      // Editable data
+      customerName: `${ride.customer.firstName} ${ride.customer.lastName}`,
+      phoneNumber: ride.customer.customerPhone,
+      customerPhone: ride.customer.customerPhone,
+      startAddress: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
+      startLocation: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
+      endLocation: `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`,
+      volunteerName: ride.volunteer?.user 
+        ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}` 
+        : '',
+      date: ride.date.toISOString(),
+      startTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+      status: ride.status,
+    }));
 
     return NextResponse.json(formattedRides);
   } catch (error) {
     console.error('Error fetching rides:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
