@@ -1,12 +1,14 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
-const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status, convertTime, startAddress }) => {
+const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status, convertTime, startAddress, hideActions, isVolunteer }) => {
   const router = useRouter();
 
   const handleRowClick = () => {
     router.push(`/Dashboard/rides/ride/${contact.id}`);
   };
+
+  const showVolunteerName = (status === "Reserved" || status === "Completed") && !isVolunteer;
 
   return (
     <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200">
@@ -22,35 +24,37 @@ const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick, status, conv
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
         {typeof convertTime === 'function' ? convertTime(contact.startTime) : contact.startTime}
       </td>
-      {status === "Reserved" || status === "Completed" ? (
+      {showVolunteerName && (
         <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
-          {contact.volunteerName}
+          {contact.volunteerName || 'N/A'}
         </td>
-      ) : null}
-      <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
-        <div className="flex justify-center">
-          <button
-            className="text-white bg-[#419902] cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-[#2b6701]"
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              handleEditClick(event, contact);
-            }}
-          >
-            <span className="material-symbols-rounded">edit</span>
-          </button>
-          <button
-            className="text-white bg-red-500 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-700"
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              handleDeleteClick(contact.id);
-            }}
-          >
-            <span className="material-symbols-rounded">delete</span>
-          </button>
-        </div>
-      </td>
+      )}
+      {!hideActions && (
+        <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">
+          <div className="flex justify-center">
+            <button
+              className="text-white bg-[#419902] cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-[#2b6701]"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleEditClick(event, contact);
+              }}
+            >
+              <span className="material-symbols-rounded">edit</span>
+            </button>
+            <button
+              className="text-white bg-red-500 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-700"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleDeleteClick(contact.id);
+              }}
+            >
+              <span className="material-symbols-rounded">delete</span>
+            </button>
+          </div>
+        </td>
+      )}
     </tr>
   );
 };

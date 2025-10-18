@@ -47,11 +47,6 @@ const fetchRides = async () => {
         }
         const rawData = await response.json();
         
-        // ADD THESE LOGS
-        console.log("=== RAW API DATA ===");
-        console.log("First ride from API:", rawData[0]);
-        console.log("Has volunteerName?", rawData[0]?.volunteerName);
-        console.log("Has startAddress?", rawData[0]?.startAddress);
 
         const formattedData = rawData.map((ride) => ({
             id: ride.id,
