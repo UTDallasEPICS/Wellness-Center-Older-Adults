@@ -1,4 +1,3 @@
-// app/components/AddRidesTable.jsx
 "use client";
 import { useState, useEffect } from "react";
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
@@ -20,25 +19,22 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     setContacts(initialContacts);
   }, [initialContacts]);
 
-  // Helper function to get customer name from ID
+  // Helper functions (kept as is for functionality)
   const getCustomerNameById = (customerID) => {
     const customer = customers?.find(c => c.id === customerID);
     return customer ? `${customer.firstName} ${customer.lastName}` : '';
   };
 
-  // Helper function to get customer phone from ID
   const getCustomerPhoneById = (customerID) => {
     const customer = customers?.find(c => c.id === customerID);
     return customer?.customerPhone || '';
   };
 
-  // Helper function to get address string from ID
   const getAddressById = (addressID) => {
     const address = addresses?.find(a => a.id === addressID);
     return address ? `${address.street}, ${address.city}, ${address.state} ${address.postalCode}` : '';
   };
 
-  // Helper function to get volunteer name from ID
   const getVolunteerNameById = (volunteerID) => {
     const volunteer = volunteers?.find(v => v.id === volunteerID);
     if (volunteer && volunteer.user) {
@@ -47,7 +43,6 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     return '';
   };
 
-  // Helper function to find customer ID by name
   const getCustomerIdByName = (customerName) => {
     const customer = customers?.find(c => 
       `${c.firstName} ${c.lastName}`.toLowerCase() === customerName.toLowerCase()
@@ -55,7 +50,6 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     return customer?.id || null;
   };
 
-  // Helper function to find address ID by address string
   const getAddressIdByString = (addressString) => {
     const address = addresses?.find(a => {
       const fullAddress = `${a.street}, ${a.city}, ${a.state} ${a.postalCode}`;
@@ -64,7 +58,6 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
     return address?.id || null;
   };
 
-  // Helper function to find volunteer ID by name
   const getVolunteerIdByName = (volunteerName) => {
     const volunteer = volunteers?.find(v => {
       if (v.user) {
@@ -114,19 +107,11 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
       pickupDateTimeISO = dateObj.toISOString();
     }
 
-    // Get the original contact to preserve the existing IDs
     const originalContact = contacts.find((contact) => contact.id === editContactId);
 
-    // Parse customer name and phone changes
     let customerUpdates = null;
     const currentCustomerName = originalContact.customerName;
     const currentCustomerPhone = originalContact.customerPhone;
-    
-    console.log("=== CUSTOMER CHANGE DETECTION ===");
-    console.log("Current name:", currentCustomerName);
-    console.log("New name:", editFormData.customerName);
-    console.log("Current phone:", currentCustomerPhone);
-    console.log("New phone:", editFormData.phoneNumber);
     
     if (editFormData.customerName !== currentCustomerName || editFormData.phoneNumber !== currentCustomerPhone) {
       const [firstName, ...lastNameParts] = editFormData.customerName.split(' ');
@@ -136,12 +121,8 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
         lastName: lastNameParts.join(' ') || '',
         customerPhone: editFormData.phoneNumber || currentCustomerPhone
       };
-      
-      console.log("=== CUSTOMER UPDATES CREATED ===");
-      console.log("Customer updates object:", customerUpdates);
     }
 
-    // Parse address changes
     let addressUpdates = null;
     if (editFormData.startAddress && editFormData.startAddress !== originalContact.startLocation) {
       const addressParts = editFormData.startAddress.split(',').map(part => part.trim());
@@ -162,7 +143,6 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
       }
     }
 
-    // Parse volunteer changes
     let volunteerUpdates = null;
     const currentVolunteerName = getVolunteerNameById(originalContact.volunteerID);
     if (editFormData.volunteerName && editFormData.volunteerName !== currentVolunteerName) {
@@ -205,9 +185,11 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
           <thead>
             <tr>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Client Name</th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Date</th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Time</th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
-              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Status</th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
             </tr>
           </thead>
@@ -234,7 +216,8 @@ const AddRidesTable = ({ initialContacts, convertTime, onEditRide, onDeleteRide,
                     handleDeleteClick={handleDeleteClick}
                     convertTime={convertTime}
                     status={contact.status}
-                    startAddress={contact.startLocation} // Pass startLocation directly
+                    startAddress={contact.startLocation}
+                    userRole="ADMIN" // Assuming Admin view for Unreserved table actions
                   />
                 )
               ))}
