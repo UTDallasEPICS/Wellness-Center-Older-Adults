@@ -25,7 +25,9 @@ export default function Page() {
     const [error, setError] = useState(null);
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('available');
-    const [searchTerm, setSearchTerm] = useState(''); // Added state for search input
+    const [searchTerm, setSearchTerm] = useState('');
+    // ⬇️ ADDED STATE FOR CHECKBOX SELECTION ⬇️
+    const [selectedRides, setSelectedRides] = useState([]);
 
     const convertTo12Hour = (time24) => {
         if (!time24) return "";
@@ -39,6 +41,29 @@ export default function Page() {
         }
         return `${hours12}:${minutes} ${ampm}`;
     };
+
+    // ⬇️ HANDLER TO TOGGLE INDIVIDUAL RIDE SELECTION ⬇️
+    const handleToggleRideSelection = (rideId) => {
+        setSelectedRides(prevSelected => {
+            if (prevSelected.includes(rideId)) {
+                return prevSelected.filter(id => id !== rideId);
+            } else {
+                return [...prevSelected, rideId];
+            }
+        });
+    };
+
+    // ⬇️ HANDLER TO TOGGLE ALL VISIBLE RIDES IN A TAB ⬇️
+    const handleToggleAllRides = (currentTableRides, isChecked) => {
+        if (isChecked) {
+            const allIds = currentTableRides.map(ride => ride.id);
+            // This implementation simplifies by just setting the selected IDs for the current filtered list
+            setSelectedRides(allIds); 
+        } else {
+            setSelectedRides([]);
+        }
+    };
+
 
     const fetchRides = async () => {
         setLoading(true);
@@ -441,6 +466,10 @@ export default function Page() {
                     onDeleteRide={handleDeleteRide}
                     customers={customers}
                     addresses={addresses}
+                    // ⬇️ ADDED PROPS ⬇️
+                    selectedRides={selectedRides} 
+                    onToggleSelect={handleToggleRideSelection}
+                    onToggleAll={handleToggleAllRides}
                 />
             ),
         },
@@ -453,6 +482,10 @@ export default function Page() {
                     convertTime={convertTo12Hour}
                     onRideDeleted={handleDeleteRide}
                     onRideUpdated={handleEditRide}
+                    // ⬇️ ADDED PROPS ⬇️
+                    selectedRides={selectedRides} 
+                    onToggleSelect={handleToggleRideSelection}
+                    onToggleAll={handleToggleAllRides}
                 />
             ),
         },
@@ -464,6 +497,10 @@ export default function Page() {
                     initialContacts={filterRides("Completed")}
                     convertTime={convertTo12Hour}
                     onDeleteRide={handleDeleteRide}
+                    // ⬇️ ADDED PROPS ⬇️
+                    selectedRides={selectedRides} 
+                    onToggleSelect={handleToggleRideSelection}
+                    onToggleAll={handleToggleAllRides}
                 />
             ),
         },
@@ -472,7 +509,7 @@ export default function Page() {
     // --- Main Rides Page UI with Search and New Layout ---
     return (
         <div className="h-full w-full p-10 bg-[#f4f4f4] flex justify-center">
-            {/* The main content container (max-width for better desktop display) */}
+            {/* The main content container (max-w-6xl for better desktop display) */}
             <div className="max-w-6xl w-full">
                 
                 {/* Header and Add Button */}

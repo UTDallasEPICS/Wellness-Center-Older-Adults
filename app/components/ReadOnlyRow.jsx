@@ -1,4 +1,3 @@
-// app/components/ReadOnlyRow.jsx
 import React from "react";
 import { useRouter } from "next/navigation";
 
@@ -10,7 +9,10 @@ const ReadOnlyRow = ({
     status, 
     convertTime, 
     startAddress, 
-    userRole = "ADMIN" // Default role for safety
+    userRole = "ADMIN", // Default role for safety
+    // ⬇️ NEW PROPS FOR CHECKBOX SELECTION ⬇️
+    selected,
+    onToggleSelect
 }) => {
     const router = useRouter();
     
@@ -29,74 +31,104 @@ const ReadOnlyRow = ({
         return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().slice(-2)}`;
     }
 
-    // Determine if the Volunteer Name column should be present
+    // ⬇️ UPDATED LOGIC: Only show Volunteer column if status is Reserved or Completed ⬇️
     const showVolunteerColumn = status === "Reserved" || status === "Completed";
     
-    // Use contact.customerPhone as it's passed from the parent Page.jsx
     const contactNumber = contact.customerPhone || contact.phoneNumber;
 
     return (
-        <tr onClick={handleRowClick} className="cursor-pointer hover:bg-gray-100 transition-colors duration-200 border-b border-gray-100">
-            {/* 1. Client Name */}
-            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-800">
-                {contact.customerName}
+        <tr className="cursor-pointer hover:bg-gray-100 transition-colors duration-200 border-b border-gray-100">
+            
+            {/* 0. CHECKBOX COLUMN */}
+            <td className="p-3 text-center w-12" onClick={(e) => e.stopPropagation()}>
+                <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => onToggleSelect(contact.id)}
+                    className="h-5 w-5 rounded border-gray-300 text-[#419902] focus:ring-[#419902]"
+                />
             </td>
             
-            {/* 2. Date */}
-            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600">
-                {formatDate(contact.date)}
+            {/* 1. Client Name + Date (Combined for display) */}
+            <td 
+                className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-800"
+                onClick={handleRowClick}
+            >
+                <div className="flex flex-col items-center">
+                    <span className="font-semibold">{contact.customerName}</span>
+                    <span className="text-sm font-normal text-gray-500">
+                        {formatDate(contact.date)}
+                    </span>
+                </div>
             </td>
-
-            {/* 3. Time */}
-            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600">
-                {typeof convertTime === 'function' ? convertTime(contact.startTime) : contact.startTime}
-            </td>
-
-            {/* 4. Contact Number */}
-            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600">
+            
+            {/* 2. Contact Number */}
+            <td 
+                className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600"
+                onClick={handleRowClick}
+            >
                 {contactNumber}
             </td>
 
-            {/* 5. Address (using startAddress prop which contains startLocation string) */}
-            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600">
+            {/* 3. Address (using startAddress prop which contains startLocation string) */}
+            <td 
+                className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600"
+                onClick={handleRowClick}
+            >
                 {startAddress}
             </td>
+
+            {/* 4. Pick-up Time */}
+            <td 
+                className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600"
+                onClick={handleRowClick}
+            >
+                {typeof convertTime === 'function' ? convertTime(contact.startTime) : contact.startTime}
+            </td>
             
-            {/* 6. Volunteer Name (Conditional) */}
+            {/* 5. Volunteer Name (Conditional) */}
+            {/* This cell will only render if the status is Reserved or Completed */}
             {showVolunteerColumn && (
-                <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-800">
+                <td 
+                    className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-800"
+                    onClick={handleRowClick}
+                >
                     {contact.volunteerName || 'N/A'}
                 </td>
             )}
             
-            {/* 7. ACTION COLUMN */}
-            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light">
-                <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+            {/* 6. ACTION COLUMN */}
+            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light" 
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex justify-center items-center h-full space-x-2">
                     
-                    {/* ADMIN: Edit and Delete buttons (Only for unreserved/available rides) */}
-                    {isAdmin && (status === "Unreserved" || status === "AVAILABLE") && (
+                    {/* ADMIN: Edit and Delete buttons (Only for unreserved/available/added rides) */}
+                    {isAdmin && (status === "Unreserved" || status === "AVAILABLE" || status === "Added") && (
                         <>
                             <button
                                 className="text-gray-500 hover:text-[#419902] mx-1 transition duration-300"
                                 type="button"
+                                title="Edit Ride"
                                 onClick={(event) => handleEditClick(event, contact)}
                             >
-                                <span className="material-symbols-rounded">edit</span>
+                                <span className="material-symbols-rounded text-xl">edit</span>
                             </button>
                             <button
                                 className="text-gray-500 hover:text-red-500 mx-1 transition duration-300"
                                 type="button"
+                                title="Delete Ride"
                                 onClick={() => handleDeleteClick(contact.id)}
                             >
-                                <span className="material-symbols-rounded">delete</span>
+                                <span className="material-symbols-rounded text-xl">delete</span>
                             </button>
                         </>
                     )}
 
-                    {/* VOLUNTEER: Reserve button (Only for unreserved/available rides) */}
-                    {isVolunteer && (status === "Unreserved" || status === "AVAILABLE") && (
+                    {/* VOLUNTEER: Reserve button (Only for unreserved/available/added rides) */}
+                    {isVolunteer && (status === "Unreserved" || status === "AVAILABLE" || status === "Added") && (
                         <button
-                            className="text-white bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700"
+                            className="text-white bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                             type="button"
                             onClick={() => handleReserveClick(contact.id)}
                         >
@@ -107,7 +139,7 @@ const ReadOnlyRow = ({
                     {/* View Details/Status for Reserved/Completed (Admin/Volunteer) */}
                     {(status === "Reserved" || status === "Completed") && (
                         <button
-                            className="text-white bg-gray-500 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600"
+                            className="text-white bg-gray-500 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600 font-medium"
                             type="button"
                             onClick={handleRowClick}
                         >
