@@ -63,25 +63,25 @@ const CompletedRidesTable = ({ initialContacts, convertTime, onDeleteRide }) => 
                 <table className="border-collapse ml-[0.5%] w-[99%]">
                     <thead>
                         <tr>
-                            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                                 Client Name
                             </th>
-                            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                                 Date
                             </th>
-                            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                                 Time
                             </th>
-                            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                                 Contact Number
                             </th>
-                            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                                 Address
                             </th>
-                            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                                 Volunteer Name
                             </th>
-                            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                                 Actions
                             </th>
                         </tr>

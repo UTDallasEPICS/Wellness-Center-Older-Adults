@@ -10,9 +10,8 @@ const ReadOnlyRow = ({
     convertTime, 
     startAddress, 
     userRole = "ADMIN", // Default role for safety
-    // ⬇️ NEW PROPS FOR CHECKBOX SELECTION ⬇️
     selected,
-    onToggleSelect
+    onToggleSelect // <--- This prop is correctly defined
 }) => {
     const router = useRouter();
     
@@ -31,7 +30,7 @@ const ReadOnlyRow = ({
         return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().slice(-2)}`;
     }
 
-    // ⬇️ UPDATED LOGIC: Only show Volunteer column if status is Reserved or Completed ⬇️
+    // UPDATED LOGIC: Only show Volunteer column if status is Reserved or Completed
     const showVolunteerColumn = status === "Reserved" || status === "Completed";
     
     const contactNumber = contact.customerPhone || contact.phoneNumber;
@@ -40,11 +39,11 @@ const ReadOnlyRow = ({
         <tr className="cursor-pointer hover:bg-gray-100 transition-colors duration-200 border-b border-gray-100">
             
             {/* 0. CHECKBOX COLUMN */}
-            <td className="p-3 text-center w-12" onClick={(e) => e.stopPropagation()}>
+            <td className="p-3 text-center bg-[#fffdf5] w-12" onClick={(e) => e.stopPropagation()}>
                 <input
                     type="checkbox"
                     checked={selected}
-                    onChange={() => onToggleSelect(contact.id)}
+                    onChange={() => onToggleSelect(contact.id)} 
                     className="h-5 w-5 rounded border-gray-300 text-[#419902] focus:ring-[#419902]"
                 />
             </td>
@@ -128,7 +127,7 @@ const ReadOnlyRow = ({
                     {/* VOLUNTEER: Reserve button (Only for unreserved/available/added rides) */}
                     {isVolunteer && (status === "Unreserved" || status === "AVAILABLE" || status === "Added") && (
                         <button
-                            className="text-white bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
+                            className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                             type="button"
                             onClick={() => handleReserveClick(contact.id)}
                         >
@@ -139,7 +138,7 @@ const ReadOnlyRow = ({
                     {/* View Details/Status for Reserved/Completed (Admin/Volunteer) */}
                     {(status === "Reserved" || status === "Completed") && (
                         <button
-                            className="text-white bg-gray-500 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600 font-medium"
+                            className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600 font-medium"
                             type="button"
                             onClick={handleRowClick}
                         >
