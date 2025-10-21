@@ -49,6 +49,9 @@ export default function Page() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [customerToDelete, setCustomerToDelete] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
+    const [customerToEdit, setCustomerToEdit] = useState(null);
+
 
     const fetchCustomers = async () => {
         try {
@@ -69,6 +72,13 @@ export default function Page() {
     useEffect(() => {
         fetchCustomers();
     }, []);
+
+    const closeModalAndRefresh = () => {
+        setIsAddCustomerModalOpen(false);
+        setIsEditCustomerModalOpen(false);
+        setCustomerToEdit(null);
+        fetchCustomers(); // Refresh the list after an operation
+    };
 
     const handleAddCustomerSubmit = (newCustomer) => {
         setIsAddCustomerModalOpen(false);
@@ -133,6 +143,41 @@ export default function Page() {
         setShowDeleteModal(false);
         setCustomerToDelete(null);
     };
+
+    const handleEditClick = (customer) => {
+        console.log('Editing customer:', customer);
+        setCustomerToEdit(customer);
+        setIsEditCustomerModalOpen(true);
+    };
+
+    
+    const handleEditCustomerSubmit = async (updatedCustomer) => {
+        setIsEditCustomerModalOpen(false);
+
+        try {
+            const customerID = updatedCustomer.id || customerToEdit.id;
+            
+            const response = await fetch(`/api/customer/updateCustomer/${customerToEdit.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedCustomer), // Keep only one body: JSON.stringify(updatedAdmin)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData?.message || 'Failed to update customer');
+            }
+
+            toast.success('Customer updated successfully!');
+            closeModalAndRefresh(); // Use consolidated refresh function
+        } catch (error) {
+            console.error('Error updating customer:', error);
+            toast.error(error.message || 'Failed to update customer.');
+        }
+    };
+    
 
     // Filter customers based on search query
     const filteredCustomers = customers.filter(customer => {
@@ -233,7 +278,9 @@ export default function Page() {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div className="flex items-center space-x-3">
-                                        <button className="text-green-600 hover:text-blue-900 transition duration-150">
+                                        <button 
+                                        onClick={() => handleEditClick(customer)}
+                                        className="text-green-600 hover:text-blue-900 transition duration-150">
                                             <span className="material-symbols-rounded text-lg">edit</span>
                                         </button>
                                         <button
@@ -265,6 +312,21 @@ export default function Page() {
                     </div>
                 </div>
             )}
+
+            {isEditCustomerModalOpen && (
+                <div style={modalOverlayStyle}>
+                    <div style={modalContentStyle}>
+                        <button style={modalCloseButtonStyle} onClick={() => setIsEditCustomerModalOpen(false)}>&times;</button>
+                        <h2 className="text-left font-light text-2xl mb-5">Edit Client</h2>
+                        <ClientInputForm
+                            onSubmit={handleEditCustomerSubmit}
+                            onClose={() => setIsEditCustomerModalOpen(false)}
+                            initialData={customerToEdit}
+                        />
+                    </div>
+                </div>
+            )}
+
 
             {showDeleteModal && (
                 <div style={modalOverlayStyle}>
