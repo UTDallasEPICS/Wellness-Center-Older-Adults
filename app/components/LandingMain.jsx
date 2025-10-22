@@ -4,8 +4,8 @@ import carImage from "../../public/images/croppedCarImage.png";
 
 import React from "react";
 import { useAuth } from "../providers/Auth";
-import Header from "/app/components/Header.jsx";
-import Footer from "/app/components/Footer.jsx";
+import Header from "../components/Header.jsx";
+import Footer from "../components/Footer.jsx";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
