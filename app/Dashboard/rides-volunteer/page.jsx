@@ -1,4 +1,3 @@
-// /app/Dashboard/rides/page.jsx (or equivalent path)
 "use client";
 import React, { useState, useEffect } from "react";
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
@@ -13,7 +12,6 @@ import RideMap from '../../components/RideMap';
 import { Search, Plus } from 'lucide-react'; // Assuming lucide-react or similar icon library is available
 
 export default function Page() {
-    // NOTE: If using an app router path like /rides/[id], useParams() will have the ID
     const { id: rideIdFromParams } = useParams();
     const router = useRouter();
     const [rideDetails, setRideDetails] = useState(null);
@@ -181,99 +179,8 @@ export default function Page() {
         }
     };
 
-    const handleEditRide = async (updatedRideData) => {
-        try {
-            const rideResponse = await fetch(`/api/rides/${updatedRideData.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    customerID: updatedRideData.customerID,
-                    date: updatedRideData.date,
-                    pickupTime: updatedRideData.pickupTime,
-                    startAddressID: updatedRideData.startAddressID,
-                    endAddressID: updatedRideData.endAddressID,
-                    volunteerID: updatedRideData.volunteerID,
-                    status: updatedRideData.status,
-                    // Include the updates data for customer and address
-                    customerUpdates: updatedRideData.customerUpdates,
-                    addressUpdates: updatedRideData.addressUpdates,
-                    volunteerUpdates: updatedRideData.volunteerUpdates
-                }),
-            });
-            if (!rideResponse.ok) {
-                const errorData = await rideResponse.json();
-                throw new Error(
-                    `Failed to update ride: ${rideResponse.status} - ${
-                        errorData?.message || "Unknown error"
-                    }`
-                );
-            }
 
-            const responseData = await rideResponse.json();
 
-            // Optimistic update using local state, then refresh
-            if (responseData.formattedData) {
-                setRidesData(currentRides => 
-                    currentRides.map(ride => 
-                        ride.id === updatedRideData.id 
-                            ? { ...ride, ...responseData.formattedData }
-                            : ride
-                    )
-                );
-            }
-
-            toast.success("Ride updated successfully!");
-            await fetchRides();
-            if (rideDetails?.id === updatedRideData.id) {
-                await fetchRideDetails(updatedRideData.id);
-            }
-
-        } catch (error) {
-            console.error("Error updating ride:", error);
-            toast.error(`Failed to update ride: ${error.message}`);
-        }
-    };
-
-    const handleDeleteRide = async (rideId) => {
-        if (window.confirm("Are you sure you want to delete this ride?")) {
-            try {
-                // Assuming /api/deleteRides/[id] is the correct API route
-                const response = await fetch(`/api/deleteRides/${rideId}`, {
-                    method: "DELETE",
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(
-                        `Failed to delete ride: ${response.status} - ${
-                            errorData?.message || "Unknown error"
-                        }`
-                    );
-                }
-                toast.success("Ride deleted successfully!");
-                // Filter out the deleted ride from local state immediately
-                setRidesData(prevData => prevData.filter(ride => ride.id !== rideId));
-                setSelectedRides(prevSelected => prevSelected.filter(id => id !== rideId));
-                
-                // Clear details view if it was the deleted ride
-                if (rideDetails?.id === rideId) {
-                    setRideDetails(null); 
-                    // Navigate back to the main table view
-                    router.push('/Dashboard/rides');
-                }
-                
-                // Final data refresh after deletion
-                await fetchRides(); 
-
-            } catch (error) {
-                console.error("Error deleting ride:", error);
-                toast.error(`Failed to delete ride: ${error.message}`);
-            }
-        }
-    };
-
-    // FIX: Implementation for the Reserve button click from ReadOnlyRow
     const handleReserveClick = async (rideId) => {
         try {
             const response = await fetch(`/api/rides/reserve/${rideId}`, {
@@ -281,7 +188,6 @@ export default function Page() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // Assuming the backend handles authentication and volunteerID automatically
                 body: JSON.stringify({ status: 'Reserved' }),
             });
 
