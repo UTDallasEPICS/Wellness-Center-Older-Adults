@@ -12,17 +12,17 @@ export default function Ride() {
   const [pickupAddress, setPickupAddress] = useState('');
   const [dropoffAddress, setDropoffAddress] = useState('');
   const [pickupTime, setPickupTime] = useState('');
+  // driveTimeAB state holds the ESTIMATED time (A->B)
   const [driveTimeAB, setDriveTimeAB] = useState('');
   const [mileage, setMileage] = useState('');
-  
-  // State for the actual logged time (from DB 'totalTime' field)
+  // totalTime state holds the LOGGED/ACTUAL time (from DB 'totalTime' field)
   const [totalTime, setTotalTime] = useState(''); 
   const [notes, setNotes] = useState('');
   const [error, setError] = useState(null);
   
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
 
-  // === HELPER FUNCTIONS MOVED TO THE TOP TO AVOID ReferenceError ===
+  // === HELPER FUNCTIONS (DEFINED BEFORE USE) ===
   
   // Formats time from 24-hour string (e.g., "21:30") to "9:30 pm"
   function formatTime(timeString) {
@@ -64,8 +64,8 @@ export default function Ride() {
           finalAddress: data.finalAddress || data.pickupAddress || '', 
           wait_time: data.wait_time || '', 
           mileage: data.mileage || '',
-          driveTimeAB: data.driveTimeAB || '',   // Estimated time
-          totalTime: data.totalTime || '',       // Logged time (from DB field)
+          driveTimeAB: data.driveTimeAB || '',   // Estimated time (used as base for modal)
+          totalTime: data.totalTime || '',       // Logged time (DB field)
           pickupTime: data.pickupTime || '',
           customer: data.customer || { name: '' },
           notes: data.notes || '',
@@ -75,12 +75,11 @@ export default function Ride() {
         setPickupAddress(enrichedData.pickupAddress || '');
         setDropoffAddress(enrichedData.dropoffAddress || '');
         setPickupTime(enrichedData.pickupTime || '');
-        setDriveTimeAB(enrichedData.driveTimeAB || ''); // Initialize estimated time
+        setDriveTimeAB(enrichedData.driveTimeAB || '');
         setMileage(enrichedData.mileage || '');
         setNotes(enrichedData.notes || '');
         
-        // Corrected state initialization:
-        // Set totalTime state to the logged time if it exists, otherwise leave it blank.
+        // Initialization for the LOGGED time display field
         setTotalTime(enrichedData.totalTime || '');
         
       } catch (err) {
@@ -125,7 +124,6 @@ export default function Ride() {
         pickupAddress, dropoffAddress, pickupTime, driveTimeAB, mileage, notes,
       };
       setRideDetails(updatedRideDetails);
-      // If estimated driveTimeAB was updated, update the initialDriveTime prop for the modal
       setDriveTimeAB(updatedRideDetails.driveTimeAB); 
       setIsEditing(false);
     } catch (err) {
@@ -183,6 +181,14 @@ export default function Ride() {
   const handleOpenTimeModal = () => {
       setIsTimeModalOpen(true);
   };
+
+  // NEW HANDLER: Opens the modal specifically for editing the logged time
+  const handleEditLoggedTime = () => {
+    // Only allow editing if the ride status is Reserved or Completed
+    if (rideDetails.status === 'Reserved' || rideDetails.status === 'Completed') {
+      setIsTimeModalOpen(true);
+    }
+  };
   
   const handleSaveCompletion = async (driveData) => {
     if (rideDetails) {
@@ -190,11 +196,12 @@ export default function Ride() {
         const newTotalTimeString = `${driveData.hours} hr ${driveData.minutes} min`;
         const newNotes = driveData.notes.trim();
         
+        // Determine status: If already Completed, keep it. Otherwise, mark as Completed.
+        const statusToUse = rideDetails.status === 'Completed' ? 'Completed' : 'Completed'; 
+        
         const updatePayload = {
-            status: 'Completed',
-            // driveTimeAB is the payload key mapped to 'totalTime' in the API
+            status: statusToUse,
             driveTimeAB: newTotalTimeString, 
-            // notes is the payload key mapped to 'specialNote' in the API
             notes: newNotes, 
         };
         
@@ -206,31 +213,36 @@ export default function Ride() {
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`);
+          throw new Error(`Failed to update ride: ${response.status} - ${errorData?.error || 'Unknown error'}`);
         }
         
         const responseData = await response.json();
         const { updatedRide } = responseData; 
         
-        // Update the state variables used for display
+        // --- FIX 1: Update state to reflect changes ---
         setTotalTime(updatedRide.totalTime); 
         setNotes(updatedRide.specialNote);   
         
-        // Update the main rideDetails object for consistent rendering
         setRideDetails(prevDetails => ({ 
             ...prevDetails, 
-            status: 'Completed',
+            status: statusToUse,
             totalTime: updatedRide.totalTime,
             notes: updatedRide.specialNote,
         }));
         
-        // Close the modal and navigate
+        // Close the modal, allowing the page to re-render with the new time visible
         setIsTimeModalOpen(false);
-        router.push('/Dashboard/rides?tab=completed');
+
+        // --- FIX 2: Conditional Redirection ---
+        // Only redirect if the status actually changed to 'Completed' from something else.
+        if (statusToUse === 'Completed' && rideDetails.status !== 'Completed') {
+             router.push('/Dashboard/rides?tab=completed');
+        }
+        // If the ride was already 'Completed' (editing time), we stay on the page.
         
       } catch (err) { 
-          console.error("Error updating ride status to Completed:", err); 
-          setError("Failed to mark ride as completed."); 
+          console.error("Error saving logged time:", err); 
+          setError("Failed to save time/notes."); 
       }
     }
   };
@@ -283,17 +295,26 @@ export default function Ride() {
                             <p className="text-gray-700 text-base">{mileage}</p>
                         </div>
                         
-                        {/* DISPLAY 1: DRIVE TIME (ESTIMATE) - Reverts to original label */}
+                        {/* DISPLAY 1: DRIVE TIME (ESTIMATE) */}
                         <div className="flex flex-col">
                             <p className="text-xl font-bold mb-1">Drive Time (Est.)</p>
                             <p className="text-gray-700 text-base">{driveTimeAB}</p>
                         </div>
                         
-                        {/* DISPLAY 2: TOTAL TIME (LOGGED TIME) - Displays the result from the modal */}
+                        {/* DISPLAY 2: TOTAL TIME (LOGGED TIME) */}
                         <div className="flex flex-col">
-                            <p className="text-xl font-bold mb-1">Total Time (Logged)</p>
-                            <p className="text-gray-700 text-base">
-                                {totalTime}
+                            {/* MAKE THE LABEL CLICKABLE */}
+                            <p 
+                                className={`text-xl font-bold mb-1 ${totalTime ? 'cursor-pointer text-blue-600 hover:text-blue-800 transition-colors' : 'text-gray-800'}`}
+                                onClick={handleEditLoggedTime}
+                            >
+                                Total Time (Logged)
+                            </p>
+                            <p 
+                                className={`text-gray-700 text-base ${totalTime ? 'cursor-pointer' : ''}`}
+                                onClick={handleEditLoggedTime}
+                            >
+                                {totalTime || 'Click to Log Time'}
                             </p>
                         </div>
                         
@@ -305,7 +326,7 @@ export default function Ride() {
                     </div>
                 </div>
             ) : (
-                // --- EDITING MODE --- (Keeping functional edit mode styles)
+                // --- EDITING MODE --- 
                 <div className="space-y-6">
                     {/* Trip Edit */}
                     <div className="pt-2">
@@ -388,11 +409,14 @@ export default function Ride() {
         )}
       </div>
       
+      {/* 3. Pass the current LOGGED totalTime when editing, or estimated time when completing */}
       <TotalTimeModal
         isOpen={isTimeModalOpen}
         onClose={handleCloseTimeModal}
         onSave={handleSaveCompletion} 
-        initialDriveTime={driveTimeAB}
+        // Logic: If opening for the first time (totalTime is empty), use driveTimeAB. 
+        // If opening to edit (totalTime is set), use totalTime.
+        initialDriveTime={totalTime || driveTimeAB} 
       />
       
     </div>
