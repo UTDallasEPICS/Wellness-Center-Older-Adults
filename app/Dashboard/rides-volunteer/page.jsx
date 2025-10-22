@@ -4,7 +4,6 @@ import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
 import AddRidesTable from "/app/components/AddRidesTable.jsx";
 import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
 import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
-import AddRideForm from "/app/components/AddRideForm.jsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
@@ -155,32 +154,6 @@ export default function Page() {
         }
     }, [searchParams, rideIdFromParams]);
 
-    const handleAddRide = async (newRideData) => {
-        try {
-            const response = await fetch('/api/createRide', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newRideData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to add ride: ${response.status} - ${errorData?.message || 'Unknown error'}`);
-            }
-
-            toast.success("Ride added successfully!");
-            setIsModalOpen(false); // Close the modal
-            await fetchRides(); // Fetch updated list
-        } catch (error) {
-            console.error("Error adding ride:", error);
-            toast.error(`Failed to add ride: ${error.message}`);
-        }
-    };
-
-
-
     const handleReserveClick = async (rideId) => {
         try {
             const response = await fetch(`/api/rides/${rideId}`, {
@@ -207,13 +180,6 @@ export default function Page() {
             console.error("Error reserving ride:", error);
             toast.error(`Failed to reserve ride: ${error.message}`);
         }
-    };
-
-    const handleAddFormSubmit = (formData) => {
-        // NOTE: Redundant as handleAddRide already closes modal and refreshes, 
-        // but kept to ensure modal closes/redirects if form submission is decoupled.
-        setIsModalOpen(false); 
-        // window.location.reload(); // Removed unnecessary page reload here
     };
 
     function formatTime(timeString) {
@@ -382,13 +348,6 @@ export default function Page() {
                 {/* Header and Add Button */}
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-4xl font-light text-gray-800">Rides</h1>
-                    <button
-                        type="button"
-                        className="h-12 w-12 rounded-full text-white bg-[#419902] hover:bg-[#378300] transition-colors flex items-center justify-center shadow-lg"
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        <Plus size={28} />
-                    </button>
                 </div>
 
                 {/* Search Bar */}
@@ -439,13 +398,6 @@ export default function Page() {
                 </SimpleTab>
 
             </div>
-
-            <AddRideForm
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                handleAddFormSubmit={handleAddFormSubmit}
-            />
-            
             {/* Notification is handled by toast, so this block is likely redundant */}
             {notification && (
                 <div className="absolute top-4 right-4 z-50">{notification}</div>
