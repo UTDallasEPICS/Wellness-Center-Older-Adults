@@ -297,11 +297,10 @@ export default function Ride() {
                     {(rideDetails.status === 'AVAILABLE' || rideDetails.status === 'Added' || rideDetails.status === 'Unreserved') ? (
                         <>
                             <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-colors" onClick={handleAcceptRide}>Accept?</button>
-                            <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-md hover:bg-gray-300 transition-colors" onClick={handleEditClick}>Edit</button>
                         </>
                     ) : rideDetails.status === 'Reserved' ? (
                         <>
-                            <button className="flex-grow px-5 py-3 bg-gray-200 text-white font-semibold rounded-md shadow-md hover:bg-gray-300 transition-colors" onClick={handleUnreserveRide}>Unreserve</button>
+                            <button className="flex-grow px-5 py-3 bg-gray-500 text-white font-semibold rounded-md shadow-md hover:bg-gray-300 transition-colors" onClick={handleUnreserveRide}>Unreserve</button>
                             <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-colors" onClick={handleCompleteRide}>Completed</button>
                         </>
                     ) : null}
