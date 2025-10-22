@@ -10,18 +10,40 @@ const SideNav = ({ toggleCollapse, isCollapsed }) => {
         ${isCollapsed ? "w-[70px]" : "w-[250px]"}`}
     >
       <div className="flex items-center justify-between h-[70px] px-4 border-b border-gray-200">
-          <div className="flex items-center space-x-2 overflow-hidden">
-        <Image src="/favicon.ico" width={30} height={30} alt="Site Favicon" />
-            {!isCollapsed && (
-              <span className="font-semibold text-lg text-green-800">WCOA</span>
-            )}
-          </div>
-        <button
-          className="flex items-center justify-center h-10 w-10 text-green-800 hover:bg-gray-100 rounded-lg transition"
-          onClick={toggleCollapse}
-        >
-          <Menu className="size-6" />
-        </button>
+        <div className="group relative flex items-center">
+          <Image
+            src="/favicon.ico"
+            width={30}
+            height={30}
+            alt="Site Favicon"
+            onClick={toggleCollapse}
+            className={`cursor-pointer transition-opacity ${
+              isCollapsed
+                ? "group-hover:opacity-0 group-hover:pointer-events-none"
+                : ""
+            }`}
+          />
+          {isCollapsed && (
+            <button
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-[30px] w-[30px] flex items-center justify-center text-green-800 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto hover:bg-gray-100 transition"
+              onClick={toggleCollapse}
+              aria-label="Open menu"
+            >
+              <Menu className="size-6" />
+            </button>
+          )}
+          {!isCollapsed && (
+            <span className="font-semibold text-lg text-green-800">WCOA</span>
+          )}
+        </div>
+        {!isCollapsed && (
+          <button
+            className="flex items-center justify-center h-10 w-10 text-green-800 hover:bg-gray-100 rounded-lg transition"
+            onClick={toggleCollapse}
+          >
+            <Menu className="size-6" />
+          </button>
+        )}
       </div>
 
       {/* Nav Links */}
