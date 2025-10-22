@@ -14,50 +14,16 @@ export default function Ride() {
   const [pickupTime, setPickupTime] = useState('');
   const [driveTimeAB, setDriveTimeAB] = useState('');
   const [mileage, setMileage] = useState('');
+  
+  // State for the actual logged time (from DB 'totalTime' field)
+  const [totalTime, setTotalTime] = useState(''); 
   const [notes, setNotes] = useState('');
   const [error, setError] = useState(null);
   
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchRideDetails = async () => {
-      try {
-        const response = await fetch(`/api/ride/get/${id}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ride details: ${response.status}`);
-        }
-        const data = await response.json();
-        
-        // Ensure data fields exist, defaulting to empty strings if null/undefined
-        const enrichedData = {
-          ...data,
-          finalAddress: data.finalAddress || data.pickupAddress || '', // Assuming C is often the return to A
-          wait_time: data.wait_time || '', 
-          mileage: data.mileage || '',
-          driveTimeAB: data.driveTimeAB || '',
-          pickupTime: data.pickupTime || '',
-          customer: data.customer || { name: '' },
-          notes: data.notes || '',
-        };
-        
-        setRideDetails(enrichedData);
-        setPickupAddress(enrichedData.pickupAddress || '');
-        setDropoffAddress(enrichedData.dropoffAddress || '');
-        setPickupTime(enrichedData.pickupTime || '');
-        setDriveTimeAB(enrichedData.driveTimeAB || '');
-        setMileage(enrichedData.mileage || '');
-        setNotes(enrichedData.notes || '');
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchRideDetails();
-  }, [id]);
-
-  if (error) return <div className="text-red-600 p-5">Error: {error}</div>;
-  if (!rideDetails) return <div className="animate-pulse p-5">Loading...</div>;
-
+  // === HELPER FUNCTIONS MOVED TO THE TOP TO AVOID ReferenceError ===
+  
   // Formats time from 24-hour string (e.g., "21:30") to "9:30 pm"
   function formatTime(timeString) {
     if (!timeString) return "";
@@ -82,6 +48,51 @@ export default function Ride() {
     const day = date.getDate();
     return `${month}/${day}/${year}`;
   }
+  // === END HELPER FUNCTIONS ===
+
+  useEffect(() => {
+    const fetchRideDetails = async () => {
+      try {
+        const response = await fetch(`/api/ride/get/${id}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ride details: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        const enrichedData = {
+          ...data,
+          finalAddress: data.finalAddress || data.pickupAddress || '', 
+          wait_time: data.wait_time || '', 
+          mileage: data.mileage || '',
+          driveTimeAB: data.driveTimeAB || '',   // Estimated time
+          totalTime: data.totalTime || '',       // Logged time (from DB field)
+          pickupTime: data.pickupTime || '',
+          customer: data.customer || { name: '' },
+          notes: data.notes || '',
+        };
+        
+        setRideDetails(enrichedData);
+        setPickupAddress(enrichedData.pickupAddress || '');
+        setDropoffAddress(enrichedData.dropoffAddress || '');
+        setPickupTime(enrichedData.pickupTime || '');
+        setDriveTimeAB(enrichedData.driveTimeAB || ''); // Initialize estimated time
+        setMileage(enrichedData.mileage || '');
+        setNotes(enrichedData.notes || '');
+        
+        // Corrected state initialization:
+        // Set totalTime state to the logged time if it exists, otherwise leave it blank.
+        setTotalTime(enrichedData.totalTime || '');
+        
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchRideDetails();
+  }, [id]);
+
+  if (error) return <div className="text-red-600 p-5">Error: {error}</div>;
+  if (!rideDetails) return <div className="animate-pulse p-5">Loading...</div>;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -114,6 +125,8 @@ export default function Ride() {
         pickupAddress, dropoffAddress, pickupTime, driveTimeAB, mileage, notes,
       };
       setRideDetails(updatedRideDetails);
+      // If estimated driveTimeAB was updated, update the initialDriveTime prop for the modal
+      setDriveTimeAB(updatedRideDetails.driveTimeAB); 
       setIsEditing(false);
     } catch (err) {
       console.error("Error updating ride details:", err);
@@ -147,25 +160,25 @@ export default function Ride() {
   };
 
   const handleUnreserveRide = async () => {
-  if (rideDetails) {
-    try {
-      const response = await fetch(`/api/rides/${rideDetails.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', },
-        body: JSON.stringify({ status: 'AVAILABLE', volunteerID: null }),
-      });
-      if (!response.ok) { 
-        const errorData = await response.json();
-        throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`); 
+    if (rideDetails) {
+      try {
+        const response = await fetch(`/api/rides/${rideDetails.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', },
+          body: JSON.stringify({ status: 'AVAILABLE', volunteerID: null }),
+        });
+        if (!response.ok) { 
+          const errorData = await response.json();
+          throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`); 
+        }
+        setRideDetails({ ...rideDetails, status: 'AVAILABLE' });
+        router.push('/Dashboard/rides?tab=available');
+      } catch (err) { 
+        console.error("Error updating ride status:", err); 
+        setError("Failed to unreserve ride."); 
       }
-      setRideDetails({ ...rideDetails, status: 'AVAILABLE' });
-      router.push('/Dashboard/rides?tab=available');
-    } catch (err) { 
-      console.error("Error updating ride status:", err); 
-      setError("Failed to unreserve ride."); 
     }
-  }
-};
+  };
   
   const handleOpenTimeModal = () => {
       setIsTimeModalOpen(true);
@@ -174,24 +187,15 @@ export default function Ride() {
   const handleSaveCompletion = async (driveData) => {
     if (rideDetails) {
       try {
-        // Prepare data to send to the API (status: 'Completed' + drive time/notes)
-        // You might need to adjust your backend API to accept driveTimeAB, mileage, and notes update
-        // or ensure these are part of the 'Completed' status update logic.
+        const newTotalTimeString = `${driveData.hours} hr ${driveData.minutes} min`;
+        const newNotes = driveData.notes.trim();
         
-        // For simplicity, we'll update the main fields if they were provided, 
-        // and then set the status to 'Completed'. 
-        // Note: The modal collects hours, minutes, notes, and totalMinutes.
         const updatePayload = {
             status: 'Completed',
-            // Update drive time, notes, and mileage based on modal input
-            // NOTE: The modal is designed for total drive time, not just A->B. 
-            // You may need a separate mileage input in the modal or assume it's set elsewhere.
-            // For now, let's assume 'driveTimeAB' in the backend means total time.
-            driveTimeAB: `${driveData.hours} hr ${driveData.minutes} min`, 
-            // Assuming the total ride notes can be updated from the modal notes.
-            notes: driveData.notes.trim() || rideDetails.notes, 
-            // If you want to log totalMinutes, you'd add a field to your database/API for it.
-            // totalMinutes: driveData.totalMinutes 
+            // driveTimeAB is the payload key mapped to 'totalTime' in the API
+            driveTimeAB: newTotalTimeString, 
+            // notes is the payload key mapped to 'specialNote' in the API
+            notes: newNotes, 
         };
         
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
@@ -205,13 +209,23 @@ export default function Ride() {
           throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`);
         }
         
-        // Optimistically update the state and navigate
-        setRideDetails({ 
-            ...rideDetails, 
+        const responseData = await response.json();
+        const { updatedRide } = responseData; 
+        
+        // Update the state variables used for display
+        setTotalTime(updatedRide.totalTime); 
+        setNotes(updatedRide.specialNote);   
+        
+        // Update the main rideDetails object for consistent rendering
+        setRideDetails(prevDetails => ({ 
+            ...prevDetails, 
             status: 'Completed',
-            driveTimeAB: updatePayload.driveTimeAB,
-            notes: updatePayload.notes,
-        });
+            totalTime: updatedRide.totalTime,
+            notes: updatedRide.specialNote,
+        }));
+        
+        // Close the modal and navigate
+        setIsTimeModalOpen(false);
         router.push('/Dashboard/rides?tab=completed');
         
       } catch (err) { 
@@ -263,20 +277,30 @@ export default function Ride() {
                             <p className="text-gray-700 text-base">{formatTime(rideDetails.pickupTime)}</p>
                         </div>
 
-                        {/* Row 2: Total Mileage and Drive Time */}
+                        {/* Row 2: Total Mileage and Drive Time (Estimated) */}
                         <div className="flex flex-col">
                             <p className="text-xl font-bold mb-1">Total Mileage</p>
-                            <p className="text-gray-700 text-base">{rideDetails.mileage}</p>
-                        </div>
-                        <div className="flex flex-col">
-                            <p className="text-xl font-bold mb-1">Drive Time</p>
-                            <p className="text-gray-700 text-base">{rideDetails.driveTimeAB}</p>
+                            <p className="text-gray-700 text-base">{mileage}</p>
                         </div>
                         
-                        {/* Row 4: Notes */}
+                        {/* DISPLAY 1: DRIVE TIME (ESTIMATE) - Reverts to original label */}
+                        <div className="flex flex-col">
+                            <p className="text-xl font-bold mb-1">Drive Time (Est.)</p>
+                            <p className="text-gray-700 text-base">{driveTimeAB}</p>
+                        </div>
+                        
+                        {/* DISPLAY 2: TOTAL TIME (LOGGED TIME) - Displays the result from the modal */}
+                        <div className="flex flex-col">
+                            <p className="text-xl font-bold mb-1">Total Time (Logged)</p>
+                            <p className="text-gray-700 text-base">
+                                {totalTime}
+                            </p>
+                        </div>
+                        
+                        {/* Row 4: Notes (Using the updated 'notes' state) */}
                         <div className="flex flex-col col-span-2">
                             <p className="text-xl font-bold mb-1">Notes</p>
-                            <p className="text-gray-700 text-base">{rideDetails.notes}</p>
+                            <p className="text-gray-700 text-base">{notes}</p>
                         </div>
                     </div>
                 </div>
@@ -345,7 +369,6 @@ export default function Ride() {
                     ) : rideDetails.status === 'Reserved' ? (
                         <>
                             <button className="flex-grow px-5 py-3 bg-gray-500 text-white font-semibold rounded-md shadow-md hover:bg-gray-300 transition-colors" onClick={handleUnreserveRide}>Unreserve</button>
-                            {/* Call the function to open the modal */}
                             <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-colors" onClick={handleOpenTimeModal}>Completed</button> 
                         </>
                     ) : null}
@@ -369,7 +392,7 @@ export default function Ride() {
         isOpen={isTimeModalOpen}
         onClose={handleCloseTimeModal}
         onSave={handleSaveCompletion} 
-        initialDriveTime={rideDetails.driveTimeAB}
+        initialDriveTime={driveTimeAB}
       />
       
     </div>
