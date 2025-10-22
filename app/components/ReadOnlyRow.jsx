@@ -11,7 +11,7 @@ const ReadOnlyRow = ({
     startAddress, 
     userRole = "ADMIN", // Default role for safety
     selected,
-    onToggleSelect // <--- This prop is correctly defined
+    onToggleSelect
 }) => {
     const router = useRouter();
     
@@ -97,27 +97,31 @@ const ReadOnlyRow = ({
             )}
             
             {/* 6. ACTION COLUMN */}
-            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light" 
-                onClick={(e) => e.stopPropagation()}
-            >
+            <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light"> 
                 <div className="flex justify-center items-center h-full space-x-2">
                     
                     {/* ADMIN: Edit and Delete buttons (Only for unreserved/available/added rides) */}
                     {isAdmin && (status === "Unreserved" || status === "AVAILABLE" || status === "Added") && (
                         <>
                             <button
-                                className="text-gray-500 hover:text-[#419902] mx-1 transition duration-300"
+                                className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                                 type="button"
                                 title="Edit Ride"
-                                onClick={(event) => handleEditClick(event, contact)}
+                                onClick={(event) => {
+                                    event.stopPropagation(); //Stop propagation here
+                                    handleEditClick(event, contact);
+                                }}
                             >
                                 <span className="material-symbols-rounded text-xl">edit</span>
                             </button>
                             <button
-                                className="text-gray-500 hover:text-red-500 mx-1 transition duration-300"
+                                className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                                 type="button"
                                 title="Delete Ride"
-                                onClick={() => handleDeleteClick(contact.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation(); //Stop propagation here
+                                    handleDeleteClick(contact.id);
+                                }}
                             >
                                 <span className="material-symbols-rounded text-xl">delete</span>
                             </button>
@@ -129,7 +133,10 @@ const ReadOnlyRow = ({
                         <button
                             className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                             type="button"
-                            onClick={() => handleReserveClick(contact.id)}
+                            onClick={(e) => {
+                                e.stopPropagation(); // FIX: Must be called as a function!
+                                handleReserveClick(contact.id);
+                            }}
                         >
                             Reserve
                         </button>
@@ -140,7 +147,10 @@ const ReadOnlyRow = ({
                         <button
                             className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600 font-medium"
                             type="button"
-                            onClick={handleRowClick}
+                            onClick={(e) => {
+                                e.stopPropagation(); 
+                                handleRowClick();
+                            }}
                         >
                             View Details
                         </button>

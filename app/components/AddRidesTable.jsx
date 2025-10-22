@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-// Reverting to original absolute paths as requested
 import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
 import EditableRow from "/app/components/EditableRow.jsx";
 
@@ -9,6 +8,7 @@ const AddRidesTable = ({
     convertTime, 
     onEditRide, 
     onDeleteRide, 
+    handleReserveClick, 
     customers, 
     addresses, 
     volunteers, 
@@ -53,10 +53,8 @@ const AddRidesTable = ({
     }, []);
     // ---------------------------
 
-    // ⬇️ CHECKBOX LOGIC ⬇️
     const allSelected = contacts.length > 0 && 
                         contacts.every(ride => selectedRides.includes(ride.id));
-    // ----------------------
 
     // Helper function to get volunteer name from ID
     const getVolunteerNameById = (volunteerID) => {
@@ -201,7 +199,9 @@ const AddRidesTable = ({
     };
 
     const handleReserveRide = (rideId) => {
-        console.log(`Volunteer attempting to reserve ride: ${rideId}`);
+        if (typeof handleReserveClick === 'function') {
+            handleReserveClick(rideId);
+        }
     };
 
     if (userRole === null) {
@@ -218,7 +218,6 @@ const AddRidesTable = ({
                 <table className="bg-[#fffdf5] border-collapse ml-[0.5%] w-[99%]">
                     <thead>
                         <tr>
-                            {/* ⬇️ CHECKBOX HEADER ⬇️ */}
                             <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal w-12">
                                 <input
                                     type="checkbox"
@@ -227,16 +226,11 @@ const AddRidesTable = ({
                                     className="h-5 w-5 rounded border-gray-300 text-[#419902] focus:ring-[#419902]"
                                 />
                             </th>
-                            {/* ⬆️ END CHECKBOX HEADER ⬆️ */}
                             
                             <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Client Name</th>
                             <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
                             <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
                             <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
-                            
-                            {/* ❌ REMOVED CONDITIONAL VOLUNTEER HEADER ❌ 
-                                Since this table only shows unreserved rides, we hide the column.
-                            */}
                             
                             <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
                         </tr>
@@ -261,7 +255,7 @@ const AddRidesTable = ({
                                         contact={contact}
                                         handleEditClick={handleEditClick}
                                         handleDeleteClick={handleDeleteClick}
-                                        handleReserveClick={handleReserveRide}
+                                        handleReserveClick={handleReserveRide} 
                                         convertTime={convertTime}
                                         status={contact.status}
                                         startAddress={contact.startLocation}
