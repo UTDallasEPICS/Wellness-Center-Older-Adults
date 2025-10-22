@@ -2,7 +2,7 @@
 import RideMap from '../../../../components/RideMap';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import TotalTimeModal from '../../../../components/TotalTimeModal.jsx'; // Adjust the path as needed
+import TotalTimeModal from '../../../../components/TotalTimeModal.jsx';
 
 export default function Ride() {
   const { id } = useParams();
@@ -369,6 +369,7 @@ export default function Ride() {
         isOpen={isTimeModalOpen}
         onClose={handleCloseTimeModal}
         onSave={handleSaveCompletion} 
+        initialDriveTime={rideDetails.driveTimeAB}
       />
       
     </div>

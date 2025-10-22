@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 
 /**
  * A modal component for inputting a drive duration in hours and minutes.
- * * @param {object} props - Component properties.
+ * @param {object} props - Component properties.
  * @param {boolean} props.isOpen - Controls the visibility of the modal.
  * @param {function} props.onClose - Function to call when closing/cancelling the modal.
  * @param {function} props.onSave - Function to call when saving the time. 
  * Receives { hours, minutes, notes, totalMinutes }.
+ * @param {string} props.initialDriveTime - The drive time string (e.g., "1 hr 30 min") to pre-fill.
  */
-const TotalTimeModal = ({ isOpen, onClose, onSave }) => {
+const TotalTimeModal = ({ isOpen, onClose, onSave, initialDriveTime }) => { 
     // ----------------------
     // 1. STATE MANAGEMENT
     // ----------------------
@@ -19,15 +20,46 @@ const TotalTimeModal = ({ isOpen, onClose, onSave }) => {
     const [notes, setNotes] = useState('');
     const [error, setError] = useState(false);
 
-    // Reset state whenever the modal opens
+    /**
+     * Helper function to parse a time string like "1 hr 30 min" or "45 min".
+     * This function MUST be defined before its usage in useEffect.
+     */
+    const parseDriveTime = (timeString) => {
+        let h = 0;
+        let m = 0;
+        if (timeString) {
+            // Regex to find numbers followed by "hr" or "min"
+            const hourMatch = timeString.match(/(\d+)\s*hr/);
+            const minuteMatch = timeString.match(/(\d+)\s*min/);
+            
+            if (hourMatch) {
+                h = parseInt(hourMatch[1], 10);
+            }
+            if (minuteMatch) {
+                m = parseInt(minuteMatch[1], 10);
+            }
+        }
+        return { hours: h, minutes: m };
+    };
+
+    // Reset state and set initial drive time whenever the modal opens
     useEffect(() => {
         if (isOpen) {
-            setHours(0);
-            setMinutes(30);
+            // 1. Parse the drive time from the prop
+            const { hours: initialHours, minutes: initialMinutes } = parseDriveTime(initialDriveTime);
+            
+            // 2. Determine the final values, defaulting to 0:30 if parsing fails
+            //    and ensuring minutes doesn't exceed 59.
+            const newHours = initialHours > 0 || initialMinutes > 0 ? initialHours : 0;
+            const newMinutes = initialHours > 0 || initialMinutes > 0 ? (initialMinutes > 59 ? 59 : initialMinutes) : 30;
+
+            // 3. Set the state with the parsed/default values
+            setHours(newHours);
+            setMinutes(newMinutes);
             setNotes('');
             setError(false);
         }
-    }, [isOpen]);
+    }, [isOpen, initialDriveTime]); // Dependency added for initialDriveTime
 
     // ----------------------
     // 2. HANDLERS & VALIDATION
