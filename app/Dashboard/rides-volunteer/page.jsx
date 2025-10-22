@@ -183,7 +183,7 @@ export default function Page() {
 
     const handleReserveClick = async (rideId) => {
         try {
-            const response = await fetch(`/api/rides/reserve/${rideId}`, {
+            const response = await fetch(`/api/rides/${rideId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -330,8 +330,8 @@ export default function Page() {
                 <AddRidesTable
                     initialContacts={availableRides}
                     convertTime={convertTo12Hour}
-                    onEditRide={handleEditRide}
-                    onDeleteRide={handleDeleteRide}
+                    //onEditRide={handleEditRide}
+                    //onDeleteRide={handleDeleteRide}
                     // FIX: Pass the new handleReserveClick function
                     handleReserveClick={handleReserveClick} 
                     customers={customers}
@@ -349,8 +349,8 @@ export default function Page() {
                 <ReservedRidesTable
                     initialContacts={reservedRides}
                     convertTime={convertTo12Hour}
-                    onRideDeleted={handleDeleteRide}
-                    onRideUpdated={handleEditRide}
+                    //onRideDeleted={handleDeleteRide}
+                    //onRideUpdated={handleEditRide}
                     selectedRides={selectedRides} 
                     onToggleSelect={handleToggleRideSelection}
                     onToggleAll={handleToggleAllRides}
@@ -364,7 +364,7 @@ export default function Page() {
                 <CompletedRidesTable
                     initialContacts={completedRides}
                     convertTime={convertTo12Hour}
-                    onDeleteRide={handleDeleteRide}
+                    //onDeleteRide={handleDeleteRide}
                     selectedRides={selectedRides} 
                     onToggleSelect={handleToggleRideSelection}
                     onToggleAll={handleToggleAllRides}
