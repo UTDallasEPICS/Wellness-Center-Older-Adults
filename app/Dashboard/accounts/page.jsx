@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useAuth } from "../../providers/Auth";
 
 export default function AccountPage() {
   const { handleLogout } = useAuth();
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
     isVolunteer: false,
-    volunteerStatus: '',
+    volunteerStatus: "",
     assignedRides: [],
-    birthdate: '',
+    birthdate: "",
   });
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,29 +25,29 @@ export default function AccountPage() {
     async function fetchUserData() {
       try {
         setLoading(true);
-        const response = await fetch('/api/user/profile');
+        const response = await fetch("/api/user/profile");
         if (!response.ok) {
-          throw new Error('Failed to fetch user data');
+          throw new Error("Failed to fetch user data");
         }
         const data = await response.json();
         const user = data.user;
-        let firstName = user.firstName || '';
-        let lastName = user.lastName || '';
+        let firstName = user.firstName || "";
+        let lastName = user.lastName || "";
         // If firstName/lastName not present, split fullName
         if ((!firstName || !lastName) && user.fullName) {
-          const [f, ...l] = user.fullName.split(' ');
+          const [f, ...l] = user.fullName.split(" ");
           firstName = f;
-          lastName = l.join(' ');
+          lastName = l.join(" ");
         }
         setFormData({
           firstName,
           lastName,
-          email: user.email || '',
-          phone: user.phone || '',
+          email: user.email || "",
+          phone: user.phone || "",
           isVolunteer: user.isVolunteer || false,
-          volunteerStatus: user.volunteerStatus || '',
+          volunteerStatus: user.volunteerStatus || "",
           assignedRides: user.assignedRides || [],
-          birthdate: user.birthdate || '',
+          birthdate: user.birthdate || "",
         });
         setProfilePic(user.profilePicUrl || null);
       } catch (err) {
@@ -76,16 +76,16 @@ export default function AccountPage() {
         volunteerStatus: formData.volunteerStatus,
       };
 
-      const response = await fetch('/api/user/update', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/user/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update account information');
+        throw new Error("Failed to update account information");
       }
-      alert('Account information updated successfully!');
+      alert("Account information updated successfully!");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -103,30 +103,34 @@ export default function AccountPage() {
       reader.readAsDataURL(file);
 
       const formData = new FormData();
-      formData.append('profilePic', file);
+      formData.append("profilePic", file);
 
       try {
-        const response = await fetch('/api/upload/profile-pic', {
-          method: 'POST',
+        const response = await fetch("/api/upload/profile-pic", {
+          method: "POST",
           body: formData,
         });
         if (!response.ok) {
-          throw new Error('Failed to upload profile picture');
+          throw new Error("Failed to upload profile picture");
         }
         const result = await response.json();
         setProfilePic(result.url);
       } catch (err) {
-        console.error('Upload error:', err);
+        console.error("Upload error:", err);
       }
     }
   };
 
   const handlePasswordChange = () => {
-    alert('Password change functionality is not configured.');
+    alert("Password change functionality is not configured.");
   };
 
   if (loading) {
-    return <div className="text-center mt-20 text-gray-500">Loading user data...</div>;
+    return (
+      <div className="text-center mt-20 text-gray-500">
+        Loading user data...
+      </div>
+    );
   }
 
   if (error) {
@@ -135,13 +139,21 @@ export default function AccountPage() {
 
   return (
     <div className="max-w-xl mx-auto my-10 p-8 bg-white shadow-lg rounded-xl">
-      <h1 className="text-center text-3xl font-bold text-gray-800 mb-8">Volunteer Account</h1>
+      <h1 className="text-center text-3xl font-bold text-gray-800 mb-8">
+        Volunteer Account
+      </h1>
 
       <div className="flex flex-col items-center mb-8">
         <label htmlFor="profile-pic-upload" className="cursor-pointer">
           <div className="w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden hover:bg-gray-100 transition-colors">
             {profilePic ? (
-              <Image src={profilePic} alt="Profile" width={128} height={128} className="object-cover w-full h-full" />
+              <Image
+                src={profilePic}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="object-cover w-full h-full"
+              />
             ) : (
               <span className="text-sm text-gray-500">Upload Profile Pic</span>
             )}
@@ -158,7 +170,12 @@ export default function AccountPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+          <label
+            htmlFor="firstName"
+            className="block text-sm font-medium text-gray-700"
+          >
+            First Name
+          </label>
           <input
             type="text"
             id="firstName"
@@ -169,7 +186,12 @@ export default function AccountPage() {
           />
         </div>
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Last Name
+          </label>
           <input
             type="text"
             id="lastName"
@@ -181,7 +203,12 @@ export default function AccountPage() {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Email
+          </label>
           <input
             type="email"
             id="email"
@@ -193,7 +220,12 @@ export default function AccountPage() {
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Phone
+          </label>
           <input
             type="tel"
             id="phone"
@@ -206,7 +238,7 @@ export default function AccountPage() {
 
         <button
           type="submit"
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Save Changes
         </button>
@@ -214,10 +246,17 @@ export default function AccountPage() {
 
       {formData.isVolunteer && (
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Volunteer Information</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Volunteer Information
+          </h2>
           <div className="bg-gray-50 p-4 rounded-lg space-y-4">
             <div>
-              <label htmlFor="volunteerStatus" className="block text-sm font-medium text-gray-700">Status</label>
+              <label
+                htmlFor="volunteerStatus"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Status
+              </label>
               <select
                 id="volunteerStatus"
                 name="volunteerStatus"
@@ -234,12 +273,24 @@ export default function AccountPage() {
               <div className="mt-4">
                 <h3 className="font-medium text-gray-700">Assigned Rides</h3>
                 <ul className="mt-2 space-y-2">
-                  {formData.assignedRides.map(ride => (
-                    <li key={ride.id} className="p-3 bg-white rounded-md shadow-sm">
-                      <p className="font-semibold text-sm">Ride on {new Date(ride.date).toLocaleDateString()}</p>
-                      <p className="text-xs text-gray-500">Pickup at {new Date(ride.pickupTime).toLocaleTimeString()}</p>
-                      <p className="text-xs text-gray-500">From: {ride.addrStart.street}</p>
-                      <p className="text-xs text-gray-500">To: {ride.addrEnd?.street || 'N/A'}</p>
+                  {formData.assignedRides.map((ride) => (
+                    <li
+                      key={ride.id}
+                      className="p-3 bg-white rounded-md shadow-sm"
+                    >
+                      <p className="font-semibold text-sm">
+                        Ride on {new Date(ride.date).toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Pickup at{" "}
+                        {new Date(ride.pickupTime).toLocaleTimeString()}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        From: {ride.addrStart.street}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        To: {ride.addrEnd?.street || "N/A"}
+                      </p>
                     </li>
                   ))}
                 </ul>
@@ -256,12 +307,12 @@ export default function AccountPage() {
         >
           Change Password
         </button>
-        <button
+        {/* <button
           onClick={handleLogout}
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-red-600 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
         >
           Logout
-        </button>
+        </button> */}
       </div>
     </div>
   );

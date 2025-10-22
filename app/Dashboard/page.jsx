@@ -24,7 +24,7 @@ export default function Page() {
             await fetchUserName();
             await fetchRides();
           } else if (roleData.role === 'VOLUNTEER') {
-            router.replace('/Dashboard/rides'); // Redirect volunteers to rides page
+            router.replace('/Dashboard/rides-volunteer'); // Redirect volunteers to rides page
             return;
           } else {
             router.replace('/'); // Redirect all others to home
