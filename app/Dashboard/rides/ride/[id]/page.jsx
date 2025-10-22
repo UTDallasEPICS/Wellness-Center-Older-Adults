@@ -2,6 +2,7 @@
 import RideMap from '../../../../components/RideMap';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import TotalTimeModal from '../../../../components/TotalTimeModal.jsx'; // Adjust the path as needed
 
 export default function Ride() {
   const { id } = useParams();
@@ -15,6 +16,8 @@ export default function Ride() {
   const [mileage, setMileage] = useState('');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState(null);
+  
+  const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchRideDetails = async () => {
@@ -163,24 +166,65 @@ export default function Ride() {
     }
   }
 };
-
-  const handleCompleteRide = async () => {
+  
+  const handleOpenTimeModal = () => {
+      setIsTimeModalOpen(true);
+  };
+  
+  const handleSaveCompletion = async (driveData) => {
     if (rideDetails) {
       try {
+        // Prepare data to send to the API (status: 'Completed' + drive time/notes)
+        // You might need to adjust your backend API to accept driveTimeAB, mileage, and notes update
+        // or ensure these are part of the 'Completed' status update logic.
+        
+        // For simplicity, we'll update the main fields if they were provided, 
+        // and then set the status to 'Completed'. 
+        // Note: The modal collects hours, minutes, notes, and totalMinutes.
+        const updatePayload = {
+            status: 'Completed',
+            // Update drive time, notes, and mileage based on modal input
+            // NOTE: The modal is designed for total drive time, not just A->B. 
+            // You may need a separate mileage input in the modal or assume it's set elsewhere.
+            // For now, let's assume 'driveTimeAB' in the backend means total time.
+            driveTimeAB: `${driveData.hours} hr ${driveData.minutes} min`, 
+            // Assuming the total ride notes can be updated from the modal notes.
+            notes: driveData.notes.trim() || rideDetails.notes, 
+            // If you want to log totalMinutes, you'd add a field to your database/API for it.
+            // totalMinutes: driveData.totalMinutes 
+        };
+        
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', },
-          body: JSON.stringify({ status: 'Completed' }),
+          body: JSON.stringify(updatePayload),
         });
+        
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`);
         }
-        setRideDetails({ ...rideDetails, status: 'Completed' });
+        
+        // Optimistically update the state and navigate
+        setRideDetails({ 
+            ...rideDetails, 
+            status: 'Completed',
+            driveTimeAB: updatePayload.driveTimeAB,
+            notes: updatePayload.notes,
+        });
         router.push('/Dashboard/rides?tab=completed');
-      } catch (err) { console.error("Error updating ride status to Completed:", err); setError("Failed to mark ride as completed."); }
+        
+      } catch (err) { 
+          console.error("Error updating ride status to Completed:", err); 
+          setError("Failed to mark ride as completed."); 
+      }
     }
   };
+  
+  const handleCloseTimeModal = () => {
+      setIsTimeModalOpen(false);
+  };
+
 
   return (
     <div className="flex w-full h-full bg-white font-sans text-gray-800">
@@ -301,7 +345,8 @@ export default function Ride() {
                     ) : rideDetails.status === 'Reserved' ? (
                         <>
                             <button className="flex-grow px-5 py-3 bg-gray-500 text-white font-semibold rounded-md shadow-md hover:bg-gray-300 transition-colors" onClick={handleUnreserveRide}>Unreserve</button>
-                            <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-colors" onClick={handleCompleteRide}>Completed</button>
+                            {/* Call the function to open the modal */}
+                            <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-colors" onClick={handleOpenTimeModal}>Completed</button> 
                         </>
                     ) : null}
                 </div>
@@ -319,6 +364,13 @@ export default function Ride() {
           />
         )}
       </div>
+      
+      <TotalTimeModal
+        isOpen={isTimeModalOpen}
+        onClose={handleCloseTimeModal}
+        onSave={handleSaveCompletion} 
+      />
+      
     </div>
   );
 }
