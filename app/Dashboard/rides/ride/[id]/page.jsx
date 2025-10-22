@@ -144,19 +144,25 @@ export default function Ride() {
   };
 
   const handleUnreserveRide = async () => {
-    if (rideDetails) {
-      try {
-        const response = await fetch(`/api/rides/${rideDetails.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', },
-          body: JSON.IFY({ status: 'AVAILABLE' }),
-        });
-        if (!response.ok) { throw new Error(`Failed to update ride status: ${response.status}`); }
-        setRideDetails({ ...rideDetails, status: 'AVAILABLE' });
-        router.push('/Dashboard/rides?tab=available');
-      } catch (err) { console.error("Error updating ride status:", err); setError("Failed to unreserve ride."); }
+  if (rideDetails) {
+    try {
+      const response = await fetch(`/api/rides/${rideDetails.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', },
+        body: JSON.stringify({ status: 'AVAILABLE', volunteerID: null }),
+      });
+      if (!response.ok) { 
+        const errorData = await response.json();
+        throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`); 
+      }
+      setRideDetails({ ...rideDetails, status: 'AVAILABLE' });
+      router.push('/Dashboard/rides?tab=available');
+    } catch (err) { 
+      console.error("Error updating ride status:", err); 
+      setError("Failed to unreserve ride."); 
     }
-  };
+  }
+};
 
   const handleCompleteRide = async () => {
     if (rideDetails) {
