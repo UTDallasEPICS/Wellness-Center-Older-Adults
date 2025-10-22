@@ -18,7 +18,7 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
     lastName: "",
     address: "",
     city: "",
-    state: "", // Initialize with an empty string or default state
+    state: "TX", // Initialize with an empty string or default state
     phone: "",
     zipcode: "",
   });
