@@ -20,7 +20,9 @@ export default function Page() {
         if (roleRes.ok && roleData.role) {
           setRole(roleData.role);
           if (roleData.role === 'ADMIN') {
-            // Stay on this page
+            // Stay on this page - fetch dashboard data
+            await fetchUserName();
+            await fetchRides();
           } else if (roleData.role === 'VOLUNTEER') {
             router.replace('/Dashboard/rides'); // Redirect volunteers to rides page
             return;
@@ -32,13 +34,6 @@ export default function Page() {
           setRole(null);
           router.replace('/');
           return;
-        }
-        const response = await fetch('/api/getFirstName');
-        const data = await response.json();
-        if (response.ok) {
-          setWelcomeMessage(data.message);
-        } else {
-          console.error(data.error);
         }
       } catch (error) {
         console.error('Error fetching user data:', error);

@@ -1,3 +1,380 @@
+// // app\Dashboard\volunteers\page.jsx
+// "use client";
+// import React, { useEffect, useState } from "react";
+// import AddVolunteersTable from "/app/components/AddVolunteersTable.jsx";
+// import EditVolunteerModal from "/app/components/EditVolunteerModal.jsx";
+// import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+
+// const modalOverlayStyle = {
+//   position: 'fixed',
+//   top: 0,
+//   left: 0,
+//   width: '100%',
+//   height: '100%',
+//   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//   display: 'flex',
+//   justifyContent: 'center',
+//   alignItems: 'center',
+//   zIndex: 50,
+// };
+
+// const modalContentStyle = {
+//   backgroundColor: 'white',
+//   padding: '20px',
+//   borderRadius: '8px',
+//   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+//   maxWidth: '90%',
+//   maxHeight: '90%',
+//   overflowY: 'auto',
+//   position: 'relative',
+// };
+
+// const modalCloseButtonStyle = {
+//   position: 'absolute',
+//   top: '10px',
+//   right: '10px',
+//   background: 'none',
+//   border: 'none',
+//   fontSize: '1.5em',
+//   cursor: 'pointer',
+//   color: 'gray',
+// };
+
+// export default function Page() {
+//   const [volunteersData, setVolunteersData] = useState([]);
+//   const [addFormData, setAddFormData] = useState({
+//     firstName: "",
+//     lastName: "",
+//     email: "",
+//     phone: "",
+//   });
+//   const [editVolunteerId, setEditVolunteerId] = useState(null);
+//   const [editFormData, setEditFormData] = useState({
+//     firstName: "",
+//     lastName: "",
+//     email: "",
+//     phone: "",
+//   });
+//   const [showEditModal, setShowEditModal] = useState(false);
+//   const [showDeleteModal, setShowDeleteModal] = useState(false);
+//   const [volunteerToDelete, setVolunteerToDelete] = useState(null); // Changed to store only ID
+//   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+//   const fetchVolunteers = async () => {
+//     try {
+//       const response = await fetch('/api/getAllVolunteers');
+//       const data = await response.json();
+//       if (response.ok) {
+//         setVolunteersData(data);
+//       } else {
+//         throw new Error(data.message || 'Failed to fetch volunteers');
+//       }
+//     } catch (error) {
+//       console.error('Error fetching volunteers:', error);
+//       toast.error('Error fetching volunteers.');
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchVolunteers();
+//   }, []);
+
+//   const handleAddFormChange = (event) => {
+//     const fieldName = event.target.getAttribute("name");
+//     const fieldValue = event.target.value;
+//     setAddFormData({ ...addFormData, [fieldName]: fieldValue });
+//   };
+
+//   const handleOpenAddModal = () => {
+//     setIsAddModalOpen(true);
+//   };
+
+//   const handleCloseAddModal = () => {
+//     setIsAddModalOpen(false);
+//     setAddFormData({ firstName: "", lastName: "", email: "", phone: "" });
+//   };
+
+//   const handleAddFormSubmit = async (event) => {
+//     event.preventDefault();
+
+//     if (!addFormData.firstName.trim() ||
+//       !addFormData.lastName.trim() ||
+//       !addFormData.email.trim() ||
+//       !addFormData.phone.trim()) {
+//       toast.error("Volunteer not added! Empty Field(s)!");
+//       return;
+//     }
+
+//     const newVolunteer = {
+//       firstName: addFormData.firstName,
+//       lastName: addFormData.lastName,
+//       email: addFormData.email,
+//       phone: addFormData.phone,
+//     };
+
+//     try {
+//       const response = await fetch('/api/addVolunteer', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(newVolunteer),
+//       });
+
+//       const data = await response.json();
+
+//       if (!response.ok) {
+//         throw new Error(data.message || 'Failed to add volunteer');
+//       }
+
+//       // Success (201 Created)
+//       const createdUser = data.data;
+//       handleCloseAddModal();
+//       toast.success("Volunteer added successfully!");
+//       window.location.reload();
+//     } catch (error) {
+//       console.error('Error adding volunteer:', error);
+//       toast.error(error.message || "Failed to add volunteer.");
+//     }
+//   };
+
+//   const handleEditClick = (volunteer) => {
+//     setEditVolunteerId(volunteer.id);
+//     setEditFormData({
+//       firstName: volunteer.firstName,
+//       lastName: volunteer.lastName,
+//       email: volunteer.email,
+//       phone: volunteer.phone,
+//     });
+//     setShowEditModal(true);
+//   };
+
+//   const handleEditFormChange = (event) => {
+//     const fieldName = event.target.getAttribute("name");
+//     const fieldValue = event.target.value;
+//     setEditFormData({ ...editFormData, [fieldName]: fieldValue });
+//   };
+
+//   const handleSaveClick = async (event) => {
+//     event.preventDefault();
+//     try {
+//       const response = await fetch('/api/editVolunteer', {
+//         method: 'PUT',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           id: Number(editVolunteerId),
+//           ...editFormData
+//         }),
+//       });
+
+//       const result = await response.json();
+
+//       if (result.status === 200) {
+//         const updatedVolunteers = volunteersData.map((volunteer) =>
+//           volunteer.id === editVolunteerId
+//             ? { ...volunteer, ...editFormData }
+//             : volunteer
+//         );
+
+//         setVolunteersData(updatedVolunteers);
+//         setEditVolunteerId(null);
+//         setShowEditModal(false);
+//         toast.success("Volunteer updated successfully!");
+//         window.location.reload(); // And here!
+
+//       } else {
+//         throw new Error(result.message);
+//       }
+//     } catch (error) {
+//       console.error('Error updating volunteer:', error);
+//       toast.error(error.message || "Failed to update volunteer.");
+//     }
+//   };
+
+//   const handleDeleteClick = (VolunteerID) => {
+//     console.log("Delete button clicked for VolunteerID:", VolunteerID);
+//     setVolunteerToDelete(VolunteerID); // Store only the ID
+//     console.log("volunteerToDelete state:", VolunteerID);
+//     setShowDeleteModal(true);
+//   };
+
+//   const handleConfirmDelete = async () => {
+//     console.log("handleConfirmDelete called. volunteerToDelete:", volunteerToDelete);
+//     const volunteerIdToDelete = volunteerToDelete; // Directly use the ID
+//     console.log("volunteerIdToDelete:", volunteerIdToDelete);
+//     const previousVolunteersData = [...volunteersData];
+
+//     // Optimistically update the UI
+//     setVolunteersData(volunteersData.filter(
+//       (volunteer) => volunteer.id !== volunteerIdToDelete
+//     ));
+//     setShowDeleteModal(false);
+//     setVolunteerToDelete(null);
+
+//     try {
+//       const response = await fetch(`/api/deleteVolunteer/${volunteerIdToDelete}`, {
+//         method: 'DELETE',
+//       });
+
+//       if (!response.ok) {
+//         // Revert the optimistic update on error
+//         setVolunteersData(previousVolunteersData);
+//         const errorData = await response.json();
+//         throw new Error(errorData?.message || 'Failed to delete volunteer');
+//       }
+
+//       toast.success("Volunteer deleted successfully!");
+//       window.location.reload();
+
+//     } catch (error) {
+//       console.error('Error deleting volunteer:', error);
+//       toast.error(error.message || "Failed to delete volunteer.");
+//       // Optionally, re-fetch data to ensure consistency if optimistic update fails consistently
+//       // fetchVolunteers();
+//     }
+//   };
+
+//   const handleCancelDelete = () => {
+//     setShowDeleteModal(false);
+//     setVolunteerToDelete(null);
+//   };
+
+//   const handleCancelClick = () => {
+//     setEditVolunteerId(null);
+//     setShowEditModal(false);
+//   };
+
+//   return (
+//     <div className="w-full min-h-screen bg-[#f4f1f0] flex flex-col relative"> {/* Main container */}
+//             <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
+//                 <div className="text-black text-left font-light text-[30px]">
+//                     <h1>Volunteers</h1>
+//                 </div>
+//         <div className="ml-auto flex pr-6 pr-4 pt-4">
+//                     <button
+//                         type="button"
+//                         className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
+//                         onClick={() => setIsAddModalOpen(true)}
+//                     >
+//                         <span className="material-symbols-rounded">add</span>
+//                     </button>
+//                 </div>
+//       </div>
+//       <div className="mt-8">
+//         <AddVolunteersTable
+//           volunteersData={volunteersData}
+//           handleEditClick={handleEditClick}
+//           handleDeleteClick={handleDeleteClick}
+//           handleEditFormChange={handleEditFormChange}
+//           handleSaveClick={handleSaveClick}
+//           handleCancelClick={handleCancelClick}
+//           editVolunteerId={editVolunteerId}
+//           editFormData={editFormData}
+//         />
+//       </div>
+
+//       {isAddModalOpen && (
+//         <div style={modalOverlayStyle}>
+//           <div style={modalContentStyle}>
+//             <button style={modalCloseButtonStyle} onClick={handleCloseAddModal}>&times;</button>
+//             <h2 className="text-left font-light text-2xl mb-5">Add a Volunteer</h2>
+//             <form
+//               className="flex flex-col space-y-4"
+//               onSubmit={handleAddFormSubmit}
+//             >
+//               <div className="w-full">
+//                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+//                   First Name
+//                 </label>
+//                 <input
+//                   className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+//                   type="text"
+//                   name="firstName"
+//                   placeholder="First Name"
+//                   value={addFormData.firstName}
+//                   onChange={handleAddFormChange}
+//                 />
+//               </div>
+
+//               <div className="w-full">
+//                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+//                   Last Name
+//                 </label>
+//                 <input
+//                   className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+//                   type="text"
+//                   name="lastName"
+//                   placeholder="Last Name"
+//                   value={addFormData.lastName}
+//                   onChange={handleAddFormChange}
+//                 />
+//               </div>
+
+//               <div className="w-full">
+//                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+//                   Email
+//                 </label>
+//                 <input
+//                   className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+//                   type="email"
+//                   name="email"
+//                   placeholder="Email"
+//                   value={addFormData.email}
+//                   onChange={handleAddFormChange}
+//                 />
+//               </div>
+
+//               <div className="w-full">
+//                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+//                   Phone
+//                 </label>
+//                 <input
+//                   className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+//                   type="text"
+//                   name="phone"
+//                   placeholder="Phone"
+//                   value={addFormData.phone}
+//                   onChange={handleAddFormChange}
+//                 />
+//               </div>
+
+//               <div className="w-full flex justify-end mt-4">
+//                 <button
+//                   className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-[#419902]"
+//                   type="submit"
+//                 >
+//                   Add
+//                 </button>
+//               </div>
+//             </form>
+//           </div>
+//         </div>
+//       )}
+
+//       {showEditModal && (
+//         <EditVolunteerModal
+//           editFormData={editFormData}
+//           handleEditFormChange={handleEditFormChange}
+//           handleSaveClick={handleSaveClick}
+//           handleCancelClick={handleCancelClick}
+//         />
+//       )}
+
+//       {showDeleteModal && (
+//         <DeleteConfirmationModal
+//           volunteerName={volunteersData.find(v => v.id === volunteerToDelete)?.firstName + " " + volunteersData.find(v => v.id === volunteerToDelete)?.lastName}
+//           handleConfirmDelete={handleConfirmDelete}
+//           handleCancelDelete={handleCancelDelete}
+//         />
+//       )}
+//     </div>
+//   );
+// }
+
 // app\Dashboard\volunteers\page.jsx
 "use client";
 import React, { useEffect, useState } from "react";
@@ -59,8 +436,9 @@ export default function Page() {
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [volunteerToDelete, setVolunteerToDelete] = useState(null); // Changed to store only ID
+  const [volunteerToDelete, setVolunteerToDelete] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchVolunteers = async () => {
     try {
@@ -80,6 +458,15 @@ export default function Page() {
   useEffect(() => {
     fetchVolunteers();
   }, []);
+
+  // Filter volunteers based on search query
+  const filteredVolunteers = volunteersData.filter(volunteer => {
+    const fullName = `${volunteer.firstName} ${volunteer.lastName}`.toLowerCase();
+    const searchLower = searchQuery.toLowerCase();
+    return fullName.includes(searchLower) || 
+           volunteer.email.toLowerCase().includes(searchLower) ||
+           volunteer.phone.includes(searchQuery);
+  });
 
   const handleAddFormChange = (event) => {
     const fieldName = event.target.getAttribute("name");
@@ -129,8 +516,6 @@ export default function Page() {
         throw new Error(data.message || 'Failed to add volunteer');
       }
 
-      // Success (201 Created)
-      const createdUser = data.data;
       handleCloseAddModal();
       toast.success("Volunteer added successfully!");
       window.location.reload();
@@ -184,8 +569,7 @@ export default function Page() {
         setEditVolunteerId(null);
         setShowEditModal(false);
         toast.success("Volunteer updated successfully!");
-        window.location.reload(); // And here!
-
+        window.location.reload();
       } else {
         throw new Error(result.message);
       }
@@ -197,18 +581,14 @@ export default function Page() {
 
   const handleDeleteClick = (VolunteerID) => {
     console.log("Delete button clicked for VolunteerID:", VolunteerID);
-    setVolunteerToDelete(VolunteerID); // Store only the ID
-    console.log("volunteerToDelete state:", VolunteerID);
+    setVolunteerToDelete(VolunteerID);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    console.log("handleConfirmDelete called. volunteerToDelete:", volunteerToDelete);
-    const volunteerIdToDelete = volunteerToDelete; // Directly use the ID
-    console.log("volunteerIdToDelete:", volunteerIdToDelete);
+    const volunteerIdToDelete = volunteerToDelete;
     const previousVolunteersData = [...volunteersData];
 
-    // Optimistically update the UI
     setVolunteersData(volunteersData.filter(
       (volunteer) => volunteer.id !== volunteerIdToDelete
     ));
@@ -221,7 +601,6 @@ export default function Page() {
       });
 
       if (!response.ok) {
-        // Revert the optimistic update on error
         setVolunteersData(previousVolunteersData);
         const errorData = await response.json();
         throw new Error(errorData?.message || 'Failed to delete volunteer');
@@ -229,12 +608,9 @@ export default function Page() {
 
       toast.success("Volunteer deleted successfully!");
       window.location.reload();
-
     } catch (error) {
       console.error('Error deleting volunteer:', error);
       toast.error(error.message || "Failed to delete volunteer.");
-      // Optionally, re-fetch data to ensure consistency if optimistic update fails consistently
-      // fetchVolunteers();
     }
   };
 
@@ -249,34 +625,46 @@ export default function Page() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#f4f1f0] flex flex-col relative"> {/* Main container */}
-            <div className="flex flex-row items-center bg-[#f4f1f0] py-8 px-8"> {/* Header */}
-                <div className="text-black text-left font-light text-[30px]">
-                    <h1>Volunteers</h1>
-                </div>
-        <div className="ml-auto flex pr-6 pr-4 pt-4">
-                    <button
-                        type="button"
-                        className="h-[45px] w-[45px] rounded-full text-white bg-[#419902] border-none flex items-center justify-center shadow-md mr-2"
-                        onClick={() => setIsAddModalOpen(true)}
-                    >
-                        <span className="material-symbols-rounded">add</span>
-                    </button>
-                </div>
-      </div>
-      <div className="mt-8">
-        <AddVolunteersTable
-          volunteersData={volunteersData}
-          handleEditClick={handleEditClick}
-          handleDeleteClick={handleDeleteClick}
-          handleEditFormChange={handleEditFormChange}
-          handleSaveClick={handleSaveClick}
-          handleCancelClick={handleCancelClick}
-          editVolunteerId={editVolunteerId}
-          editFormData={editFormData}
-        />
+    <div className="w-full min-h-screen bg-[#f4f1f0] p-6">
+      {/* Header Section */}
+      <div className="flex flex-col mb-6">
+        <h1 className="text-2xl font-light text-gray-800 mb-4">Volunteers</h1>
+        
+        {/* Search Bar and Add Button */}
+        <div className="flex items-center justify-between">
+          <div className="relative w-64">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search by Volunteer..."
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <button
+            type="button"
+            className="bg-[#0da000] hover:bg-[#0c8a00] text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition duration-200"
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            <span className="material-symbols-rounded text-lg">+</span>
+          </button>
+        </div>
       </div>
 
+      {/* Table Section */}
+      <AddVolunteersTable
+        volunteersData={filteredVolunteers}
+        handleEditClick={handleEditClick}
+        handleDeleteClick={handleDeleteClick}
+      />
+
+      {/* Add Volunteer Modal */}
       {isAddModalOpen && (
         <div style={modalOverlayStyle}>
           <div style={modalContentStyle}>

@@ -16,6 +16,8 @@ const DisplayRidesTable = ({
     const handleDeleteClick = (id) => { console.warn("Delete not available on this volunteer page."); };
     // --- ------------------------------------------------------------------------------------------ ---
 
+    
+
   return (
     <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-[#fffdf5]">
       <h2 className="text-center text-[1.2rem] font-light text-gray-500 mt-4 mb-2">
@@ -30,9 +32,6 @@ const DisplayRidesTable = ({
           <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Contact Number</th>
           <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Address</th>
           <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Pick-up Time</th>
-          {/* NOTE: Your table headers here seem to be missing 'Date' and 'Hours' 
-            but the ReadOnlyRow only outputs 4 data columns + 1 action column.
-            I've kept the headers as you provided, but be aware of the mismatch. */}
           <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">Actions</th>
           </tr>
         </thead>
