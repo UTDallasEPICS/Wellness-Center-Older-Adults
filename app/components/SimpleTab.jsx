@@ -1,52 +1,74 @@
-import React, { useState } from 'react';
+// app/components/SimpleTab.jsx
+"use client";
+import React, { useState, useEffect } from 'react';
 
-const SimpleTab = ({ activeKey, children, onTabAdd }) => {
-  const [key, setKey] = useState(activeKey);
-  const childArray = Array.isArray(children) ? children : [children];
+const SimpleTab = ({ 
+    activeKey, 
+    children, 
+    onChange, // Renamed from onTabClick for better convention
+    tabClassName = "",
+    activeTabClassName = "",
+    inactiveTabClassName = "",
+    tabContainerClassName = "",
+    contentContainerClassName = ""
+}) => {
+    // Use an internal state that mirrors the controlled state (activeKey) if onChange is provided, 
+    // or manages its own state if not fully controlled.
+    const [key, setKey] = useState(activeKey);
+    useEffect(() => {
+        setKey(activeKey);
+    }, [activeKey]);
 
-  const handleTabClick = (newKey) => {
-    setKey(newKey);
-  };
+    const childArray = React.Children.toArray(children).filter(Boolean);
 
-  const handleAddButtonClick = () => {
-    if (onTabAdd) {
-      onTabAdd();
-    }
-  };
+    const handleTabClick = (newKey) => {
+        if (onChange) {
+            onChange(newKey);
+        }
+        setKey(newKey);
+    };
 
-  return (
-    <div className="mt-[5%] ml-[calc(5%-20px)] w-[90%] text-left rounded-lg border border-gray-300 p-6 bg-[#f4f1f0]">
-      <div className="flex relative bg-[#f4f1f0] border-b border-gray-300">
-        {childArray.map((item) => (
-          <div
-            key={item.props.aKey}
-            className={`min-w-[80px] px-5 py-4 text-gray-600 opacity-60 bg-[#f4f1f0] text-xl text-center font-light cursor-pointer transition-all ease-in-out ${
-              key === item.props.aKey
-                ? 'opacity-100 bg-[#f4f1f0] text-black border-b-4 border-black'
-                : 'hover:opacity-100 hover:[#ffffff]/70'
-            }`}
-            onClick={() => handleTabClick(item.props.aKey)}
-          >
-            {item.props.title}
-          </div>
-        ))}
-      </div>
-      <div className="p-2.5 border-none bg-[#f4f1f0]">
-        {childArray.map((item) => (
-          <div
-            key={item.props.aKey}
-            className={`${key === item.props.aKey ? 'block' : 'hidden'} bg-[#f4f1f0] text-gray-800 font-light`}
-          >
-            {item.props.children}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    return (
+        <div className="w-full">
+            {/* Tab Headers Container */}
+            <div className={`flex relative border-b border-gray-300 ${tabContainerClassName}`}>
+                {childArray.map((item) => {
+                    const isActive = key === item.props.aKey;
+                    const defaultTabStyle = "px-5 py-2 text-xl font-semibold cursor-pointer transition-colors duration-200";
+                    
+                    return (
+                        <div
+                            key={item.props.aKey}
+                            className={`${defaultTabStyle} ${tabClassName} ${
+                                isActive 
+                                    ? activeTabClassName 
+                                    : inactiveTabClassName
+                            }`}
+                            onClick={() => handleTabClick(item.props.aKey)}
+                        >
+                            {item.props.title}
+                        </div>
+                    );
+                })}
+            </div>
+            
+            {/* Tab Content Container */}
+            <div className={`p-0 ${contentContainerClassName}`}>
+                {childArray.map((item) => (
+                    <div
+                        key={item.props.aKey}
+                        className={`${key === item.props.aKey ? 'block' : 'hidden'} w-full`}
+                    >
+                        {item.props.children}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 };
 
 export const Tab = () => {
-  return <></>;
+    return <></>;
 };
 
 export default SimpleTab;

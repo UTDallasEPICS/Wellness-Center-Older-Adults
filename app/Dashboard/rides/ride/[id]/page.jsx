@@ -101,17 +101,8 @@ export default function Ride() {
     try {
       const response = await fetch(`/api/rides/${rideDetails.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          pickupAddress,
-          dropoffAddress,
-          pickupTime,
-          driveTimeAB,
-          mileage,
-           notes,
-        }),
+        headers: { 'Content-Type': 'application/json', },
+        body: JSON.stringify({ pickupAddress, dropoffAddress, pickupTime, driveTimeAB, mileage, notes, }),
       });
       if (!response.ok) { throw new Error(`Failed to update ride details: ${response.status}`); }
 
@@ -153,19 +144,25 @@ export default function Ride() {
   };
 
   const handleUnreserveRide = async () => {
-    if (rideDetails) {
-      try {
-        const response = await fetch(`/api/rides/${rideDetails.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', },
-          body: JSON.stringify({ status: 'AVAILABLE' }),
-        });
-        if (!response.ok) { throw new Error(`Failed to update ride status: ${response.status}`); }
-        setRideDetails({ ...rideDetails, status: 'AVAILABLE' });
-        router.push('/Dashboard/rides?tab=available');
-      } catch (err) { console.error("Error updating ride status:", err); setError("Failed to unreserve ride."); }
+  if (rideDetails) {
+    try {
+      const response = await fetch(`/api/rides/${rideDetails.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', },
+        body: JSON.stringify({ status: 'AVAILABLE', volunteerID: null }),
+      });
+      if (!response.ok) { 
+        const errorData = await response.json();
+        throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`); 
+      }
+      setRideDetails({ ...rideDetails, status: 'AVAILABLE' });
+      router.push('/Dashboard/rides?tab=available');
+    } catch (err) { 
+      console.error("Error updating ride status:", err); 
+      setError("Failed to unreserve ride."); 
     }
-  };
+  }
+};
 
   const handleCompleteRide = async () => {
     if (rideDetails) {
@@ -186,115 +183,133 @@ export default function Ride() {
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/2 p-5 bg-[#f4f1f0] font-sans">
-        <div className="flex justify-between mb-5">
-          <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
-          <p className="m-0">Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Date not available'}</p>
-        </div>
-
-        {/* Details Section */}
-        {isEditing ? (
-          <div className="space-y-4">
-            {/* Trip Edit */}
-            <div>
-              <p className="font-semibold text-gray-700 mb-2">Trip</p>
-              <div className="space-y-2">
-                <label className="block text-sm">
-                  <span className="font-medium text-gray-500">A:</span>
-                  <input type="text" name="pickupAddress" value={pickupAddress} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
-                </label>
-                <label className="block text-sm">
-                  <span className="font-medium text-gray-500">B:</span>
-                  <input type="text" name="dropoffAddress" value={dropoffAddress} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
-                </label>
-              </div>
-            </div>
-
-            {/* Other Edit Fields */}
-            <div className="grid grid-cols-2 gap-4">
-              <label>
-                <span className="font-semibold text-gray-700">Pick-up Time</span>
-                <input type="text" name="pickupTime" value={pickupTime} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
-              </label>
-              <div className="flex flex-col">
-                <p className="font-semibold text-gray-700">Client</p>
-                <p className="mt-1 text-gray-800">{rideDetails.customer?.name}</p>
-              </div>
-              <label>
-                <span className="font-semibold text-gray-700">Drive Time</span>
-                <input type="text" name="driveTimeAB" value={driveTimeAB} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
-              </label>
-              <label>
-                <span className="font-semibold text-gray-700">Total Mileage</span>
-                <input type="text" name="mileage" value={mileage} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors" />
-              </label>
-              <label className="col-span-2">
-                <span className="font-semibold text-gray-700">Notes</span>
-                <textarea name="notes" value={notes} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors"></textarea>
-              </label>
-            </div>
-
-            {/* Edit Action Buttons */}
-            <div className="flex gap-4">
-              <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleSaveClick}>Save</button>
-              <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-lg hover:bg-gray-300 transition-colors" onClick={handleCancelEdit}>Cancel</button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Trip Details */}
-            <div>
-              <div className="flex justify-between items-start">
-                <div className="space-y-1">
-                  <p className="font-semibold text-gray-700">Trip</p>
-                  <p className="text-gray-600">A: {rideDetails.pickupAddress}</p>
-                  <p className="text-gray-600">B: {rideDetails.dropoffAddress}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-gray-700">Pick-up Time</p>
-                  <p className="text-gray-600">{rideDetails.pickupTime ? formatTime(rideDetails.pickupTime) : 'N/A'}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Other Details */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="flex flex-col">
-                <p className="font-semibold text-gray-700">Client</p>
-                <p className="text-gray-600">{rideDetails.customer?.name}</p>
-              </div>
-              <div className="flex flex-col text-right">
-                <p className="font-semibold text-gray-700">Drive Time</p>
-                <p className="text-gray-600">{rideDetails.driveTimeAB}</p>
-              </div>
-              <div className="flex flex-col">
-                <p className="font-semibold text-gray-700">Total Mileage</p>
-                <p className="text-gray-600">{rideDetails.mileage}</p>
-              </div>
-              <div className="flex flex-col col-span-2">
-                <p className="font-semibold text-gray-700">Notes</p>
-                <p className="text-gray-600">{rideDetails.notes || 'N/A'}</p>
-              </div>
-            </div>
-            {/* Action Buttons */}
-            <div className="flex gap-4 mt-6">
-              {(rideDetails.status === 'AVAILABLE' || rideDetails.status === 'Added' || rideDetails.status === 'Unreserved') ? (
-                <>
-                  <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleAcceptRide}>Accept?</button>
-                  <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-lg hover:bg-gray-300 transition-colors" onClick={handleEditClick}>Edit</button>
-                </>
-              ) : rideDetails.status === 'Reserved' ? (
-                <>
-                  <button className="flex-grow px-5 py-3 bg-yellow-500 text-white font-semibold rounded-md shadow-lg hover:bg-yellow-600 transition-colors" onClick={handleUnreserveRide}>Unreserve</button>
-                  <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleCompleteRide}>Completed</button>
-                </>
-              ) : null}
-            </div>
-          </div>
-        )}
-      </div>
+    <div className="flex w-full h-full bg-white font-sans text-gray-800">
       
+      {/* Left Side: Ride Details Panel */}
+      <div className="w-1/2 p-6 overflow-y-auto flex flex-col justify-between">
+        
+        <div className="flex-grow">
+            {/* Header */}
+            <div className="flex justify-between mb-6 border-b border-gray-100 pb-4">
+                <h2 className="text-4xl font-normal">Ride #{rideDetails.id}</h2>
+                <p className="text-gray-600 font-normal text-xl mt-2">Date: {formatDate(rideDetails.date)}</p>
+            </div>
+
+            {/* Content Display (Non-Editing Mode) */}
+            {!isEditing ? (
+                <div className="space-y-6">
+                    {/* Trip Details */}
+                    <div className="space-y-2">
+                        <p className="text-xl font-bold mb-2">Trip</p>
+                        <div className="text-sm pl-4 border-l-4 border-yellow-500 text-gray-700 space-y-1">
+                            <p><span className="font-bold text-gray-900">A:</span> {rideDetails.pickupAddress}</p>
+                            <p><span className="font-bold text-gray-900">B:</span> {rideDetails.dropoffAddress}</p>
+                        </div>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 gap-x-12 gap-y-6 pt-4">
+                        {/* Row 1: Client and Pick-up Time */}
+                        <div className="flex flex-col">
+                            <p className="text-xl font-bold mb-1">Client</p>
+                            <p className="text-gray-700 text-base">{rideDetails.customer?.name || ''}</p>
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="text-xl font-bold mb-1">Pick up Time</p>
+                            <p className="text-gray-700 text-base">{formatTime(rideDetails.pickupTime)}</p>
+                        </div>
+
+                        {/* Row 2: Total Mileage and Drive Time */}
+                        <div className="flex flex-col">
+                            <p className="text-xl font-bold mb-1">Total Mileage</p>
+                            <p className="text-gray-700 text-base">{rideDetails.mileage}</p>
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="text-xl font-bold mb-1">Drive Time</p>
+                            <p className="text-gray-700 text-base">{rideDetails.driveTimeAB}</p>
+                        </div>
+                        
+                        {/* Row 4: Notes */}
+                        <div className="flex flex-col col-span-2">
+                            <p className="text-xl font-bold mb-1">Notes</p>
+                            <p className="text-gray-700 text-base">{rideDetails.notes}</p>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                // --- EDITING MODE --- (Keeping functional edit mode styles)
+                <div className="space-y-6">
+                    {/* Trip Edit */}
+                    <div className="pt-2">
+                        <p className="font-light text-gray-700 text-lg mb-2">Trip</p>
+                        <div className="space-y-3 pl-4 border-l-4 border-green-600 text-sm">
+                            <label className="block">
+                                <span className="font-medium text-gray-500 block">A:</span>
+                                <input type="text" name="pickupAddress" value={pickupAddress} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors p-2 text-gray-700" />
+                            </label>
+                            <label className="block">
+                                <span className="font-medium text-gray-500 block">B:</span>
+                                <input type="text" name="dropoffAddress" value={dropoffAddress} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors p-2 text-gray-700" />
+                            </label>
+                            <label className="block">
+                                <span className="font-medium text-gray-500 block">C:</span>
+                                <input type="text" name="finalAddress" value={rideDetails.finalAddress || ''} disabled className="w-full mt-1 border-gray-200 bg-gray-50 rounded-md shadow-sm p-2 text-gray-500 cursor-not-allowed" />
+                            </label>
+                        </div>
+                    </div>
+                    {/* Other Edit Fields Grid */}
+                    <div className="grid grid-cols-2 gap-x-12 gap-y-4 pt-4 border-t border-gray-100">
+                        <label className="col-span-1">
+                            <span className="font-light text-gray-700 text-lg block mb-1">Pick-up Time</span>
+                            <input type="text" name="pickupTime" value={pickupTime} onChange={handleInputChange} className="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors p-2 text-gray-700" />
+                        </label>
+                        <div className="flex flex-col">
+                            <p className="font-light text-gray-700 text-lg">Client</p>
+                            <p className="mt-1 text-gray-700">{rideDetails.customer?.name}</p>
+                        </div>
+                        <label className="col-span-1">
+                            <span className="font-light text-gray-700 text-lg block mb-1">Drive Time</span>
+                            <input type="text" name="driveTimeAB" value={driveTimeAB} onChange={handleInputChange} className="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors p-2 text-gray-700" />
+                        </label>
+                        <label className="col-span-1">
+                            <span className="font-light text-gray-700 text-lg block mb-1">Total Mileage</span>
+                            <input type="text" name="mileage" value={mileage} onChange={handleInputChange} className="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors p-2 text-gray-700" />
+                        </label>
+                        <div className="flex flex-col col-span-2">
+                            <p className="font-light text-gray-700 text-lg">Notes</p>
+                            <textarea name="notes" value={notes} onChange={handleInputChange} className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-colors p-2 text-gray-700"></textarea>
+                        </div>
+                    </div>
+                    {/* Edit Action Buttons */}
+                    <div className="flex gap-4 pt-4 border-t border-gray-200">
+                        <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors" onClick={handleSaveClick}>Save</button>
+                        <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-lg hover:bg-gray-300 transition-colors" onClick={handleCancelEdit}>Cancel</button>
+                    </div>
+                </div>
+            )}
+        </div>
+        
+        {/* Footer/Action Buttons - Removed Status Bars */}
+        <div className="pt-4 mt-auto">
+            {/* Action Buttons */}
+            {!isEditing && (
+                <div className="flex gap-4">
+                    {(rideDetails.status === 'AVAILABLE' || rideDetails.status === 'Added' || rideDetails.status === 'Unreserved') ? (
+                        <>
+                            <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-colors" onClick={handleAcceptRide}>Accept?</button>
+                            <button className="flex-grow px-5 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-md hover:bg-gray-300 transition-colors" onClick={handleEditClick}>Edit</button>
+                        </>
+                    ) : rideDetails.status === 'Reserved' ? (
+                        <>
+                            <button className="flex-grow px-5 py-3 bg-gray-200 text-white font-semibold rounded-md shadow-md hover:bg-gray-300 transition-colors" onClick={handleUnreserveRide}>Unreserve</button>
+                            <button className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition-colors" onClick={handleCompleteRide}>Completed</button>
+                        </>
+                    ) : null}
+                </div>
+            )}
+        </div>
+      </div> 
+
       {/* Right Side: Map */}
       <div className="w-1/2 h-full">
         {rideDetails?.pickupAddress && rideDetails?.dropoffAddress && (

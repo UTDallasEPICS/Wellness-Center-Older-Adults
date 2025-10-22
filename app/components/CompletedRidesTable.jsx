@@ -1,138 +1,124 @@
+// app/components/CompletedRidesTable.jsx
 import { useState, Fragment, useEffect } from "react";
-import ReadOnlyRow from "/app/components/ReadOnlyRow.jsx";
-import EditableRow from "/app/components/EditableRow.jsx";
+import ReadOnlyRow from "./ReadOnlyRow";
+import EditableRow from "./EditableRow";
 
-const CompletedRidesTable = ({ initialContacts }) => {
-  const [contacts, setContacts] = useState(initialContacts);
-  const [editContactId, setEditContactId] = useState(null);
+const CompletedRidesTable = ({ initialContacts, convertTime, onDeleteRide }) => {
+    const [contacts, setContacts] = useState(initialContacts);
+    const [editContactId, setEditContactId] = useState(null);
+    const [editFormData, setEditFormData] = useState({
+        customerName: "",
+        phoneNumber: "",
+        startAddress: "",
+        pickupTime: "",
+        volunteerName: "",
+    });
 
-  useEffect(() => {
-    setContacts(initialContacts);
-  }, [initialContacts]);
+    useEffect(() => {
+        setContacts(initialContacts);
+    }, [initialContacts]);
 
-  const handleEditClick = (event, contact) => {
-    event.preventDefault();
-    setEditContactId(contact.id);
-    const formValues = {
-      customerName: contact.customerName,
-      phoneNumber: contact.phoneNumber,
-      startAddress: contact.startAddress,
-      pickupTime: contact.pickupTime,
-      volunteerName: contact.volunteerName,
+    const handleEditClick = (event, contact) => {
+        event.preventDefault();
+        setEditContactId(contact.id);
+        const formValues = {
+            customerName: contact.customerName,
+            phoneNumber: contact.phoneNumber,
+            startAddress: contact.startAddress,
+            pickupTime: contact.pickupTime,
+            volunteerName: contact.volunteerName,
+        };
+        setEditFormData(formValues);
     };
-    setEditFormData(formValues);
-  };
 
-  const [editFormData, setEditFormData] = useState({
-    customerName: "",
-    phoneNumber: "",
-    startAddress: "",
-    pickupTime: "",
-    volunteerName: "",
-  });
+    const handleEditFormChange = (event) => {
+        event.preventDefault();
+        const fieldName = event.target.getAttribute("name");
+        const fieldValue = event.target.value;
 
-  const handleEditFormChange = (event) => {
-    event.preventDefault();
-    const fieldName = event.target.getAttribute("name");
-    const fieldValue = event.target.value;
-
-    const newFormData = { ...editFormData };
-    newFormData[fieldName] = fieldValue;
-    setEditFormData(newFormData);
-  };
-
-  const handleEditFormSubmit = (event) => {
-    event.preventDefault();
-    const editedContact = {
-      id: editContactId,
-      customerName: editFormData.customerName,
-      phoneNumber: editFormData.phoneNumber,
-      startAddress: editFormData.startAddress,
-      pickupTime: editFormData.pickupTime,
-      volunteerName: editFormData.volunteerName,
-      status: contacts.find((contact) => contact.id === editContactId).status,
-      hours: contacts.find((contact) => contact.id === editContactId).hours,
+        const newFormData = { ...editFormData };
+        newFormData[fieldName] = fieldValue;
+        setEditFormData(newFormData);
     };
-    const newContacts = [...contacts];
-    const index = contacts.findIndex((contact) => contact.id === editContactId);
-    newContacts[index] = editedContact;
-    setContacts(newContacts);
-    setEditContactId(null);
-  };
 
-  const handleCancelClick = () => {
-    setEditContactId(null);
-  };
+    const handleEditFormSubmit = (event) => {
+        event.preventDefault();
+        // Placeholder for edit submission (in a real app, this would call an API)
+        setEditContactId(null);
+    };
 
-  const handleDeleteClick = (contactId) => {
-    const newContacts = [...contacts];
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    newContacts.splice(index, 1);
-    setContacts(newContacts);
-  };
+    const handleCancelClick = () => {
+        setEditContactId(null);
+    };
 
-return (
-  <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
-    <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
-      <table className="border-collapse ml-[0.5%] w-[99%]">
-        {/* Serves as the header of the table */}
-        <thead>
-          <tr>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-              Client Name
-            </th>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-              Contact Number
-            </th>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-              Address
-            </th>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-              Pick-up Time
-            </th>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-              Volunteer Name
-            </th>
-            <th className="bg-white border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-              Actions
-            </th>
-          </tr>
-        </thead>
+    const handleDeleteClick = (contactId) => {
+        if (onDeleteRide) {
+            onDeleteRide(contactId);
+        }
+    };
 
-        {/* Stores the data */}
-        <tbody>
-          {/*Pulls element from the data structure to map out information */}
-          {Array.isArray(initialContacts) &&
-            initialContacts
-              .filter((contact) => contact.status === "Completed")
-              .map((contact) => (
-                <Fragment key={contact.id}>
-                  {editContactId === contact.id ? (
-                    <EditableRow
-                      editFormData={editFormData}
-                      handleEditFormChange={handleEditFormChange}
-                      status={contact.status}
-                      handleCancelClick={handleCancelClick}
-                    />
-                  ) : (
-                    <ReadOnlyRow
-                      key={contact.id}
-                      contact={contact}
-                      handleEditClick={handleEditClick}
-                      handleDeleteClick={handleDeleteClick}
-                      status={contact.status}
-                      startAddress={contact.startAddress}
-                      convertTime={(time) => time}
-                    />
-                  )}
-                </Fragment>
-              ))}
-        </tbody>
-      </table>
-      {/* Could prob make this a separate component to make it a prompt to add info */}
-    </form>
-  </div>
-);
+    return (
+        <div className="flex flex-col gap-2.5 p-4 overflow-x-auto max-h-[400px] overflow-y-auto font-sans">
+            <form className="flex gap-1.5" onSubmit={handleEditFormSubmit}>
+                <table className="border-collapse ml-[0.5%] w-[99%]">
+                    <thead>
+                        <tr>
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                                Client Name
+                            </th>
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                                Date
+                            </th>
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                                Time
+                            </th>
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                                Contact Number
+                            </th>
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                                Address
+                            </th>
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                                Volunteer Name
+                            </th>
+                            <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {Array.isArray(initialContacts) &&
+                            initialContacts
+                                .filter((contact) => contact.status === "Completed")
+                                .map((contact) => (
+                                    <Fragment key={contact.id}>
+                                        {editContactId === contact.id ? (
+                                            <EditableRow
+                                                editFormData={editFormData}
+                                                handleEditFormChange={handleEditFormChange}
+                                                status={contact.status}
+                                                handleCancelClick={handleCancelClick}
+                                            />
+                                        ) : (
+                                            <ReadOnlyRow
+                                                key={contact.id}
+                                                contact={contact}
+                                                handleEditClick={handleEditClick}
+                                                handleDeleteClick={handleDeleteClick}
+                                                status={contact.status}
+                                                startAddress={contact.startLocation || contact.startAddress}
+                                                convertTime={convertTime}
+                                                userRole="ADMIN" // Assuming Admin view for Completed table actions
+                                            />
+                                        )}
+                                    </Fragment>
+                                ))}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    );
 };
 
 export default CompletedRidesTable;

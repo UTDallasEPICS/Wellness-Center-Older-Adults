@@ -1,140 +1,455 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
-import { toast } from "react-toastify"; 
-import DisplayRidesTable from "../../components/DisplayRidesTable"; 
-import ReservedRidesTable from "../../components/ReservedRidesTable";
-
+import React, { useState, useEffect } from "react";
+import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
+import AddRidesTable from "/app/components/AddRidesTable.jsx";
+import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
+import CompletedRidesTable from "/app/components/CompletedRidesTable.jsx";
+import AddRideForm from "/app/components/AddRideForm.jsx";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
+import RideMap from '../../components/RideMap';
+import { Search, Plus } from 'lucide-react'; // Assuming lucide-react or similar icon library is available
 
 export default function Page() {
-  
-    const [ridesData, setRidesData] = useState([]);
-    const [activeTab, setActiveTab] = useState("available");
-  
-    // 🔑 CORE LOGIC: Derive isVolunteer from the reliable 'role' string.
-    const isVolunteer = user?.role === "VOLUNTEER";
-  
-    // Utility function needed by ReadOnlyRow/ViewOnlyRow
-    const convertTime = (time) => 
-      new Date(time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const { id: rideIdFromParams } = useParams();
+    const router = useRouter();
+    const [rideDetails, setRideDetails] = useState(null);
+    const [ridesData, setRidesData] = useState([]);
+    const [customers, setCustomers] = useState([]);
+    const [addresses, setAddresses] = useState([]);
+    const [notification, setNotification] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const searchParams = useSearchParams();
+    const [activeTab, setActiveTab] = useState('available');
+    const [searchTerm, setSearchTerm] = useState('');
+    // State for checkbox selection
+    const [selectedRides, setSelectedRides] = useState([]);
 
-    // Define refreshRides using useCallback for stability and dependencies
-    const refreshRides = useCallback(async () => {
-      try {
-        // NOTE: Update this API call to fetch ALL rides the current user should see
-        const response = await fetch("/api/rides"); 
-        const data = await response.json();
-        if (response.ok) {
-          setRidesData(data);
-        } else {
-          throw new Error(data.message || "Failed to fetch rides");
-        }
-      } catch (error) {
-        console.error("Error fetching rides:", error);
-        toast.error("Failed to load rides."); 
-      }
-    }, []);
+    const convertTo12Hour = (time24) => {
+        if (!time24) return "";
+        const [hours, minutes] = time24.split(":");
+        let hours12 = parseInt(hours, 10);
+        const ampm = hours12 >= 12 ? "PM" : "AM";
+        if (hours12 > 12) {
+            hours12 -= 12;
+        } else if (hours12 === 0) {
+            hours12 = 12;
+        }
+        return `${hours12}:${minutes} ${ampm}`;
+    };
 
-    useEffect(() => {
-      // Only run if user data is loaded (user?.id ensures we have the user object)
-      if (user?.id) { 
-          refreshRides();
-      }
-    }, [refreshRides, user?.id]);
+    // Handler to toggle individual ride selection
+    const handleToggleRideSelection = (rideId) => {
+        setSelectedRides(prevSelected => {
+            if (prevSelected.includes(rideId)) {
+                return prevSelected.filter(id => id !== rideId);
+            } else {
+                return [...prevSelected, rideId];
+            }
+        });
+    };
 
-    // ------------------------------------------------------------------
-    // 1. Reserve Ride Handler
-    // ------------------------------------------------------------------
-    const handleReserveRide = async (rideId) => {
-      if (!rideId || !user?.volunteerID) {
-          toast.error("Cannot reserve ride: Missing user/ride ID.");
-          return;
-      }
+    // Handler to toggle all visible rides in a tab
+    const handleToggleAllRides = (currentTableRides, isChecked) => {
+        if (isChecked) {
+            const allIds = currentTableRides.map(ride => ride.id);
+            // This implementation simplifies by just setting the selected IDs for the current filtered list
+            setSelectedRides(allIds); 
+        } else {
+            setSelectedRides([]);
+        }
+    };
 
-      try {
-        // The PUT body now explicitly sends the volunteerID
-        const response = await fetch(`/api/reserveRide/${rideId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-              status: 'Reserved', 
-              volunteerID: user.volunteerID // Pass the ID from the logged-in user
-          }), 
-        });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to reserve ride");
-        }
+    const fetchRides = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch("/api/getAvailableRides");
+            if (!response.ok) {
+                throw new Error(`Failed to fetch rides: ${response.status}`);
+            }
+            const rawData = await response.json();
+            
+            // console.log("=== RAW API DATA ===", rawData[0]);
 
-        toast.success("Ride reserved successfully! See the Reserved Rides tab.");
-      
-        // Refresh and switch tab
-        await refreshRides();
-        setActiveTab("reserved"); 
+            const formattedData = rawData.map((ride) => ({
+                id: ride.id,
+                customerID: ride.customerID,
+                customerName: ride.customerName,
+                customerPhone: ride.customerPhone,
+                phoneNumber: ride.customerPhone,
+                startAddressID: ride.startAddressID,
+                endAddressID: ride.endAddressID,
+                startLocation: ride.startLocation,
+                endLocation: ride.endLocation,
+                startAddress: ride.startAddress, 
+                volunteerName: ride.volunteerName, 
+                date: ride.date,
+                startTime: ride.startTime,
+                status: ride.status || "Unreserved",
+            }));
+            
+            // console.log("=== FORMATTED DATA ===", formattedData[0]);
+            
+            setRidesData(formattedData);
+        } catch (error) {
+            setError(error.message);
+            toast.error("Failed to load rides. Please check your network connection.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      } catch (error) {
-        console.error("Error reserving ride:", error);
-        toast.error(`Failed to reserve ride: ${error.message}`);
-      }
-    };
+    const fetchCustomers = async () => {
+        try {
+            const response = await fetch("/api/customer/getCustomer");
+            if (response.ok) {
+                const data = await response.json();
+                setCustomers(data);
+            }
+        } catch (error) {
+            console.error("Error fetching customers:", error);
+        }
+    };
 
-    // ------------------------------------------------------------------
-    // 2. Filter Rides
-    // ------------------------------------------------------------------
-    // The 'Available' tab shows rides that can be taken by any volunteer
-    const availableRides = ridesData.filter(
-      (ride) => ride.status === "AVAILABLE"
-    );
-    // The 'Reserved' tab shows rides specifically reserved by the current user
-    const reservedRides = ridesData.filter(
-      (ride) => ride.status === "Reserved" && ride.volunteerID === user?.volunteerID
-    );
+    const fetchAddresses = async () => {
+        try {
+            // NOTE: It seems strange to use /api/getAvailableRides for addresses, but kept it as per original code.
+            const response = await fetch("/api/getAvailableRides"); 
+            if (response.ok) {
+                const data = await response.json();
+                setAddresses(data);
+            }
+        } catch (error) {
+            console.error("Error fetching addresses:", error);
+        }
+    };
 
-    return (
-      <div className="mt-[2%] ml-[calc(5%-20px)] w-[90%]">
-        <div className="flex gap-8 mb-2 pl-8 pt-8">
-          <button
-            className={`text-2xl font-light pb-2 border-b-4 transition-colors duration-200 ${
-              activeTab === "available"
-                ? "border-gray-700 text-gray-500"
-                : "border-transparent text-gray-400"
-            }`}
-            onClick={() => setActiveTab("available")}
-          >
-            Available Rides ({availableRides.length})
-          </button>
-          <button
-            className={`text-2xl font-light pb-2 border-b-4 transition-colors duration-200 ${
-              activeTab === "reserved"
-                ? "border-gray-700 text-gray-500"
-                : "border-transparent text-gray-400"
-            }`}
-            onClick={() => setActiveTab("reserved")}
-          >
-            My Reserved Rides ({reservedRides.length})
-          </button>
-        </div>
-        <div className="rounded-lg border border-gray-300 bg-[#fffdf5] p-6">
-          {activeTab === "available" && (
-            <DisplayRidesTable 
-              ridesData={availableRides} 
-              handleReserveClick={handleReserveRide} // Corrected prop name
-              isVolunteer={isVolunteer}             // Passes TRUE/FALSE based on 'role'
-              convertTime={convertTime}             // Passes the utility
-              // NOTE: Ensure startAddress is passed if needed by DisplayRidesTable
-            />
-          )}
-          {activeTab === "reserved" && (
-            <ReservedRidesTable 
-              initialContacts={reservedRides} 
-              isVolunteer={isVolunteer} 
-              convertTime={convertTime}
-              // Add other necessary handlers (e.g., handleCompleteRide)
-            />
-          )}
-        </div>
-      </div>
-    );
+    const fetchRideDetails = async (id) => {
+        try {
+            const response = await fetch(`/api/ride/get/${id}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ride details: ${response.status}`);
+            }
+            const data = await response.json();
+            setRideDetails(data);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    useEffect(() => {
+        const tabFromQuery = searchParams.get('tab');
+        if (tabFromQuery && ['available', 'reserved', 'completed'].includes(tabFromQuery)) {
+            setActiveTab(tabFromQuery);
+        }
+        fetchRides();
+        fetchCustomers();
+        fetchAddresses();
+        if (rideIdFromParams) {
+            fetchRideDetails(rideIdFromParams);
+        }
+    }, [searchParams, rideIdFromParams]);
+
+    const handleAddRide = async (newRideData) => {
+        try {
+            const response = await fetch('/api/createRide', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newRideData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to add ride: ${response.status} - ${errorData?.message || 'Unknown error'}`);
+            }
+
+            toast.success("Ride added successfully!");
+            setIsModalOpen(false); // Close the modal
+            await fetchRides(); // Fetch updated list
+        } catch (error) {
+            console.error("Error adding ride:", error);
+            toast.error(`Failed to add ride: ${error.message}`);
+        }
+    };
+
+
+
+    const handleReserveClick = async (rideId) => {
+        try {
+            const response = await fetch(`/api/rides/${rideId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'Reserved' }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to reserve ride: ${response.status} - ${errorData?.message || 'Unknown error'}`);
+            }
+
+            toast.success("Ride reserved successfully!");
+            
+            // Move the user to the reserved tab and refresh data
+            setActiveTab('reserved');
+            router.push('/Dashboard/rides?tab=reserved', undefined, { shallow: true });
+            await fetchRides();
+
+        } catch (error) {
+            console.error("Error reserving ride:", error);
+            toast.error(`Failed to reserve ride: ${error.message}`);
+        }
+    };
+
+    const handleAddFormSubmit = (formData) => {
+        // NOTE: Redundant as handleAddRide already closes modal and refreshes, 
+        // but kept to ensure modal closes/redirects if form submission is decoupled.
+        setIsModalOpen(false); 
+        // window.location.reload(); // Removed unnecessary page reload here
+    };
+
+    function formatTime(timeString) {
+        if (!timeString) return "";
+        const [hours, minutes] = timeString.split(":");
+        let formattedHours = parseInt(hours, 10);
+        const formattedMinutes = String(minutes).padStart(2, "0");
+        const ampm = formattedHours >= 12 ? 'PM' : 'AM';
+        formattedHours = formattedHours % 12;
+        formattedHours = formattedHours ? formattedHours : 12;
+        return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    }
+
+    const handleAcceptRide = async () => {
+        if (rideDetails) {
+            try {
+                const response = await fetch(`/api/rides/${rideDetails.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'Reserved' }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update ride status: ${response.status}`);
+                }
+                toast.success("Ride reserved successfully!");
+                setRideDetails({ ...rideDetails, status: 'Reserved' }); // Update local state
+                router.push('/Dashboard/rides?tab=reserved');
+            } catch (err) {
+                console.error("Error updating ride status:", err);
+                toast.error("Failed to reserve ride.");
+            }
+        }
+    };
+
+    const handleCompleteRide = async () => {
+        if (rideDetails) {
+            try {
+                const response = await fetch(`/api/rides/${rideDetails.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'Completed' }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Failed to update ride status: ${response.status} - ${errorData?.error || 'Unknown error'}`);
+                }
+                toast.success("Ride completed successfully!");
+                setRideDetails({ ...rideDetails, status: 'Completed' }); // Update local state
+                router.push('/Dashboard/rides?tab=completed');
+            } catch (err) {
+                console.error("Error updating ride status to Completed:", err);
+                toast.error("Failed to mark ride as completed.");
+            }
+        }
+    };
+
+    if (loading && !rideIdFromParams) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p>Loading rides...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen text-red-500">
+                <p>Error: {error}</p>
+            </div>
+        );
+    }
+
+
+    /**
+     * Filters the rides data based on status and the search term.
+     * @param {string|string[]} statusFilter - The status or array of statuses to filter by.
+     * @returns {object[]} The filtered array of ride objects.
+     */
+    const filterRides = (statusFilter) => {
+        return ridesData.filter(ride => {
+            const statusMatch = Array.isArray(statusFilter) ? statusFilter.includes(ride.status) : ride.status === statusFilter;
+            
+            if (!statusMatch) return false;
+
+            if (searchTerm.trim() === '') return true;
+
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+            // Search logic: customer name, start location, or volunteer name
+            return (
+                (ride.customerName && ride.customerName.toLowerCase().includes(lowerCaseSearchTerm)) ||
+                (ride.startLocation && ride.startLocation.toLowerCase().includes(lowerCaseSearchTerm)) ||
+                (ride.volunteerName && ride.volunteerName.toLowerCase().includes(lowerCaseSearchTerm))
+            );
+        });
+    };
+
+    const availableRides = filterRides(["Added", "Unreserved", "AVAILABLE"]);
+    const reservedRides = filterRides("Reserved");
+    const completedRides = filterRides("Completed");
+
+
+    const tabs = [
+        {
+            aKey: "available",
+            title: `Unreserved (${availableRides.length})`,
+            content: (
+                <AddRidesTable
+                    initialContacts={availableRides}
+                    convertTime={convertTo12Hour}
+                    //onEditRide={handleEditRide}
+                    //onDeleteRide={handleDeleteRide}
+                    // FIX: Pass the new handleReserveClick function
+                    handleReserveClick={handleReserveClick} 
+                    customers={customers}
+                    addresses={addresses}
+                    selectedRides={selectedRides} 
+                    onToggleSelect={handleToggleRideSelection}
+                    onToggleAll={handleToggleAllRides}
+                />
+            ),
+        },
+        {
+            aKey: "reserved",
+            title: `Reserved (${reservedRides.length})`,
+            content: (
+                <ReservedRidesTable
+                    initialContacts={reservedRides}
+                    convertTime={convertTo12Hour}
+                    //onRideDeleted={handleDeleteRide}
+                    //onRideUpdated={handleEditRide}
+                    selectedRides={selectedRides} 
+                    onToggleSelect={handleToggleRideSelection}
+                    onToggleAll={handleToggleAllRides}
+                />
+            ),
+        },
+        {
+            aKey: "completed",
+            title: `Completed (${completedRides.length})`,
+            content: (
+                <CompletedRidesTable
+                    initialContacts={completedRides}
+                    convertTime={convertTo12Hour}
+                    //onDeleteRide={handleDeleteRide}
+                    selectedRides={selectedRides} 
+                    onToggleSelect={handleToggleRideSelection}
+                    onToggleAll={handleToggleAllRides}
+                />
+            ),
+        },
+    ];
+
+    // --- Main Rides Page UI with Search and New Layout ---
+    return (
+        <div className="h-full w-full p-10 bg-[#f4f4f4] flex justify-center">
+            {/* The main content container (max-w-6xl for better desktop display) */}
+            <div className="max-w-6xl w-full">
+                
+                {/* Header and Add Button */}
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-4xl font-light text-gray-800">Rides</h1>
+                    <button
+                        type="button"
+                        className="h-12 w-12 rounded-full text-white bg-[#419902] hover:bg-[#378300] transition-colors flex items-center justify-center shadow-lg"
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        <Plus size={28} />
+                    </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="flex items-center space-x-4 mb-8">
+                    <div className="relative flex-grow">
+                        <input
+                            type="text"
+                            placeholder="Search by Client, Location, or Volunteer..."
+                            className="w-full py-3.5 pl-12 pr-4 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-[#419902]"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    </div>
+                    {/* Filter is live on change, so keeping this button for aesthetics/alignment */}
+                    <button
+                        type="button"
+                        className="py-3 px-8 text-lg font-semibold rounded-lg text-white bg-[#419902] hover:bg-[#378300] transition-colors shadow-md"
+                        onClick={() => { /* No action needed, search is live */ }}
+                    >
+                        Search
+                    </button>
+                </div>
+
+                {/* Tabs */}
+                <SimpleTab 
+                    activeKey={activeTab} 
+                    onChange={(key) => {
+                        setActiveTab(key);
+                        // Update the URL query parameter for persistence across refreshes
+                        router.push(`/Dashboard/rides?tab=${key}`, undefined, { shallow: true });
+                    }}
+                    tabClassName="text-xl font-semibold px-4 py-2"
+                    activeTabClassName="text-[#419902] border-b-4 border-[#419902]" 
+                    inactiveTabClassName="text-gray-500 hover:text-[#419902]/80 transition-colors"
+                >
+                    {tabs.map((item) => (
+                        <Tab 
+                            key={item.aKey} 
+                            aKey={item.aKey} 
+                            title={item.title}
+                        >
+                            <div className="mt-4">
+                                {item.content}
+                            </div>
+                        </Tab>
+                    ))}
+                </SimpleTab>
+
+            </div>
+
+            <AddRideForm
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                handleAddFormSubmit={handleAddFormSubmit}
+            />
+            
+            {/* Notification is handled by toast, so this block is likely redundant */}
+            {notification && (
+                <div className="absolute top-4 right-4 z-50">{notification}</div>
+            )}
+        </div>
+    );
 }
