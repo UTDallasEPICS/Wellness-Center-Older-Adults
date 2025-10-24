@@ -266,7 +266,6 @@ export default function AccountPage() {
               >
                 <option value="available">Available</option>
                 <option value="unavailable">Unavailable</option>
-                <option value="in drive">In Drive</option>
               </select>
             </div>
             {formData.assignedRides.length > 0 && (
