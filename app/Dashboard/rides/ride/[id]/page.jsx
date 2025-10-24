@@ -328,7 +328,7 @@ export default function Ride() {
               {/* Trip Details */}
               <div className="space-y-2">
                 <p className="text-xl font-bold mb-2">Trip</p>
-                <div className="text-sm pl-4 border-l-4 border-yellow-500 text-gray-700 space-y-1">
+                <div className="text-lg pl-4 border-l-4 border-yellow-500 text-gray-700 space-y-1">
                   <p>
                     <span className="font-bold text-gray-900">A:</span>{" "}
                     {rideDetails.pickupAddress}
