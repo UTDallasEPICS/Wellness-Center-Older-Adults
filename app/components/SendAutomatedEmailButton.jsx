@@ -1,59 +1,50 @@
 import React, { useState } from 'react';
 import { Minus, X, CheckCircle, AlertCircle } from 'lucide-react';
 
-// hardcoded data required by your API (name, email, message)
 const AUTOMATED_EMAIL_DATA = {
     name: "System Tester (Automated)",
+    email: "djanjanam@gmail.com",
     message: "This is a successful automated test email triggered by a frontend button. This confirms that the contact form API route and Nodemailer service are operational.",
 };
 
-// Modal Component
+
 const StatusModal = ({ isOpen, title, message, onClose, type }) => {
     if (!isOpen) return null;
 
     const isSuccess = type === 'success';
 
-    const borderColor = isSuccess ? 'border-green-500' : 'border-red-500';
-    const backgroundColor = isSuccess ? 'bg-green-50' : 'bg-red-50';
-    const iconColor = isSuccess ? 'text-green-500' : 'text-red-500';
+    const statusClasses = {
+        success: 'text-[#00cc00] border-[#00cc00] bg-[#e6ffe6]', 
+        error: 'text-[#cc0000] border-[#cc0000] bg-[#ffe6e6]',
+    };
+
+    const modalColorClasses = statusClasses[type] || statusClasses.error; // Default to error
     const Icon = isSuccess ? CheckCircle : AlertCircle;
 
     return (
-        // Modal Backdrop
-        <div 
-            className="fixed inset-0 flex items-center justify-center z-[1000] bg-black bg-opacity-50" 
-            onClick={onClose}
-        >
-            {/* Modal Content */}
-            <div 
-                className={`bg-white p-5 rounded-lg max-w-sm w-[90%] shadow-2xl border-2 ${borderColor} ${backgroundColor} transform scale-100 transition-transform duration-300 ease-out`}
-                onClick={(e) => e.stopPropagation()}
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+            <div
+                className={`bg-white p-5 rounded-lg max-w-sm w-[90%] shadow-xl border-2 transition-all duration-300 transform scale-100 ${modalColorClasses}`}
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the content
             >
-                {/* Modal Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-gray-200">
                     <div className="flex items-center">
-                        <Icon size={24} className={`mr-2 ${iconColor}`} />
-                        <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+                        <Icon size={24} className={`mr-2 ${isSuccess ? 'text-[#00cc00]' : 'text-[#cc0000]'}`} />
+                        <h2 className="text-xl font-semibold m-0">{title}</h2>
                     </div>
-                    
                     <button 
-                        className="p-1 text-gray-500 hover:text-gray-700 ml-auto" 
+                        className="p-1 text-gray-700 hover:text-gray-900 transition ml-auto border-none bg-transparent cursor-pointer" 
                         onClick={onClose}
                     >
                         <X size={20} />
                     </button>
                 </div>
-                
-                {/* Modal Body */}
                 <div className="py-5">
-                    <p className="text-gray-700">{message}</p>
+                    <p className="m-0">{message}</p>
                 </div>
-                
-                {/* Modal Footer */}
                 <div className="pt-4 border-t border-gray-200 text-right">
                     <button 
-                        className="px-4 py-2 text-white rounded-md transition-colors duration-200 
-                                   bg-[#419902] hover:bg-[#378300]" 
+                        className="bg-[#419902] hover:bg-[#378300] text-white font-medium py-2 px-4 rounded transition" 
                         onClick={onClose}
                     >
                         OK
@@ -71,7 +62,7 @@ const SendAutomatedEmailButton = () => {
     const [statusMessage, setStatusMessage] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
     const [modalTitle, setModalTitle] = useState('');
-    const [modalType, setModalType] = useState('success'); // 'success' or 'error'
+    const [modalType, setModalType] = useState('success'); 
 
     const handleSendEmail = async () => {
         setLoading(true);
@@ -81,7 +72,9 @@ const SendAutomatedEmailButton = () => {
         try {
             const response = await fetch('/api/email', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(AUTOMATED_EMAIL_DATA),
             });
 
@@ -103,7 +96,7 @@ const SendAutomatedEmailButton = () => {
             setStatusMessage('A network error occurred. Please check your connection.');
         } finally {
             setLoading(false);
-            setModalOpen(true); 
+            setModalOpen(true);
         }
     };
 
@@ -118,15 +111,13 @@ const SendAutomatedEmailButton = () => {
                 onClick={handleSendEmail}
                 disabled={loading}
                 className={`
-                    h-12 w-12 rounded-full text-white flex items-center justify-center shadow-lg
-                    transition-all duration-300 ease-in-out border-none
+                    h-12 w-12 rounded-full text-white flex items-center justify-center shadow-lg transition-all 
                     ${loading 
                         ? 'bg-[#378300] cursor-not-allowed' 
-                        : 'bg-[#419902] hover:bg-[#378300] cursor-pointer'
+                        : 'bg-[#419902] hover:bg-[#378300] active:shadow-none cursor-pointer'
                     }
                 `}
             >
-                {/* ellipsis '...' when loading */}
                 {loading ? (
                     <span className="text-xl leading-none">...</span>
                 ) : (
