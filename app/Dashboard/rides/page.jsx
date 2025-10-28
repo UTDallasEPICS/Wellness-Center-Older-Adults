@@ -1,4 +1,3 @@
-// /app/Dashboard/rides/page.jsx
 "use client";
 import React, { useState, useEffect } from "react";
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
@@ -11,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import RideMap from '../../components/RideMap';
 import { Search, Plus } from 'lucide-react';
+import SendAutomatedEmailButton from '/app/components/SendAutomatedEmailButton.jsx'; 
 
 export default function Page() {
     const { id: rideIdFromParams } = useParams();
@@ -331,7 +331,7 @@ export default function Page() {
                 },
                 body: JSON.stringify({ 
                     status: 'AVAILABLE',
-                    volunteerID: null  // Clear the volunteer assignment
+                    volunteerID: null  // Clear the volunteer assignment
                 }),
             });
 
@@ -470,55 +470,6 @@ export default function Page() {
             actionButton = null;
         }
 
-        return (
-            <div className="flex h-screen">
-                <div className="w-1/2 p-5 ride-details-container">
-                    <div className="flex justify-between mb-5">
-                        <h2 className="text-2xl font-bold">Ride #{rideDetails.id}</h2>
-                        <p className="m-0">
-                            Date: {rideDetails.date ? new Date(rideDetails.date).toLocaleDateString() : 'Date not available'}
-                        </p>
-                    </div>
-                    <div className="flex justify-between mb-5">
-                        <div>
-                            <p className="my-1 font-semibold"><strong>Trip</strong></p>
-                            <p className="my-1">A: {rideDetails.pickupAddress}</p>
-                            <p className="my-1">B: {rideDetails.dropoffAddress}</p>
-                        </div>
-                        <p className="m-0">
-                            <strong>Pick-up Time</strong><br />
-                            {rideDetails.pickupTime
-                                ? formatTime(new Date(rideDetails.pickupTime).toLocaleTimeString('en-US', { hour12: false }))
-                                : 'N/A'}
-                        </p>
-                    </div>
-
-                    <div className="flex justify-between mb-5">
-                        <p className="m-0"><strong>Client</strong><br />{rideDetails.customer?.name}</p>
-                        <p className="m-0"><strong>Drive Time</strong><br />A-B: {rideDetails.driveTimeAB}</p>
-                    </div>
-
-                    <div className="flex justify-between mb-5">
-                        <p className="m-0"><strong>Total Mileage</strong><br />{rideDetails.mileage}</p>
-                        <p className="m-0"><strong>Wait Time</strong><br />{rideDetails.waitTime || 'N/A'}</p>
-                    </div>
-
-                    <div className="flex justify-between mb-5">
-                        {actionButton}
-                        <p className="m-0"><strong>Notes</strong><br />N/A</p>
-                    </div>
-                </div>
-                <div className="w-1/2 h-screen">
-                    {rideDetails?.pickupAddress && rideDetails?.dropoffAddress && (
-                        <RideMap
-                            pickupAddress={rideDetails.pickupAddress}
-                            dropoffAddress={rideDetails.dropoffAddress}
-                            finalAddress={rideDetails.dropoffAddress}
-                        />
-                    )}
-                </div>
-            </div>
-        );
     }
 
     const filterRides = (statusFilter) => {
@@ -595,13 +546,19 @@ export default function Page() {
                 
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-4xl font-light text-gray-800">Rides</h1>
-                    <button
-                        type="button"
-                        className="h-12 w-12 rounded-full text-white bg-[#419902] hover:bg-[#378300] transition-colors flex items-center justify-center shadow-lg"
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        <Plus size={28} />
-                    </button>
+                    <div className="flex items-center space-x-3"> 
+                        <SendAutomatedEmailButton /> 
+
+                        <button
+                            type="button"
+                            className="h-12 w-12 rounded-full text-white bg-[#419902] hover:bg-[#378300] transition-colors flex items-center justify-center shadow-lg"
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            <Plus size={28} />
+                        </button>
+                    </div>
+
+                    
                 </div>
 
                 <div className="flex items-center space-x-4 mb-8">
