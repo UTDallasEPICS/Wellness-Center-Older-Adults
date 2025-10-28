@@ -10,7 +10,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import RideMap from '../../components/RideMap';
 import { Search, Plus } from 'lucide-react';
-import SendAutomatedEmailButton from '/app/components/SendAutomatedEmailButton.jsx'; 
 
 export default function Page() {
     const { id: rideIdFromParams } = useParams();
