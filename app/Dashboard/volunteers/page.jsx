@@ -62,6 +62,18 @@ export default function Page() {
   const [volunteerToDelete, setVolunteerToDelete] = useState(null); // Changed to store only ID
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  // Basic client-side validators
+  const validateName = (name) => /^[A-Za-z' -]{2,50}$/.test(name.trim());
+  const validateEmail = (email) => {
+    // Leverage browser type=email but add a simple regex guard too
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  };
+  const validatePhone = (phone) => {
+    // Accept digits, spaces, dashes, parentheses; require 10-15 digits
+    const digits = phone.replace(/\D/g, "");
+    return digits.length >= 10 && digits.length <= 15;
+  };
+
   const fetchVolunteers = async () => {
     try {
       const response = await fetch('/api/getAllVolunteers');
@@ -99,11 +111,20 @@ export default function Page() {
   const handleAddFormSubmit = async (event) => {
     event.preventDefault();
 
-    if (!addFormData.firstName.trim() ||
-      !addFormData.lastName.trim() ||
-      !addFormData.email.trim() ||
-      !addFormData.phone.trim()) {
-      toast.error("Volunteer not added! Empty Field(s)!");
+    if (!validateName(addFormData.firstName)) {
+      toast.error("Please enter a valid first name (letters, spaces, ' or -; 2-50 chars).");
+      return;
+    }
+    if (!validateName(addFormData.lastName)) {
+      toast.error("Please enter a valid last name (letters, spaces, ' or -; 2-50 chars).");
+      return;
+    }
+    if (!validateEmail(addFormData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!validatePhone(addFormData.phone)) {
+      toast.error("Please enter a valid phone number (10-15 digits).");
       return;
     }
 
@@ -164,6 +185,23 @@ export default function Page() {
 
   const handleSaveClick = async (event) => {
     event.preventDefault();
+    // Validate edit form before submitting
+    if (!validateName(editFormData.firstName)) {
+      toast.error("Please enter a valid first name (letters, spaces, ' or -; 2-50 chars).");
+      return;
+    }
+    if (!validateName(editFormData.lastName)) {
+      toast.error("Please enter a valid last name (letters, spaces, ' or -; 2-50 chars).");
+      return;
+    }
+    if (!validateEmail(editFormData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!validatePhone(editFormData.phone)) {
+      toast.error("Please enter a valid phone number (10-15 digits).");
+      return;
+    }
     try {
       const response = await fetch('/api/editVolunteer', {
         method: 'PUT',
@@ -302,6 +340,8 @@ export default function Page() {
                   placeholder="First Name"
                   value={addFormData.firstName}
                   onChange={handleAddFormChange}
+                  required
+                  pattern="^[A-Za-z' -]{2,50}$"
                 />
               </div>
 
@@ -316,6 +356,8 @@ export default function Page() {
                   placeholder="Last Name"
                   value={addFormData.lastName}
                   onChange={handleAddFormChange}
+                  required
+                  pattern="^[A-Za-z' -]{2,50}$"
                 />
               </div>
 
@@ -330,6 +372,7 @@ export default function Page() {
                   placeholder="Email"
                   value={addFormData.email}
                   onChange={handleAddFormChange}
+                  required
                 />
               </div>
 
@@ -339,11 +382,13 @@ export default function Page() {
                 </label>
                 <input
                   className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-                  type="text"
+                  type="tel"
                   name="phone"
                   placeholder="Phone"
                   value={addFormData.phone}
                   onChange={handleAddFormChange}
+                  required
+                  inputMode="tel"
                 />
               </div>
 

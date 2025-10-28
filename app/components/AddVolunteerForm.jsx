@@ -56,6 +56,8 @@ const VolunteerForm = ({
           placeholder="First Name"
           value={addFormData.firstName}
           onChange={handleAddFormChange}
+          required
+          pattern="^[A-Za-z' -]{2,50}$"
         />
       </div>
 
@@ -70,6 +72,8 @@ const VolunteerForm = ({
           placeholder="Last Name"
           value={addFormData.lastName}
           onChange={handleAddFormChange}
+          required
+          pattern="^[A-Za-z' -]{2,50}$"
         />
       </div>
 
@@ -84,6 +88,7 @@ const VolunteerForm = ({
           placeholder="Email"
           value={addFormData.email}
           onChange={handleAddFormChange}
+          required
         />
       </div>
 
@@ -93,11 +98,13 @@ const VolunteerForm = ({
         </label>
         <input
           className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
-          type="text"
+          type="tel"
           name="phone"
           placeholder="Phone"
           value={addFormData.phone}
           onChange={handleAddFormChange}
+          required
+          inputMode="tel"
         />
       </div>
 
