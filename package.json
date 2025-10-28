@@ -34,6 +34,8 @@
     "cookies": "^0.9.1",
     "cookies-next": "^4.3.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "google-map-react": "^2.2.1",
     "jose": "^6.1.0",
     "js-cookie": "^3.0.5",
@@ -62,7 +64,8 @@
     "@badeball/cypress-cucumber-preprocessor": "^21.0.3",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.4",
     "@eslint/compat": "^1.2.8",
-    "@types/node": "^20.17.30",
+    "@types/express": "^5.0.5",
+    "@types/node": "^20.19.23",
     "@types/nodemailer": "^7.0.3",
     "@types/react": "^18.3.20",
     "@types/react-big-calendar": "^1.16.1",
@@ -88,7 +91,8 @@
     "prettier": "^3.5.3",
     "prisma": "^6.6.0",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
     "wait-on": "^8.0.3"
   },
   "overrides": {
