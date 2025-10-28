@@ -1,5 +1,6 @@
 import { createTransport, SendMailOptions } from "nodemailer";
 // Search up App Passwords in the Google account Settings to get to the app and its passwords, but you dont have access to the passwords agail later so you need to use before you get rid of the pop-up boxes.
+// Everyone needs to do: npm install nodemailer
 // Initialize the Nodemailer Transporter
 // Connects to the Gmail SMTP server using your .env variables.
 const transporter = createTransport({
