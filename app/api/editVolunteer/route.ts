@@ -29,39 +29,95 @@ export async function PUT(req: Request) {
       message: 'Invalid JSON body in request',
     });
   }
-try {
+  try {
     const { id, firstName, lastName, email, phone } = requestBody as EditVolunteerParams;
 
-    // Convert the ID to a number
     const volunteerId = Number(id);
+    const first = (firstName || '').trim();
+    const last = (lastName || '').trim();
+    const mail = (email || '').trim();
+    const phoneRaw = (phone || '').trim();
+    const phoneDigits = phoneRaw.replace(/\D/g, '');
 
-    if (isNaN(volunteerId) || !firstName || !lastName || !email || !phone) {
-        return Response.json({
-            status: 400,
-            message: 'Missing or invalid required fields',
-        });
+    const nameRe = /^[A-Za-z][A-Za-z' -]{0,39}$/; // 1-40 chars
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (isNaN(volunteerId) || !first || !last || !mail || !phoneRaw) {
+      return Response.json({
+        status: 400,
+        message: 'Missing or invalid required fields',
+      });
+    }
+    if (!nameRe.test(first)) {
+      return Response.json({ status: 400, message: 'Invalid first name.' });
+    }
+    if (!nameRe.test(last)) {
+      return Response.json({ status: 400, message: 'Invalid last name.' });
+    }
+    if (!emailRe.test(mail) || mail.length > 254) {
+      return Response.json({ status: 400, message: 'Invalid email address.' });
+    }
+    if (phoneDigits.length !== 10) {
+      return Response.json({ status: 400, message: 'Invalid phone number. Use exactly 10 digits.' });
     }
 
     const existingVolunteer = await prisma.volunteerInfo.findUnique({
-        where: {
-            id: volunteerId, // Use the converted number here
-        },
+      where: { id: volunteerId },
+      select: { userID: true },
     });
 
     if (!existingVolunteer) {
-        return Response.json({
-            status: 404,
-            message: 'Volunteer not found',
-        });
+      return Response.json({
+        status: 404,
+        message: 'Volunteer not found',
+      });
     }
 
-    // ... (rest of the code for updating the user)
+    // Ensure email/phone uniqueness excluding this user
+    const currentUserId = existingVolunteer.userID;
+    const emailConflict = await prisma.user.findFirst({
+      where: { email: mail, NOT: { id: currentUserId } },
+      select: { id: true },
+    });
+    if (emailConflict) {
+      return Response.json({
+        status: 400,
+        message: 'Email already in use by another user',
+      });
+    }
 
-} catch (error) {
+    const phoneConflict = phoneRaw
+      ? await prisma.user.findFirst({ where: { phone: phoneRaw, NOT: { id: currentUserId } }, select: { id: true } })
+      : null;
+    if (phoneConflict) {
+      return Response.json({
+        status: 400,
+        message: 'Phone number already in use by another user',
+      });
+    }
+
+    // Update the related user record
+    const updatedUser = await prisma.user.update({
+      where: { id: currentUserId },
+      data: { firstName: first, lastName: last, email: mail, phone: phoneRaw },
+    });
+
+    return Response.json({
+      status: 200,
+      message: 'Volunteer updated successfully',
+      volunteer: {
+        id: volunteerId,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        phone: updatedUser.phone ?? '',
+      },
+    });
+  } catch (error) {
     console.error('Error updating volunteer:', error);
     return Response.json({
-        status: 500,
-        message: 'Internal Server Error',
+      status: 500,
+      message: 'Internal Server Error',
     });
-}
+  }
 }
