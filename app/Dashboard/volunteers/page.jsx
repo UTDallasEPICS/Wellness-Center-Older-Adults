@@ -439,6 +439,34 @@ export default function Page() {
   const [volunteerToDelete, setVolunteerToDelete] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [addErrors, setAddErrors] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [editErrors, setEditErrors] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+
+  const validateFields = (data) => {
+    const errors = { firstName: '', lastName: '', email: '', phone: '' };
+    const first = (data.firstName || '').trim();
+    const last = (data.lastName || '').trim();
+    const email = (data.email || '').trim();
+    const phone = (data.phone || '').trim();
+
+    const nameRe = /^[A-Za-z][A-Za-z' -]{0,39}$/; // 1-40 chars letters, spaces, hyphen, apostrophe
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const digits = phone.replace(/\D/g, '');
+
+    if (!first || !nameRe.test(first)) {
+      errors.firstName = 'First name is required and must be 1-40 letters (may include space, - or \').';
+    }
+    if (!last || !nameRe.test(last)) {
+      errors.lastName = 'Last name is required and must be 1-40 letters (may include space, - or \').';
+    }
+    if (!email || !emailRe.test(email) || email.length > 254) {
+      errors.email = 'Enter a valid email address.';
+    }
+    if (!digits || digits.length !== 10) {
+      errors.phone = 'Enter a valid 10-digit phone number.';
+    }
+    return errors;
+  };
 
   const fetchVolunteers = async () => {
     try {
@@ -472,6 +500,9 @@ export default function Page() {
     const fieldName = event.target.getAttribute("name");
     const fieldValue = event.target.value;
     setAddFormData({ ...addFormData, [fieldName]: fieldValue });
+    if (addErrors[fieldName]) {
+      setAddErrors({ ...addErrors, [fieldName]: '' });
+    }
   };
 
   const handleOpenAddModal = () => {
@@ -485,12 +516,11 @@ export default function Page() {
 
   const handleAddFormSubmit = async (event) => {
     event.preventDefault();
-
-    if (!addFormData.firstName.trim() ||
-      !addFormData.lastName.trim() ||
-      !addFormData.email.trim() ||
-      !addFormData.phone.trim()) {
-      toast.error("Volunteer not added! Empty Field(s)!");
+    const errors = validateFields(addFormData);
+    const hasErrors = Object.values(errors).some(Boolean);
+    if (hasErrors) {
+      setAddErrors(errors);
+      toast.error("Please fix the form errors.");
       return;
     }
 
@@ -533,6 +563,7 @@ export default function Page() {
       email: volunteer.email,
       phone: volunteer.phone,
     });
+    setEditErrors({ firstName: '', lastName: '', email: '', phone: '' });
     setShowEditModal(true);
   };
 
@@ -540,10 +571,20 @@ export default function Page() {
     const fieldName = event.target.getAttribute("name");
     const fieldValue = event.target.value;
     setEditFormData({ ...editFormData, [fieldName]: fieldValue });
+    if (editErrors[fieldName]) {
+      setEditErrors({ ...editErrors, [fieldName]: '' });
+    }
   };
 
   const handleSaveClick = async (event) => {
     event.preventDefault();
+    const errors = validateFields(editFormData);
+    const hasErrors = Object.values(errors).some(Boolean);
+    if (hasErrors) {
+      setEditErrors(errors);
+      toast.error("Please fix the form errors.");
+      return;
+    }
     try {
       const response = await fetch('/api/editVolunteer', {
         method: 'PUT',
@@ -685,7 +726,11 @@ export default function Page() {
                   placeholder="First Name"
                   value={addFormData.firstName}
                   onChange={handleAddFormChange}
+                  maxLength={40}
                 />
+                {addErrors.firstName && (
+                  <p className="mt-1 text-sm text-red-600">{addErrors.firstName}</p>
+                )}
               </div>
 
               <div className="w-full">
@@ -699,7 +744,11 @@ export default function Page() {
                   placeholder="Last Name"
                   value={addFormData.lastName}
                   onChange={handleAddFormChange}
+                  maxLength={40}
                 />
+                {addErrors.lastName && (
+                  <p className="mt-1 text-sm text-red-600">{addErrors.lastName}</p>
+                )}
               </div>
 
               <div className="w-full">
@@ -713,7 +762,11 @@ export default function Page() {
                   placeholder="Email"
                   value={addFormData.email}
                   onChange={handleAddFormChange}
+                  maxLength={254}
                 />
+                {addErrors.email && (
+                  <p className="mt-1 text-sm text-red-600">{addErrors.email}</p>
+                )}
               </div>
 
               <div className="w-full">
@@ -727,7 +780,12 @@ export default function Page() {
                   placeholder="Phone"
                   value={addFormData.phone}
                   onChange={handleAddFormChange}
+                  inputMode="tel"
+                  maxLength={20}
                 />
+                {addErrors.phone && (
+                  <p className="mt-1 text-sm text-red-600">{addErrors.phone}</p>
+                )}
               </div>
 
               <div className="w-full flex justify-end mt-4">
@@ -749,6 +807,7 @@ export default function Page() {
           handleEditFormChange={handleEditFormChange}
           handleSaveClick={handleSaveClick}
           handleCancelClick={handleCancelClick}
+          errors={editErrors}
         />
       )}
 
