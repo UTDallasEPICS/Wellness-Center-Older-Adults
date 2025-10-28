@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         html: `
             <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eeeeee;">
                 <h2 style="font-size: 24px; color: #1a202c; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #419902; padding-bottom: 10px;">
-                    📧 New Contact Form Submission
+                    New Contact Form Submission
                 </h2>
 
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 15px;">

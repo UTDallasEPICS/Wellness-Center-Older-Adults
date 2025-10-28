@@ -547,8 +547,6 @@ export default function Page() {
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-4xl font-light text-gray-800">Rides</h1>
                     <div className="flex items-center space-x-3"> 
-                        <SendAutomatedEmailButton /> 
-
                         <button
                             type="button"
                             className="h-12 w-12 rounded-full text-white bg-[#419902] hover:bg-[#378300] transition-colors flex items-center justify-center shadow-lg"
