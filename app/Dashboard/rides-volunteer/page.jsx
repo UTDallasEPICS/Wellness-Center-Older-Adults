@@ -1,4 +1,3 @@
-// /app/Dashboard/rides/page.jsx
 "use client";
 import React, { useState, useEffect } from "react";
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
