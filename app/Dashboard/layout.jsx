@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import SideNav from "@/app/components/Sidebar/sidenav";
+import SideNav from "@/app/components/sidebar/sidenav";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

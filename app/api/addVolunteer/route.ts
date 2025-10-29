@@ -21,10 +21,50 @@ export async function POST(req: Request) {
   try {
     const { firstName, lastName, email, phone } = (await req.json()) as VolunteerRequestBody;
 
+    const first = (firstName || '').trim();
+    const last = (lastName || '').trim();
+    const mail = (email || '').trim();
+    const phoneRaw = (phone || '').trim();
+    const phoneDigits = phoneRaw.replace(/\D/g, '');
+
+    const nameRe = /^[A-Za-z][A-Za-z' -]{0,39}$/; // 1-40 chars
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!first || !last || !mail || !phoneRaw) {
+      return new Response(
+        JSON.stringify({ status: 400, message: 'All fields are required.' }),
+        { status: 400 }
+      );
+    }
+    if (!nameRe.test(first)) {
+      return new Response(
+        JSON.stringify({ status: 400, message: 'Invalid first name.' }),
+        { status: 400 }
+      );
+    }
+    if (!nameRe.test(last)) {
+      return new Response(
+        JSON.stringify({ status: 400, message: 'Invalid last name.' }),
+        { status: 400 }
+      );
+    }
+    if (!emailRe.test(mail) || mail.length > 254) {
+      return new Response(
+        JSON.stringify({ status: 400, message: 'Invalid email address.' }),
+        { status: 400 }
+      );
+    }
+    if (phoneDigits.length !== 10) {
+      return new Response(
+        JSON.stringify({ status: 400, message: 'Invalid phone number. Use exactly 10 digits.' }),
+        { status: 400 }
+      );
+    }
+
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
       where: {
-        email,
+        email: mail,
       },
     });
 
@@ -41,7 +81,7 @@ export async function POST(req: Request) {
     // Check if the phone number already exists
     const existingPhone = await prisma.user.findUnique({
       where: {
-        phone,
+        phone: phoneRaw,
       },
     });
 
@@ -58,10 +98,10 @@ export async function POST(req: Request) {
     // Create the user and link it to the volunteer
     const newUser = await prisma.user.create({
       data: {
-        firstName,
-        lastName,
-        email,
-        phone,
+        firstName: first,
+        lastName: last,
+        email: mail,
+        phone: phoneRaw,
         role: 'VOLUNTEER',
         volunteer: {
           create: {

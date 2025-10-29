@@ -5,6 +5,7 @@ const EditVolunteerModal = ({
   handleEditFormChange,
   handleSaveClick,
   handleCancelClick,
+  errors = { firstName: '', lastName: '', email: '', phone: '' },
 }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
@@ -19,7 +20,11 @@ const EditVolunteerModal = ({
               value={editFormData.firstName}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
+              maxLength={40}
             />
+            {errors.firstName && (
+              <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+            )}
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Last Name</label>
@@ -29,7 +34,11 @@ const EditVolunteerModal = ({
               value={editFormData.lastName}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
+              maxLength={40}
             />
+            {errors.lastName && (
+              <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+            )}
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Email</label>
@@ -39,7 +48,11 @@ const EditVolunteerModal = ({
               value={editFormData.email} 
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
+              maxLength={254}
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Phone</label>
@@ -49,7 +62,12 @@ const EditVolunteerModal = ({
               value={editFormData.phone}  
               onChange={handleEditFormChange}
               className="w-full px-3 py-2 border rounded-md"
+              inputMode="tel"
+              maxLength={20}
             />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
           </div>
           <div className="flex justify-end">
             <button

@@ -11,14 +11,25 @@ const US_STATES = [
   "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
 ];
 
-const ClientInputForm = ({ onSubmit, onClose }) => { 
+const ClientInputForm = ({ onSubmit, onClose, initialData = null }) => { 
   const [clientInfo, setClientInfo] = useState({
+    firstName: initialData?.firstName || "",
+    middleName: initialData?.middleName || "",
+    lastName: initialData?.lastName || "",
+    address: initialData?.address?.street || initialData?.streetAddress || "",
+    city: initialData?.address?.city || initialData?.city || "",
+    state: initialData?.address?.state || initialData?.state || "TX",
+    phone: initialData?.customerPhone || initialData?.phone || "",
+    zipcode: (initialData?.address?.postalCode || initialData?.customerZipCode || "").toString(),
+  });
+
+  const [errors, setErrors] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
     address: "",
     city: "",
-    state: "", // Initialize with an empty string or default state
+    state: "",
     phone: "",
     zipcode: "",
   });
@@ -29,10 +40,20 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
       ...prevState,
       [name]: value,
     }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = validateFields(clientInfo);
+    const hasErrors = Object.values(validationErrors).some(Boolean);
+    if (hasErrors) {
+      setErrors(validationErrors);
+      return;
+    }
+
     const formattedClientInfo = {
       firstName: clientInfo.firstName,
       middleName: clientInfo.middleName,
@@ -51,10 +72,52 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
       lastName: "",
       address: "",
       city: "",
-      state: "",
+      state: "TX",
       phone: "",
       zipcode: "",
     });
+  };
+
+  const validateFields = (data) => {
+    const out = { firstName: "", middleName: "", lastName: "", address: "", city: "", state: "", phone: "", zipcode: "" };
+    const first = (data.firstName || "").trim();
+    const middle = (data.middleName || "").trim();
+    const last = (data.lastName || "").trim();
+    const address = (data.address || "").trim();
+    const city = (data.city || "").trim();
+    const state = (data.state || "").trim();
+    const zip = (data.zipcode || "").toString().trim();
+    const phoneRaw = (data.phone || "").trim();
+    const phoneDigits = phoneRaw.replace(/\D/g, "");
+
+    const nameRe = /^[A-Za-z][A-Za-z' -]{0,39}$/; // 1-40 chars letters, space, -, '\'
+    const zipRe = /^\d{5}$/;
+
+    if (!first || !nameRe.test(first)) {
+      out.firstName = "First name is required and must be 1-40 letters (may include space, - or ').";
+    }
+    if (middle && !nameRe.test(middle)) {
+      out.middleName = "Middle name must be 1-40 letters (may include space, - or ').";
+    }
+    if (!last || !nameRe.test(last)) {
+      out.lastName = "Last name is required and must be 1-40 letters (may include space, - or ').";
+    }
+    if (!address) {
+      out.address = "Street address is required.";
+    }
+    if (!city) {
+      out.city = "City is required.";
+    }
+    if (!state || !US_STATES.includes(state)) {
+      out.state = "Select a valid US state.";
+    }
+    if (!zip || !zipRe.test(zip)) {
+      out.zipcode = "Enter a valid 5-digit ZIP code.";
+    }
+    if (phoneRaw && phoneDigits.length !== 10) {
+      out.phone = "Enter a valid 10-digit phone number or leave blank.";
+    }
+    return out;
   };
 
   return (
@@ -62,17 +125,15 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
       <div className="bg-white p-8 rounded-lg w-full max-w-2xl relative">
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           <div className="flex justify-between items-center mb-5">
-            <h2 className="text-left font-light text-2xl">Add a Client</h2>
+            <h2 className="text-left font-light text-2xl">{initialData ? "Edit Client" : "Add a Client"}</h2>
             <button
               type="submit"
               className="bg-[#419902] text-white px-6 py-2.5 text-base rounded-lg cursor-pointer hover:bg-[#378300]"
             >
-              Add
+              {initialData ? "Save" : "Add"}
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[70vh]">
-            {/* ... other fields (First Name, Middle Name, Last Name, Address) remain the same ... */}
-            
             {/* First Name */}
             <div>
                 <label htmlFor="clientFirstName" className="block text-sm font-medium text-gray-700">
@@ -84,7 +145,11 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                     value={clientInfo.firstName}
                     placeholder="First Name"
                     onChange={handleChange}
+                    maxLength={40}
                 />
+                {errors.firstName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                )}
             </div>
 
             {/* Middle Name */}
@@ -99,7 +164,11 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                     placeholder="Middle Name"
                     value={clientInfo.middleName}
                     onChange={handleChange}
+                    maxLength={40}
                 />
+                {errors.middleName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.middleName}</p>
+                )}
             </div>
 
             {/* Last Name */}
@@ -114,7 +183,11 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                     placeholder="Last Name"
                     value={clientInfo.lastName}
                     onChange={handleChange}
+                    maxLength={40}
                 />
+                {errors.lastName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                )}
             </div>
 
             {/* Address */}
@@ -130,6 +203,9 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                     value={clientInfo.address}
                     onChange={handleChange}
                 />
+                {errors.address && (
+                  <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+                )}
             </div>
 
             {/* City */}
@@ -145,6 +221,9 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                 value={clientInfo.city}
                 onChange={handleChange}
               />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+              )}
             </div>
 
             {/* State (Now a dropdown) */}
@@ -165,6 +244,9 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                   </option>
                 ))}
               </select>
+              {errors.state && (
+                <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+              )}
             </div>
 
             {/* Phone */}
@@ -182,6 +264,9 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                 inputMode="numeric"
                 onChange={handleChange}
               />
+              {errors.phone && (
+                <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+              )}
             </div>
 
             {/* Zip Code */}
@@ -200,6 +285,9 @@ const ClientInputForm = ({ onSubmit, onClose }) => {
                 inputMode="numeric"
                 onChange={handleChange}
               />
+              {errors.zipcode && (
+                <p className="mt-1 text-sm text-red-600">{errors.zipcode}</p>
+              )}
             </div>
           </div>
           <div className="flex justify-end mt-4 space-x-2">
