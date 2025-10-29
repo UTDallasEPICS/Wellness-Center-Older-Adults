@@ -72,8 +72,6 @@ export default function Page() {
         setLoading(true);
         setError(null);
         try {
-            // Assuming this endpoint fetches all clients, and we filter on the frontend
-            // If your API supports filtering (e.g., /getCustomer?status=all), use that instead for better performance.
             const response = await fetch('/api/customer/getCustomer'); 
             if (!response.ok) {
                 throw new Error(`Failed to fetch client data: ${response.status}`);
@@ -235,11 +233,9 @@ export default function Page() {
             // Switch tab after archiving/restoring
             if (isArchived) {
                 setActiveTab('archived');
-                // 🛠️ CORRECTED PATH HERE
                 router.push('/Dashboard/client?tab=archived', undefined, { shallow: true });
             } else {
                 setActiveTab('active');
-                // 🛠️ CORRECTED PATH HERE
                 router.push('/Dashboard/client?tab=active', undefined, { shallow: true });
             }
             

@@ -47,7 +47,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         
     } catch (error) {
         if (error instanceof Error && 'code' in error && error.code === 'P2025') {
-             // P2025 is Prisma's error code for "An operation failed because it depends on one or more records that were required but not found." (Record not found)
             return NextResponse.json({ message: 'Client not found.' }, { status: 404 });
         }
         
