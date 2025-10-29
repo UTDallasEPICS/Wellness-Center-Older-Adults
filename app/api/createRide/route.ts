@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -19,7 +20,7 @@ interface RideRequestBody {
 
 export async function POST(req: Request) {
     if (req.method !== 'POST') {
-        return Response.json({ status: 405, message: 'Method Not Allowed' });
+        return NextResponse.json({ status: 405, message: 'Method Not Allowed' });
     }
 
     try {
@@ -38,6 +39,21 @@ export async function POST(req: Request) {
             extraInfo,
         } = (await req.json()) as RideRequestBody;
 
+        console.log("Received ride data:", {
+          customerId,
+          pickupStreet,
+          pickupCity,
+          pickupState,
+          pickupZip,
+          destinationStreet,
+          destinationCity,
+          destinationState,
+          destinationZip,
+          pickUpTime,
+          date,
+          extraInfo,
+      });
+
         // 1.  Find the Customer ID.
         const customer = await prisma.customer.findUnique({
             where: {
@@ -46,7 +62,7 @@ export async function POST(req: Request) {
         });
 
         if (!customer) {
-            return Response.json({ status: 400, message: 'Customer not found' });
+            return NextResponse.json({ status: 400, message: 'Customer not found' });
         }
 
         const pickupDateTime = new Date(date);
@@ -118,11 +134,11 @@ export async function POST(req: Request) {
         .then((ride) => {
             const successResponse = { status: 201, message: 'Ride created successfully', data: ride };
             console.log("API Success Response:", successResponse);
-            return Response.json(successResponse);
+            return NextResponse.json(successResponse);
         })
         .catch((error) => {
             console.error('Error creating ride within transaction:', error);
-            return Response.json({
+            return NextResponse.json({
                 status: 500,
                 message: 'Failed to create ride due to a database error',
                 error: error.message, // Include a more specific error message
@@ -133,7 +149,7 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('Error during request processing:', error);
-        return Response.json({
+        return NextResponse.json({
             status: 500,
             message: 'Internal Server Error during request processing',
             error: error.message,
