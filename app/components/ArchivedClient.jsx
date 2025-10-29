@@ -10,7 +10,7 @@ const AddClientsTable = ({ customers, handleDeleteClick, searchQuery }) => {
                customer.customerPhone.includes(searchQuery) ||
                (customer.email && customer.email.toLowerCase().includes(searchLower));
     });
-
+    
     return (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <table className="min-w-full">
