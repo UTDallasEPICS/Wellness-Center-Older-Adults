@@ -1,10 +1,14 @@
-// client/page.jsx
 "use client";
 import React, { useState, useEffect } from 'react';
+import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
 import ClientInputForm from "/app/components/ClientInputForm.jsx";
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
+import ClientTable from "/app/components/ClientTable.jsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
+import { Search, Plus } from 'lucide-react';
+
 
 const modalOverlayStyle = {
     position: 'fixed',
@@ -41,88 +45,132 @@ const modalCloseButtonStyle = {
     padding: 0,
 };
 
+
 export default function Page() {
-    const [customers, setCustomers] = useState([]);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    
+    // States
+    const [clients, setClients] = useState([]); // Holds ALL clients (active and archived)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
+    const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [customerToDelete, setCustomerToDelete] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
-    const [customerToEdit, setCustomerToEdit] = useState(null);
+    const [clientToDelete, setClientToDelete] = useState(null);
+    const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
+    const [clientToEdit, setClientToEdit] = useState(null);
+    const [activeTab, setActiveTab] = useState('active'); // Default to active clients
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showArchiveModal, setShowArchiveModal] = useState(false);
+    const [showRestoreModal, setShowRestoreModal] = useState(false);
+    const [clientToChangeStatus, setClientToChangeStatus] = useState(null);
 
 
-    const fetchCustomers = async () => {
+    // --- Data Fetching and CRUD Operations ---
+
+    const fetchClients = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const response = await fetch('/api/customer/getCustomer');
+            const response = await fetch('/api/customer/getCustomer'); 
             if (!response.ok) {
-                throw new Error(`Failed to fetch customer data: ${response.status}`);
+                throw new Error(`Failed to fetch client data: ${response.status}`);
             }
             const data = await response.json();
-            setCustomers(data);
-            setLoading(false);
+            // Ensure isArchived is a boolean for predictable filtering
+            const formattedData = data.map(client => ({
+                ...client,
+                isArchived: client.isArchived === true || client.isArchived === 1
+            }));
+            setClients(formattedData);
         } catch (error) {
-            console.error('Error fetching customers:', error);
-            setError('Failed to load customer data');
+            console.error('Error fetching clients:', error);
+            setError('Failed to load client data');
+        } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchCustomers();
-    }, []);
+        const tabFromQuery = searchParams.get('tab');
+        if (tabFromQuery && ['active', 'archived'].includes(tabFromQuery)) {
+            setActiveTab(tabFromQuery);
+        }
+        fetchClients();
+    }, [searchParams]);
 
     const closeModalAndRefresh = () => {
-        setIsAddCustomerModalOpen(false);
-        setIsEditCustomerModalOpen(false);
-        setCustomerToEdit(null);
-        fetchCustomers(); // Refresh the list after an operation
+        setIsAddClientModalOpen(false);
+        setIsEditClientModalOpen(false);
+        setClientToEdit(null);
+        setShowDeleteModal(false);
+        setClientToDelete(null);
+        setShowArchiveModal(false);
+        setShowRestoreModal(false);
+        setClientToChangeStatus(null);
+        fetchClients(); // Refresh the list after an operation
     };
-
-    const handleAddCustomerSubmit = (newCustomer) => {
-        setIsAddCustomerModalOpen(false);
+    
+    const handleAddClientSubmit = (newClient) => {
+        setIsAddClientModalOpen(false);
 
         fetch('/api/createCustomerAccount', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newCustomer),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newClient),
         })
             .then(response => {
                 if (!response.ok) {
-                    console.error('Failed to add customer:', response.status);
-                    throw new Error('Failed to add customer');
+                    throw new Error('Failed to add client');
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Customer added successfully:', data);
                 toast.success('Client added successfully!');
-                window.location.reload();
+                closeModalAndRefresh();
             })
             .catch(error => {
-                console.error('Error adding customer:', error);
+                console.error('Error adding client:', error);
                 toast.error('Failed to add client.');
             });
     };
 
-    const handleDeleteClick = (customerId) => {
-        console.log("Delete button clicked for CustomerID:", customerId);
-        setCustomerToDelete(customerId);
+    const handleEditClientSubmit = async (updatedClient) => {
+        setIsEditClientModalOpen(false);
+
+        try {
+            const response = await fetch(`/api/customer/updateCustomer/${clientToEdit.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedClient),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData?.message || 'Failed to update client');
+            }
+
+            toast.success('Client updated successfully!');
+            closeModalAndRefresh();
+        } catch (error) {
+            console.error('Error updating client:', error);
+            toast.error(error.message || 'Failed to update client.');
+        }
+    };
+
+    const handleDeleteClick = (clientId) => {
+        setClientToDelete(clientId);
         setShowDeleteModal(true);
     };
 
     const handleConfirmDelete = async () => {
-        console.log("handleConfirmDelete called. customerToDelete:", customerToDelete);
-        const customerIdToDelete = customerToDelete;
+        const clientIdToDelete = clientToDelete;
 
         setShowDeleteModal(false);
-        setCustomerToDelete(null);
+        setClientToDelete(null);
 
         try {
-            const response = await fetch(`/api/customer/deleteCustomer/${customerIdToDelete}`, {
+            const response = await fetch(`/api/customer/deleteCustomer/${clientIdToDelete}`, { 
                 method: 'DELETE',
             });
 
@@ -132,7 +180,7 @@ export default function Page() {
             }
 
             toast.success("Client deleted successfully!");
-            window.location.reload();
+            closeModalAndRefresh();
         } catch (error) {
             console.error('Error deleting client:', error);
             toast.error(error.message || "Failed to delete client.");
@@ -141,52 +189,103 @@ export default function Page() {
 
     const handleCancelDelete = () => {
         setShowDeleteModal(false);
-        setCustomerToDelete(null);
+        setClientToDelete(null);
     };
 
-    const handleEditClick = (customer) => {
-        console.log('Editing customer:', customer);
-        setCustomerToEdit(customer);
-        setIsEditCustomerModalOpen(true);
+    const handleEditClick = (client) => {
+        setClientToEdit(client);
+        setIsEditClientModalOpen(true);
     };
 
-    
-    const handleEditCustomerSubmit = async (updatedCustomer) => {
-        setIsEditCustomerModalOpen(false);
+
+    // --- New Archiving Logic ---
+
+    const handleArchiveClick = (clientId) => {
+        setClientToChangeStatus(clientId);
+        setShowArchiveModal(true);
+    };
+
+    const handleRestoreClick = (clientId) => {
+        setClientToChangeStatus(clientId);
+        setShowRestoreModal(true);
+    };
+
+    const handleStatusChange = async (clientId, isArchived) => {
+        setShowArchiveModal(false);
+        setShowRestoreModal(false);
+        setClientToChangeStatus(null);
 
         try {
-            const customerID = updatedCustomer.id || customerToEdit.id;
-            
-            const response = await fetch(`/api/customer/updateCustomer/${customerToEdit.id}`, {
+            const response = await fetch(`/api/customer/archiveCustomer/${clientId}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedCustomer), // Keep only one body: JSON.stringify(updatedAdmin)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isArchived: isArchived }),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData?.message || 'Failed to update customer');
+                throw new Error(errorData?.message || `Failed to ${isArchived ? 'archive' : 'restore'} client`);
             }
 
-            toast.success('Customer updated successfully!');
-            closeModalAndRefresh(); // Use consolidated refresh function
+            const message = isArchived ? "Client archived successfully!" : "Client restored successfully!";
+            toast.success(message);
+            
+            // Switch tab after archiving/restoring
+            if (isArchived) {
+                setActiveTab('archived');
+                router.push('/Dashboard/client?tab=archived', undefined, { shallow: true });
+            } else {
+                setActiveTab('active');
+                router.push('/Dashboard/client?tab=active', undefined, { shallow: true });
+            }
+            
+            closeModalAndRefresh();
         } catch (error) {
-            console.error('Error updating customer:', error);
-            toast.error(error.message || 'Failed to update customer.');
+            console.error(`Error changing client status:`, error);
+            toast.error(error.message || `Failed to change client status.`);
         }
     };
-    
 
-    // Filter customers based on search query
-    const filteredCustomers = customers.filter(customer => {
-        const fullName = `${customer.firstName} ${customer.lastName}`.toLowerCase();
-        const searchLower = searchQuery.toLowerCase();
-        return fullName.includes(searchLower) || 
-               customer.customerPhone.includes(searchQuery) ||
-               (customer.email && customer.email.toLowerCase().includes(searchLower));
-    });
+    // --- Tab and Filtering Logic ---
+    
+    const filterClients = (isArchived) => {
+        return clients.filter(client => client.isArchived === isArchived);
+    };
+    
+    const tabs = [
+        {
+            aKey: "active",
+            title: "Clients",
+            content: (
+                <ClientTable // <<< Using imported component
+                    clients={filterClients(false)}
+                    onEditClient={handleEditClick}
+                    onDeleteClient={handleDeleteClick}
+                    onArchiveClient={handleArchiveClick}
+                    onRestoreClient={handleRestoreClick}
+                    searchTerm={searchTerm}
+                    isArchivedView={false}
+                />
+            ),
+        },
+        {
+            aKey: "archived",
+            title: "Archived",
+            content: (
+                <ClientTable // <<< Using imported component
+                    clients={filterClients(true)}
+                    onEditClient={handleEditClick}
+                    onDeleteClient={handleDeleteClick}
+                    onArchiveClient={handleArchiveClick}
+                    onRestoreClient={handleRestoreClick}
+                    searchTerm={searchTerm}
+                    isArchivedView={true}
+                />
+            ),
+        },
+    ];
+    
+    // --- Loading and Error Display ---
 
     if (loading) {
         return (
@@ -204,141 +303,160 @@ export default function Page() {
         );
     }
 
+    // --- Main Component Render ---
     return (
-        <div className="w-full min-h-screen bg-[#f4f1f0] p-6">
-            {/* Header Section */}
-            <div className="flex flex-col mb-6">
-                <h1 className="text-2xl font-light text-gray-800 mb-4">Clients</h1>
+        <div className="h-full w-full p-10 bg-[#f4f4f4] flex justify-center">
+            <div className="max-w-6xl w-full">
                 
-                {/* Search Bar and Add Button */}
-                <div className="flex items-center justify-between">
-                    <div className="relative w-64">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Search by Client..."
-                            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                    
+                {/* Header Section */}
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-4xl font-light text-gray-800">Clients</h1>
                     <button
                         type="button"
-                        className="bg-[#0da000] hover:bg-[#0c8a00] text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition duration-200"
-                        onClick={() => setIsAddCustomerModalOpen(true)}
+                        className="h-12 w-12 rounded-full text-white bg-[#0da000] hover:bg-[#0c8a00] transition-colors flex items-center justify-center shadow-lg"
+                        onClick={() => setIsAddClientModalOpen(true)}
                     >
-                        <span className="material-symbols-rounded text-xl">+</span>
+                        <Plus size={28} />
                     </button>
                 </div>
-            </div>
 
-            {/* Table Section */}
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <table className="min-w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Client Name</th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Contact Number</th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Address</th>
-                            <th className="px-6 py-4 text-left text-sm font-medium text-[#103713] uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredCustomers.map((customer, index) => (
-                            <tr key={index} className="hover:bg-gray-50 transition duration-150">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                            <span className="text-gray-600 font-medium">
-                                                {customer.firstName?.charAt(0)}{customer.lastName?.charAt(0)}
-                                            </span>
-                                        </div>
-                                        <div className="ml-4">
-                                            <div className="text-sm font-medium text-[#103713]">
-                                                {customer.firstName} {customer.lastName}
-                                            </div>
-                                            <div className="text-sm text-gray-500">
-                                                @{customer.firstName?.toLowerCase()}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-[#103713]">{customer.customerPhone}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-[#103713]">
-                                        {`${customer.address?.street || ''}, ${customer.address?.city || ''}, ${customer.address?.state || ''} ${customer.address?.postalCode || ''}`}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div className="flex items-center space-x-3">
-                                        <button 
-                                        onClick={() => handleEditClick(customer)}
-                                        className="text-green-600 hover:text-blue-900 transition duration-150">
-                                            <span className="material-symbols-rounded text-lg">edit</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteClick(customer.id)}
-                                            className="text-red-600 hover:text-red-900 transition duration-150"
-                                        >
-                                            <span className="material-symbols-rounded text-lg">delete</span>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                
-                {filteredCustomers.length === 0 && (
-                    <div className="text-center py-8">
-                        <p className="text-gray-500">No clients found.</p>
+                {/* Search Bar */}
+                <div className="flex items-center space-x-4 mb-8">
+                    <div className="relative flex-grow">
+                        <input
+                            type="text"
+                            placeholder="Search by Name, Phone, or Email..."
+                            className="w-full py-3.5 pl-12 pr-4 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-[#0da000]"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                     </div>
-                )}
+                    <button
+                        type="button"
+                        className="py-3 px-8 text-lg font-semibold rounded-lg text-white bg-[#0da000] hover:bg-[#0c8a00] transition-colors shadow-md"
+                        onClick={() => {}} 
+                    >
+                        Search
+                    </button>
+                </div>
+
+                {/* Tabbed Content */}
+                <SimpleTab 
+                    activeKey={activeTab} 
+                    onChange={(key) => {
+                        setActiveTab(key);
+                        // 🛠️ CORRECTED PATH HERE
+                        router.push(`/Dashboard/client?tab=${key}`, undefined, { shallow: true });
+                    }}
+                    tabClassName="text-xl font-semibold px-4 py-2"
+                    activeTabClassName="text-[#0da000] border-b-4 border-[#0da000]" 
+                    inactiveTabClassName="text-gray-500 hover:text-[#0da000]/80 transition-colors"
+                >
+                    {tabs.map((item) => (
+                        <Tab 
+                            key={item.aKey} 
+                            aKey={item.aKey} 
+                            title={item.title}
+                        >
+                            <div className="mt-4">
+                                {item.content}
+                            </div>
+                        </Tab>
+                    ))}
+                </SimpleTab>
+
             </div>
 
-            {isAddCustomerModalOpen && (
+            {/* Add Client Modal */}
+            {isAddClientModalOpen && (
                 <div style={modalOverlayStyle}>
                     <div style={modalContentStyle}>
-                        <button style={modalCloseButtonStyle} onClick={() => setIsAddCustomerModalOpen(false)}>&times;</button>
+                        <button style={modalCloseButtonStyle} onClick={() => setIsAddClientModalOpen(false)}>&times;</button>
                         <h2 className="text-left font-light text-2xl mb-5">Add a Client</h2>
-                        <ClientInputForm onSubmit={handleAddCustomerSubmit} onClose={() => setIsAddCustomerModalOpen(false)} />
+                        <ClientInputForm onSubmit={handleAddClientSubmit} onClose={() => setIsAddClientModalOpen(false)} />
                     </div>
                 </div>
             )}
 
-            {isEditCustomerModalOpen && (
+            {/* Edit Client Modal */}
+            {isEditClientModalOpen && (
                 <div style={modalOverlayStyle}>
                     <div style={modalContentStyle}>
-                        <button style={modalCloseButtonStyle} onClick={() => setIsEditCustomerModalOpen(false)}>&times;</button>
+                        <button style={modalCloseButtonStyle} onClick={() => setIsEditClientModalOpen(false)}>&times;</button>
                         <h2 className="text-left font-light text-2xl mb-5">Edit Client</h2>
                         <ClientInputForm
-                            onSubmit={handleEditCustomerSubmit}
-                            onClose={() => setIsEditCustomerModalOpen(false)}
-                            initialData={customerToEdit}
+                            onSubmit={handleEditClientSubmit}
+                            onClose={() => setIsEditClientModalOpen(false)}
+                            initialData={clientToEdit}
                         />
                     </div>
                 </div>
             )}
-
-
+            
+            {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div style={modalOverlayStyle}>
                     <div style={modalContentStyle}>
                         <button style={modalCloseButtonStyle} onClick={handleCancelDelete}>&times;</button>
-                        <p className="mb-4">Are you sure you want to delete client: {customers.find(c => c.id === customerToDelete)?.firstName} {customers.find(c => c.id === customerToDelete)?.lastName}?</p>
+                        <h2 className="text-left font-light text-xl mb-3 text-red-600">Confirm Deletion</h2>
+                        <p className="mb-4">
+                            Are you sure you want to permanently delete client: **{clients.find(c => c.id === clientToDelete)?.firstName} {clients.find(c => c.id === clientToDelete)?.lastName}**? This action cannot be undone.
+                        </p>
                         <div className="flex justify-end">
                             <button onClick={handleCancelDelete} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded mr-2">
                                 Cancel
                             </button>
                             <button onClick={handleConfirmDelete} className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
-                                Delete
+                                Delete Permanently
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Archive Confirmation Modal */}
+            {showArchiveModal && (
+                <div style={modalOverlayStyle}>
+                    <div style={modalContentStyle}>
+                        <button style={modalCloseButtonStyle} onClick={() => setShowArchiveModal(false)}>&times;</button>
+                        <h2 className="text-left font-light text-xl mb-3 text-yellow-600">Confirm Archive</h2>
+                        <p className="mb-4">
+                            Are you sure you want to archive client: **{clients.find(c => c.id === clientToChangeStatus)?.firstName} {clients.find(c => c.id === clientToChangeStatus)?.lastName}**? They will be moved to the Archived tab.
+                        </p>
+                        <div className="flex justify-end">
+                            <button onClick={() => setShowArchiveModal(false)} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded mr-2">
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleStatusChange(clientToChangeStatus, true)} 
+                                className="bg-yellow-500 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded"
+                            >
+                                Archive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Restore Confirmation Modal */}
+            {showRestoreModal && (
+                <div style={modalOverlayStyle}>
+                    <div style={modalContentStyle}>
+                        <button style={modalCloseButtonStyle} onClick={() => setShowRestoreModal(false)}>&times;</button>
+                        <h2 className="text-left font-light text-xl mb-3 text-blue-600">Confirm Restore</h2>
+                        <p className="mb-4">
+                            Are you sure you want to restore client: **{clients.find(c => c.id === clientToChangeStatus)?.firstName} {clients.find(c => c.id === clientToChangeStatus)?.lastName}**? They will be moved back to the Clients tab.
+                        </p>
+                        <div className="flex justify-end">
+                            <button onClick={() => setShowRestoreModal(false)} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded mr-2">
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleStatusChange(clientToChangeStatus, false)} 
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                            >
+                                Restore
                             </button>
                         </div>
                     </div>
