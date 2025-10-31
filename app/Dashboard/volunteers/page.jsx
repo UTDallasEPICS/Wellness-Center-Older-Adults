@@ -621,7 +621,6 @@ export default function Page() {
   };
 
   const handleDeleteClick = (VolunteerID) => {
-    console.log("Delete button clicked for VolunteerID:", VolunteerID);
     setVolunteerToDelete(VolunteerID);
     setShowDeleteModal(true);
   };

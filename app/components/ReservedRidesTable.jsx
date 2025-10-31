@@ -1,4 +1,3 @@
-// Updated ReservedRidesTable.jsx with correct field mappings
 import { useState, Fragment, useEffect } from "react";
 import ReadOnlyRow from "./ReadOnlyRow";
 import EditableRow from "./EditableRow";
@@ -9,12 +8,10 @@ const ReservedRidesTable = ({
   onRideUpdated,
   convertTime,
   isVolunteer,
-  // NEW PROPS FOR CHECKBOX SELECTION
   selectedRides,
   onToggleSelect,
   onToggleAll,
 }) => {
-  // Filter contacts to only show reserved rides in this table
   const reservedContacts = initialContacts.filter(
     (contact) => contact.status === "Reserved"
   );
@@ -31,7 +28,6 @@ const ReservedRidesTable = ({
   });
 
   useEffect(() => {
-    // Update contacts when initialContacts prop changes
     setContacts(reservedContacts);
     (async () => {
       try {
@@ -41,27 +37,23 @@ const ReservedRidesTable = ({
         setUserRole(role);
       } catch (e) {
         console.error("Could not load user role:", e);
-        setUserRole("GUEST"); // Set a fallback role in case of failure
+        setUserRole("GUEST");
       }
     })();
   }, [initialContacts]);
 
-  // ⬇️ CHECKBOX LOGIC ⬇️
-  // Determine if the "select all" checkbox should be checked.
   const allSelected =
     contacts.length > 0 &&
     contacts.every((ride) => selectedRides.includes(ride.id));
-  // ----------------------
 
   const handleEditClick = (event, contact) => {
     event.preventDefault();
     setEditContactId(contact.id);
     const formValues = {
       customerName: contact.customerName,
-      phoneNumber: contact.phoneNumber,
-      // Assuming the contact object has startLocation as the full address string
+      phoneNumber: contact.customerPhone || contact.phoneNumber,
       startAddress: contact.startLocation || contact.startAddress,
-      startTime: contact.startTime,
+      startTime: contact.startTime ? contact.startTime.slice(0, 5) : "",
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
@@ -79,7 +71,6 @@ const ReservedRidesTable = ({
   const handleEditFormSubmit = async (event) => {
     event.preventDefault();
 
-    // This logic will need enhancement in the future to correctly handle IDs (customerID, addressID, volunteerID)
     const updatedRide = {
       id: editContactId,
       customerName: editFormData.customerName,
@@ -99,10 +90,8 @@ const ReservedRidesTable = ({
   };
 
   const handleCancelClick = async (contactId) => {
-    // This handles deletion when called by the ReadOnlyRow
     if (onRideDeleted) onRideDeleted(contactId);
 
-    // Optimistic removal from local state (if the delete API call succeeds, parent will update)
     const newContacts = contacts.filter((contact) => contact.id !== contactId);
     setContacts(newContacts);
   };
@@ -113,7 +102,6 @@ const ReservedRidesTable = ({
         <table className="border-collapse ml-[0.5%] w-[99%]">
           <thead>
             <tr>
-              {/* NEW CHECKBOX HEADER  */}
               {userRole === "ADMIN" && (
                 <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal w-12">
                   <input
@@ -124,9 +112,8 @@ const ReservedRidesTable = ({
                   />
                 </th>
               )}
-              {/* ⬆️ END CHECKBOX HEADER ⬆️ */}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Client Name
+                Client Name & Date
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Contact Number
@@ -137,18 +124,12 @@ const ReservedRidesTable = ({
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Pick-up Time
               </th>
-              {/* Volunteer Name column is present for Reserved/Completed rides */}
-              {/* { && ( */}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Volunteer Name
               </th>
-              {/* )} */}
-              {/* Actions column is visible if the user is NOT a Volunteer */}
-              {/* {!isVolunteer && ( */}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Actions
               </th>
-              {/* )} */}
             </tr>
           </thead>
           <tbody>
@@ -161,6 +142,7 @@ const ReservedRidesTable = ({
                     status={contact.status}
                     handleCancelClick={() => setEditContactId(null)}
                     isVolunteer={isVolunteer}
+                    userRole={userRole}
                   />
                 ) : (
                   <ReadOnlyRow
@@ -170,8 +152,8 @@ const ReservedRidesTable = ({
                     handleDeleteClick={() => handleCancelClick(contact.id)}
                     status={contact.status}
                     convertTime={convertTime}
-                    startAddress={contact.startAddress}
-                    isVolunteer={isVolunteer} // This passes down the user role logic
+                    startAddress={contact.startLocation || contact.startAddress}
+                    isVolunteer={isVolunteer}
                     selected={selectedRides.includes(contact.id)}
                     onToggleSelect={onToggleSelect}
                     userRole={userRole}

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         email,
         firstName,
         lastName,
-        phone: '', // Adjust if you're collecting phone separately
+        phone: '',
       },
     });
 

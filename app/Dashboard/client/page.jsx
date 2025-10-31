@@ -98,7 +98,6 @@ export default function Page() {
                 return response.json();
             })
             .then(data => {
-                console.log('Customer added successfully:', data);
                 toast.success('Client added successfully!');
                 window.location.reload();
             })
@@ -109,13 +108,11 @@ export default function Page() {
     };
 
     const handleDeleteClick = (customerId) => {
-        console.log("Delete button clicked for CustomerID:", customerId);
         setCustomerToDelete(customerId);
         setShowDeleteModal(true);
     };
 
     const handleConfirmDelete = async () => {
-        console.log("handleConfirmDelete called. customerToDelete:", customerToDelete);
         const customerIdToDelete = customerToDelete;
 
         setShowDeleteModal(false);
@@ -145,7 +142,6 @@ export default function Page() {
     };
 
     const handleEditClick = (customer) => {
-        console.log('Editing customer:', customer);
         setCustomerToEdit(customer);
         setIsEditCustomerModalOpen(true);
     };

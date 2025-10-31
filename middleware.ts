@@ -9,7 +9,6 @@ export async function middleware(request: NextRequest) {
         const pathname = request.nextUrl.pathname;
 
         if (!cvtoken && pathname !== '/') {
-            console.log(`No cvtoken found for protected route: ${pathname}. Redirecting to login.`);
             return NextResponse.redirect(loginRedirectUrl(), { status: 302 });
         } else if (cvtoken) {
             const certPem = process.env.CERT_PEM;
