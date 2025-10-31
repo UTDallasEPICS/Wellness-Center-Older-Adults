@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import TextContainer from "/app/components/TextContainer.jsx";
 //import RecentActivity from "/app/components/RecentActivity"; 
+import Leaderboard from "/app/components/leaderboard.jsx";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
@@ -106,6 +107,7 @@ export default function Page() {
         <TextContainer text="Rides Completed" showCircle={true} percentage={ridesPercentage} />
         <TextContainer text="Total Rides for the Week" number="17" />
       </div>
+      <Leaderboard />
     </div>
   );
 }
