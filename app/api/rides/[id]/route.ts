@@ -1,4 +1,3 @@
-// app/api/rides/[id]/route.ts
 import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { sendEmail} from '@/util/nodemail';
@@ -182,7 +181,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 const mailOptions: SendMailOptions = {
                     to: ADMIN_EMAIL,
                     replyTo: updatedRide.customer.email, 
-                    subject: `✅ Ride Completed: ${finalFormattedData.customerName} (ID: ${updatedRide.id})`,
+                    subject: `Ride Completed: ${finalFormattedData.customerName} (ID: ${updatedRide.id})`,
                     html: `
                         <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
                             <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">Ride Marked as Complete</h2>
