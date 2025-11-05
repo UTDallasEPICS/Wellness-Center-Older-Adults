@@ -192,14 +192,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 if (recipients.length > 0) {
                     const mailOptions: SendMailOptions = {
                         to: recipients, 
-                        subject: `Ride Completed: ${finalFormattedData.customerName} (ID: ${updatedRide.id})`,
+                        subject: `Ride Completed: ${finalFormattedData.customerName}`,
                         html: `
                             <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
                                 <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">Ride Marked as Complete</h2>
 
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
-                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Ride ID:</strong> ${updatedRide.id}</td></tr>
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Total Drive Time:</strong> ${updatedRide.totalTime}</td></tr>
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Completed On:</strong> ${new Date().toLocaleString()}</td></tr>
                                 </table>
