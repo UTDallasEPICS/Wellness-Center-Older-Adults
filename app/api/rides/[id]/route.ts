@@ -5,6 +5,7 @@ import { SendMailOptions } from 'nodemailer';
 
 const prisma = new PrismaClient();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL; // Get admin email from .env
+const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL // Get Volunteer email from .env (This is your hardcoded secondary recipient)
 
 function parseAddressString(addressString: string) {
     const parts = addressString.split(', ');
@@ -178,46 +179,59 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             };
             
             if (isCompletion && ADMIN_EMAIL && updatedRide.customer && sendEmail) {
-                const mailOptions: SendMailOptions = {
-                    to: ADMIN_EMAIL,
-                    replyTo: updatedRide.customer.email, 
-                    subject: `Ride Completed: ${finalFormattedData.customerName} (ID: ${updatedRide.id})`,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
-                            <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">Ride Marked as Complete</h2>
+                
+                // 1. Get the email of the assigned volunteer from the database (mandatory, if it exists)
+                const ASSIGNED_VOLUNTEER_EMAIL = updatedRide.volunteer?.user?.email;
+                
+                // 2. Combine Admin, Assigned Volunteer, and the hardcoded VOLUNTEER_EMAIL (from .env)
+                const recipients = [ADMIN_EMAIL, ASSIGNED_VOLUNTEER_EMAIL, VOLUNTEER_EMAIL]
+                    .filter((email, index, self): email is string => 
+                        !!email && self.indexOf(email) === index
+                    ); // Filters out null/undefined and removes duplicates
+                
+                if (recipients.length > 0) {
+                    const mailOptions: SendMailOptions = {
+                        to: recipients, 
+                        subject: `Ride Completed: ${finalFormattedData.customerName} (ID: ${updatedRide.id})`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
+                                <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">Ride Marked as Complete</h2>
 
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
-                                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
-                                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Ride ID:</strong> ${updatedRide.id}</td></tr>
-                                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Total Drive Time:</strong> ${updatedRide.totalTime}</td></tr>
-                                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Completed On:</strong> ${new Date().toLocaleString()}</td></tr>
-                            </table>
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Ride ID:</strong> ${updatedRide.id}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Total Drive Time:</strong> ${updatedRide.totalTime}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Completed On:</strong> ${new Date().toLocaleString()}</td></tr>
+                                </table>
 
-                            <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c;">Ride Route:</p>
-                            <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 14px; color: #4a5568;">
-                                <strong>Start:</strong> ${finalFormattedData.startLocation} <br/>
-                                <strong>End:</strong> ${finalFormattedData.endLocation}
+                                <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c;">Ride Route:</p>
+                                <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 14px; color: #4a5568;">
+                                    <strong>Start:</strong> ${finalFormattedData.startLocation} <br/>
+                                    <strong>End:</strong> ${finalFormattedData.endLocation}
+                                </div>
+                                
+                                <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c; margin-top: 20px;">Volunteer Notes:</p>
+                                <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 14px; color: #4a5568;">
+                                    ${updatedRide.specialNote || 'No special notes provided.'}
+                                </div>
                             </div>
-                            
-                            <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c; margin-top: 20px;">Volunteer Notes:</p>
-                            <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 14px; color: #4a5568;">
-                                ${updatedRide.specialNote || 'No special notes provided.'}
-                            </div>
-                        </div>
-                    `,
-                };
+                        `,
+                    };
 
-                try {
-                    await sendEmail(mailOptions);
-                    console.log(`Email sent for completed ride ${updatedRide.id}`);
-                } catch (emailError) {
-                    console.error(`ERROR: Failed to send completion email for ride ${updatedRide.id}:`, emailError);
-                    return NextResponse.json({ 
-                        message: 'Ride updated to Completed, but failed to send admin email notification.', 
-                        updatedRide: updatedRide,
-                        formattedData: finalFormattedData,
-                        emailError: true 
-                    }, { status: 200 });
+                    try {
+                        await sendEmail(mailOptions);
+                        console.log(`Email sent for completed ride ${updatedRide.id} to ${recipients.join(', ')}`);
+                    } catch (emailError) {
+                        console.error(`ERROR: Failed to send completion email for ride ${updatedRide.id}:`, emailError);
+                        return NextResponse.json({ 
+                            message: 'Ride updated to Completed, but failed to send admin email notification.', 
+                            updatedRide: updatedRide,
+                            formattedData: finalFormattedData,
+                            emailError: true 
+                        }, { status: 200 });
+                    }
+                } else {
+                    console.warn(`Email not sent for completed ride ${updatedRide.id}: No valid ADMIN_EMAIL or VOLUNTEER_EMAIL found.`);
                 }
             }
 
@@ -229,7 +243,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             
         } else {
 
-             const rideWithUpdatedData = await prisma.ride.findUnique({
+            const rideWithUpdatedData = await prisma.ride.findUnique({
                 where: { id: parseInt(id, 10) },
                 include: {
                     customer: true,
