@@ -165,10 +165,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 }
             });
 
-            console.log("=== FINAL RIDE UPDATE LOG ===");
-            console.log("Updated Status:", updatedRide.status);
-            console.log("Updated Total Time:", updatedRide.totalTime);
-            console.log("Updated Special Note:", updatedRide.specialNote);
+            //console.log("=== FINAL RIDE UPDATE LOG ===");
+            //console.log("Updated Status:", updatedRide.status);
+            //console.log("Updated Total Time:", updatedRide.totalTime);
+            //console.log("Updated Special Note:", updatedRide.specialNote);
 
             return NextResponse.json({ 
                 message: 'Ride updated successfully', 
