@@ -1,15 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// Replaced "next/image" with <img> to ensure compatibility
-import { X, Bell, Plus, Trash2 } from "lucide-react"; // Using lucide-react for icons
+import { X, Bell, Plus, Trash2 } from "lucide-react";
 
-// Mock implementation for demonstration purposes (replace with your actual auth/provider logic)
-const useAuth = () => ({
-  handleLogout: () => console.log("Logout triggered"),
-});
-
-// Utility component for the custom notification list item
 const NotificationRow = ({ notification, onChange, onRemove, timeOptions }) => (
   <div
     key={notification.id}
@@ -22,8 +15,7 @@ const NotificationRow = ({ notification, onChange, onRemove, timeOptions }) => (
       <select
         value={notification.value}
         onChange={(e) => onChange(notification.id, "value", e.target.value)}
-        // Green focus ring for inputs
-        className="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-green-500 focus:ring-green-500" 
+        className="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-green-500 focus:ring-green-500"
       >
         {timeOptions.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -41,11 +33,10 @@ const NotificationRow = ({ notification, onChange, onRemove, timeOptions }) => (
         type="time"
         value={notification.preferredTime}
         onChange={(e) => onChange(notification.id, "preferredTime", e.target.value)}
-        // Green focus ring for inputs
-        className="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-green-500 focus:ring-green-500" 
+        className="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-green-500 focus:ring-green-500"
       />
     </div>
-    
+
     <div className="flex-shrink-0 pt-5 sm:pt-4">
       <button
         type="button"
@@ -61,8 +52,6 @@ const NotificationRow = ({ notification, onChange, onRemove, timeOptions }) => (
 
 
 export default function AccountPage() {
-  const { handleLogout } = useAuth();
-
   const [notificationSettings, setNotificationSettings] = useState([
     { id: Date.now(), value: '24', preferredTime: '09:00' },
   ]);
@@ -77,19 +66,17 @@ export default function AccountPage() {
     isVolunteer: false,
     volunteerStatus: "",
     assignedRides: [],
-    birthdate: "",
   });
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Time options including day-based reminders (from user's last input)
   const timeOptions = [
     { value: '14 Days', label: '14 days before' },
-    { value: '13 Days', label: '13 days before' }, 
+    { value: '13 Days', label: '13 days before' },
     { value: '12 Days', label: '12 days before' },
     { value: '11 Days', label: '11 days before' },
-    { value: '10 Days', label: '10 days before' }, 
+    { value: '10 Days', label: '10 days before' },
     { value: '9 Days', label: '9 days before' },
     { value: '8 Days', label: '8 days before' },
     { value: '7 Days', label: '7 days before' },
@@ -120,10 +107,9 @@ export default function AccountPage() {
   };
 
   const handleAddNotification = () => {
-    // Default to 14 days before
     setNotificationSettings([
       ...notificationSettings,
-      { id: Date.now() + Math.random(), value: '14 Days', preferredTime: '18:00' }, 
+      { id: Date.now() + Math.random(), value: '14 Days', preferredTime: '18:00' },
     ]);
   };
 
@@ -141,36 +127,19 @@ export default function AccountPage() {
     async function fetchUserData() {
       try {
         setLoading(true);
-        // Mocking API response for demonstration
-        const mockResponse = {
-          ok: true,
-          json: async () => ({
-            user: {
-              fullName: "Jane Doe",
-              email: "jane.doe@example.com",
-              phone: "555-123-4567",
-              isVolunteer: true,
-              volunteerStatus: "available",
-              assignedRides: [
-                { id: 'r1', date: Date.now() + 86400000, pickupTime: Date.now() + 86400000 + 36000000, addrStart: { street: '123 Main St' } },
-              ],
-              notificationSettings: [
-                { id: 1, value: '24', preferredTime: '08:00' },
-                { id: 2, value: '14 Days', preferredTime: '18:00' }
-              ]
-            }
-          })
-        };
-        const response = mockResponse; // Replace with await fetch("/api/user/profile");
+        const response = await fetch('/api/user/profile');
 
         if (!response.ok) {
-          throw new Error("Failed to fetch user data");
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to fetch user data");
         }
+
         const data = await response.json();
         const user = data.user;
+
         let firstName = user.firstName || "";
         let lastName = user.lastName || "";
-        
+
         if ((!firstName || !lastName) && user.fullName) {
           const [f, ...l] = user.fullName.split(" ");
           firstName = f;
@@ -185,15 +154,18 @@ export default function AccountPage() {
           isVolunteer: user.isVolunteer || false,
           volunteerStatus: user.volunteerStatus || "",
           assignedRides: user.assignedRides || [],
-          birthdate: user.birthdate || "",
         });
-        
+
         if (user.notificationSettings && user.notificationSettings.length > 0) {
           const loadedSettings = user.notificationSettings.map((n, index) => ({
             ...n,
-            id: Date.now() + index,
+            id: Date.now() + index + Math.random(),
           }));
           setNotificationSettings(loadedSettings);
+        } else {
+             setNotificationSettings([
+               { id: Date.now(), value: '24', preferredTime: '09:00' },
+             ]);
         }
 
         setProfilePic(user.profilePicUrl || null);
@@ -218,7 +190,6 @@ export default function AccountPage() {
       const updateData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
         phone: formData.phone,
         volunteerStatus: formData.volunteerStatus,
         notificationSettings: notificationSettings.map(n => ({
@@ -227,16 +198,17 @@ export default function AccountPage() {
         })),
       };
 
-      // Mock API call
-      const mockResponse = {
-        ok: true,
-        status: 200,
-        json: async () => ({ success: true })
-      };
-      const response = mockResponse; // Replace with actual fetch call
+      const response = await fetch('/api/user/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to update account information");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update account information");
       }
       showMessage("success", "Account and notification settings updated successfully!");
     } catch (err) {
@@ -255,24 +227,26 @@ export default function AccountPage() {
       };
       reader.readAsDataURL(file);
 
-      const formData = new FormData();
-      formData.append("profilePic", file);
+      const profilePicFormData = new FormData();
+      profilePicFormData.append("profilePic", file);
 
       try {
-        // Mock API call
-        const mockResponse = {
-          ok: true,
-          json: async () => ({ url: "https://placehold.co/128x128/7f9cf5/ffffff?text=New+Pic" })
-        };
-        const response = mockResponse; // Replace with actual fetch call
+        const response = await fetch('/api/user/profile-pic-upload', {
+          method: 'POST',
+          body: profilePicFormData,
+        });
 
         if (!response.ok) {
-          throw new Error("Failed to upload profile picture");
+           setProfilePic(formData.profilePicUrl || null);
+           const errorData = await response.json();
+           throw new Error(errorData.error || "Failed to upload profile picture");
         }
+
         const result = await response.json();
         setProfilePic(result.url);
+        showMessage("success", "Profile picture uploaded successfully!");
       } catch (err) {
-        console.error("Upload error:", err);
+         showMessage("error", err.message || "Error uploading profile picture.");
       }
     }
   };
@@ -298,10 +272,9 @@ export default function AccountPage() {
       <h1 className="text-center text-3xl font-bold text-gray-800 mb-8">
         Volunteer Account
       </h1>
-      
-      {/* --- Custom Message Box --- */}
+
       {(successMessage || errorMessage) && (
-        <div 
+        <div
           className={`p-4 mb-4 rounded-lg flex items-center justify-between transition-opacity duration-300 ${successMessage ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
           role="alert"
         >
@@ -313,7 +286,6 @@ export default function AccountPage() {
           </button>
         </div>
       )}
-      {/* -------------------------- */}
 
 
       <div className="flex flex-col items-center mb-8">
@@ -344,7 +316,7 @@ export default function AccountPage() {
         />
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form id="account-form" onSubmit={handleSave} className="space-y-6">
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
           <input
@@ -379,17 +351,8 @@ export default function AccountPage() {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
           />
         </div>
-
-        <button
-          type="submit"
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
-          disabled={loading}
-        >
-          {loading ? 'Saving Changes...' : 'Save All Changes'}
-        </button>
-
-        {/* --- NOTIFICATION SETTINGS SECTION --- */}
-        <div className="pt-6 border-t border-gray-200"> 
+        
+        <div className="pt-6 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
             <Bell className="w-5 h-5 mr-2 text-green-600"/> Reminder Notifications
           </h2>
@@ -397,7 +360,7 @@ export default function AccountPage() {
             Set custom email reminders for your assigned rides. Specify how long before the ride you want the email, and what time of day you prefer to receive it.
           </p>
 
-          <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200"> {/* Green box accent */}
+          <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
             {notificationSettings.map((notification) => (
               <NotificationRow
                 key={notification.id}
@@ -417,10 +380,8 @@ export default function AccountPage() {
             </button>
           </div>
         </div>
-        {/* --- END NOTIFICATION SETTINGS SECTION --- */}
 
       </form>
-      {/* --- Volunteer Info Section --- */}
       {formData.isVolunteer && (
         <div className="mt-8 pt-6 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -475,20 +436,24 @@ export default function AccountPage() {
           </div>
         </div>
       )}
-      {/* --- End Volunteer Info Section --- */}
 
-      <div className="mt-8 flex justify-center space-x-4">
+      {/* BUTTONS AT THE BOTTOM with space-y-4 for separation */}
+      <div className="mt-8 flex flex-col space-y-4 pt-6 border-t border-gray-200">
+        
         <button
           onClick={handlePasswordChange}
-          className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" // Green focus ring
+          className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
           Change Password
         </button>
+
         <button
-          onClick={handleLogout}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-red-600 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          type="submit"
+          form="account-form"
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
+          disabled={loading}
         >
-          Logout
+          {loading ? 'Saving Changes...' : 'Save All Changes'}
         </button>
       </div>
     </div>

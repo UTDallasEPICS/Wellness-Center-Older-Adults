@@ -1,86 +1,107 @@
-import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
-export async function PUT(req) {
+function getTokenFromRequest(request: any) {
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+  const cookie = request.headers.get('cookie');
+  if (cookie) {
+    const match = cookie.match(/cvtoken=([^;]+)/);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+export async function PUT(request: any) {
   try {
-    const { firstName, lastName, email, phone, status } = await req.json();
-    const userEmail = email;
+    const token = getTokenFromRequest(request);
+    if (!token) {
+      console.error('PUT /api/user/update: Unauthorized - No token provided');
+      return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
+    }
+    let decoded: any;
+    try {
+      decoded = jwt.decode(token);
+    } catch (err) {
+      console.error('PUT /api/user/update: Unauthorized - Invalid token format');
+      return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+    }
+    const email = decoded?.email;
+    if (!email) {
+      console.error('PUT /api/user/update: Unauthorized - Email missing in token');
+      return NextResponse.json({ error: 'Unauthorized: Email missing in token' }, { status: 401 });
+    }
+    console.log(`PUT /api/user/update: Attempting to update user: ${email}`);
 
-    if (!userEmail) {
-      return new NextResponse(
-        JSON.stringify({ message: "User email is required." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+
+    const body = await request.json();
+    const {
+      firstName,
+      lastName,
+      phone,
+      volunteerStatus,
+      notificationSettings
+    } = body;
+
+    console.log('PUT /api/user/update: Received notificationSettings:', JSON.stringify(notificationSettings).substring(0, 100) + '...');
+
+    const updateData: any = {};
+    if (firstName !== undefined) updateData.firstName = firstName;
+    if (lastName !== undefined) updateData.lastName = lastName;
+    if (phone !== undefined) updateData.phone = phone;
+
+    if (notificationSettings !== undefined) {
+      if (!Array.isArray(notificationSettings)) {
+        console.error('PUT /api/user/update: Validation Error - notificationSettings is not an array.');
+        return NextResponse.json({ error: 'Invalid format for notification settings. Expected array.' }, { status: 400 });
+      }
+      updateData.notificationSettings = notificationSettings;
     }
 
-    // Find the user and include their volunteer info
-    const existingUser = await prisma.user.findUnique({
-      where: { email: userEmail },
-      include: {
-        volunteer: true, // This is key to accessing the volunteer info
-      },
-    });
 
-    if (!existingUser) {
-      return new NextResponse(
-        JSON.stringify({ message: "User not found." }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const userData = {};
-    if (firstName) userData.firstName = firstName;
-    if (lastName) userData.lastName = lastName;
-    if (phone) userData.phone = phone;
-  
-
-    let updatedUser = null;
-    if (Object.keys(userData).length > 0) {
+    let updatedUser;
+    try {
       updatedUser = await prisma.user.update({
-        where: { email: userEmail },
-        data: userData,
-        include: {
-          volunteer: true, // Also include volunteer data in the response
-        },
+        where: { email },
+        data: updateData,
+        select: { id: true, volunteer: true }
       });
+      console.log(`PUT /api/user/update: User profile updated successfully for ID: ${updatedUser.id}`);
+
+    } catch (e: any) {
+      if (e.code === 'P2025') {
+        console.error(`PUT /api/user/update: Prisma Error (P2025) - User not found with email: ${email}`);
+        return NextResponse.json({ error: 'User not found or database record missing' }, { status: 404 });
+      }
+      console.error('PUT /api/user/update: Fatal Prisma Error during user update:', e);
+      return NextResponse.json({ error: 'Database update failed due to unexpected error' }, { status: 500 });
     }
 
-    // Check if a 'status' was provided and update the VolunteerInfo model
-    let updatedVolunteer = null;
-    if (status) {
-      updatedVolunteer = await prisma.volunteerInfo.update({
-        where: { userID: existingUser.id },
-        data: {
-          status: status,
-        },
-      });
+    if (volunteerStatus !== undefined && updatedUser) {
+      if (updatedUser.volunteer) {
+        await prisma.volunteerInfo.update({
+          where: { userID: updatedUser.id },
+          data: { status: volunteerStatus },
+        });
+        console.log(`PUT /api/user/update: Volunteer status updated for ID: ${updatedUser.id}`);
+      } else {
+        await prisma.volunteerInfo.create({
+          data: { userID: updatedUser.id, status: volunteerStatus }
+        });
+        console.log(`PUT /api/user/update: VolunteerInfo created for ID: ${updatedUser.id}`);
+      }
     }
 
-    // Prepare the final response object.
-    // Use the updated user data if available, otherwise use the existing user.
-    // Combine with the updated volunteer info if it was updated.
-    const finalUser = updatedUser ? updatedUser : existingUser;
-    
-    // Replace the old volunteer info with the updated one if it exists
-    if (updatedVolunteer) {
-      finalUser.volunteer = updatedVolunteer;
-    }
+    return NextResponse.json({ message: 'Profile updated successfully' });
 
-    return new NextResponse(
-      JSON.stringify({
-        message: "Account information updated successfully.",
-        user: finalUser,
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
-  } catch (error) {
-    console.error("Error updating user information:", error);
-    return new NextResponse(
-      JSON.stringify({ message: "Internal server error." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+  } catch (error: any) {
+    console.error('API Error during profile update (Non-Prisma/Auth related):', error.message);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

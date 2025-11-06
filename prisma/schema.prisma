@@ -38,16 +38,16 @@ model Ride {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
-  firstName    String
-  lastName     String
-  phone        String?        @unique
-  role         String
-  isAdmin      Boolean        @default(false)
-  isArchived   Boolean        @default(false)
-  reminderTime String?
-  volunteer    VolunteerInfo?
+  id                   Int            @id @default(autoincrement())
+  email                String         @unique
+  firstName            String
+  lastName             String
+  phone                String?        @unique
+  role                 String
+  isAdmin              Boolean        @default(false)
+  isArchived           Boolean        @default(false)
+  notificationSettings Json?
+  volunteer            VolunteerInfo?
 }
 
 model Customer {
