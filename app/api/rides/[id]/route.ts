@@ -1,78 +1,279 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { Client, DistanceMatrixResponse, DistanceMatrixRequest } from '@googlemaps/google-maps-services-js';
+import { sendEmail} from '@/util/nodemail';
+import { SendMailOptions } from 'nodemailer';
 
 const prisma = new PrismaClient();
-const googleMapsClient = new Client({});
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL; // Get admin email from .env
+const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL // Get Volunteer email from .env (This is your hardcoded secondary recipient)
 
-// Utility function to handle Google Maps API call
-const getDistanceMatrix = async (req: DistanceMatrixRequest): Promise<DistanceMatrixResponse> => {
-  try {
-    const response = await googleMapsClient.distancematrix(req);
-    return response;
-  } catch (error: any) {
-    throw new Error(`Google Maps API error: ${error.message}`, { cause: error });
-  }
-};
-
-// GET - Fetch ride details with distance/time calculation
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
-
-  try {
-    const parsedId = parseInt(id, 10);
-
-    if (isNaN(parsedId)) {
-      return NextResponse.json({ error: 'Invalid ride ID' }, { status: 400 });
+function parseAddressString(addressString: string) {
+    const parts = addressString.split(', ');
+    if (parts.length >= 3) {
+        const street = parts[0];
+        const city = parts[1];
+        const stateZip = parts[2].split(' ');
+        const state = stateZip[0];
+        const postalCode = stateZip.slice(1).join(' ');
+        
+        return { street, city, state, postalCode };
     }
 
-    const ride = await prisma.ride.findUnique({
-      where: { id: parsedId },
-      include: {
-        customer: { include: { address: true } },
-        addrStart: true,
-        addrEnd: true,
-      },
-    });
-
-    if (!ride) {
-      return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
+    if (!ADMIN_EMAIL) {
+        console.error("ADMIN_EMAIL environment variable is not set.");
     }
 
-    const origin = ride.addrStart
-      ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`
-      : '';
-    const destination = ride.addrEnd
-      ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`
-      : '';
+    try {
+        const updateData = await request.json();
 
-    let driveTimeAB = 'N/A';
-    let mileage = 'N/A';
 
-    if (origin && destination) {
-      try {
-        const distanceMatrixAB = await getDistanceMatrix({
-          params: {
-            origins: [origin],
-            destinations: [destination],
-            key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
-            units: 'imperial',
-          },
-          timeout: 5000,
+        const ride = await prisma.ride.findUnique({
+            where: {
+                id: parseInt(id, 10),
+            },
+            include: { // Fetch required relations
+                customer: true,
+                addrStart: true,
+                addrEnd: true,
+                volunteer: { include: { user: true } }
+            }
         });
 
-        const element = distanceMatrixAB.data?.rows?.[0]?.elements?.[0];
-        driveTimeAB = element?.duration?.text || 'N/A';
-        const mileageText = element?.distance?.text;
-        mileage = mileageText ? (mileageText.includes('mi') ? mileageText : `${mileageText} mi`) : 'N/A';
-      } catch (error: any) {
-        console.error('Error fetching distance matrix:', error);
-        driveTimeAB = 'N/A';
-        mileage = 'N/A';
-      }
+        if (!ride) {
+            return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
+        }
+
+        const isCompletion = updateData.status === 'Completed';
+
+        if (isCompletion) {
+            if (!updateData.driveTimeAB) {
+                return NextResponse.json(
+                    { error: 'Cannot complete ride. Total drive time is required.' },
+                    { status: 400 }
+                );
+            }
+        }
+
+        if (updateData.pickupAddress || updateData.dropoffAddress) {
+            
+            if (updateData.pickupAddress && ride.startAddressID) {
+                const pickupParts = parseAddressString(updateData.pickupAddress);
+                if (pickupParts) {
+                    await prisma.address.update({
+                        where: { id: ride.startAddressID },
+                        data: pickupParts
+                    });
+                }
+            }
+            
+            if (updateData.dropoffAddress && ride.endAddressID) {
+                const dropoffParts = parseAddressString(updateData.dropoffAddress);
+                if (dropoffParts) {
+                    await prisma.address.update({
+                        where: { id: ride.endAddressID },
+                        data: dropoffParts
+                    });
+                }
+            }
+        }
+
+        if (updateData.customerUpdates) {
+            const customer = await prisma.customer.findUnique({
+                where: { id: parseInt(updateData.customerUpdates.id, 10) },
+            });
+            if (customer) {
+                await prisma.customer.update({
+                    where: { id: parseInt(updateData.customerUpdates.id, 10) },
+                    data: {
+                        firstName: updateData.customerUpdates.firstName,
+                        lastName: updateData.customerUpdates.lastName,
+                        customerPhone: updateData.customerUpdates.customerPhone,
+                    },
+                });
+            }
+        }
+
+        if (updateData.addressUpdates) {
+            const address = await prisma.address.findUnique({
+                where: { id: parseInt(updateData.addressUpdates.id, 10) },
+            });
+            if (address) {
+                await prisma.address.update({
+                    where: { id: parseInt(updateData.addressUpdates.id, 10) },
+                    data: {
+                        street: updateData.addressUpdates.street,
+                        city: updateData.addressUpdates.city,
+                        state: updateData.addressUpdates.state,
+                        postalCode: updateData.addressUpdates.postalCode,
+                    },
+                });
+            }
+        }
+
+        const { customerID, startAddressID, endAddressID, volunteerID, date, pickupTime, status, driveTimeAB, notes } = updateData;
+        const prismaUpdateData: any = {};
+
+        if (date !== undefined) {
+            const parsedDate = new Date(date);
+            if (!isNaN(parsedDate.getTime())) {
+                prismaUpdateData.date = parsedDate;
+            }
+        }
+        
+        if (pickupTime !== undefined) {
+            const parsedPickupTime = new Date(pickupTime);
+            if (!isNaN(parsedPickupTime.getTime())) {
+                prismaUpdateData.pickupTime = parsedPickupTime;
+            }
+        }
+        
+        if (status !== undefined) prismaUpdateData.status = status;
+        
+        if (driveTimeAB !== undefined) {
+            prismaUpdateData.totalTime = driveTimeAB;
+        }
+
+        if (notes !== undefined) {
+            prismaUpdateData.specialNote = notes;
+        }
+
+        if (customerID !== undefined) prismaUpdateData.customer = customerID === null ? { disconnect: true } : { connect: { id: parseInt(customerID as string, 10) } };
+        if (startAddressID !== undefined) prismaUpdateData.addrStart = startAddressID === null ? { disconnect: true } : { connect: { id: parseInt(startAddressID as string, 10) } };
+        if (endAddressID !== undefined) prismaUpdateData.addrEnd = endAddressID === null ? { disconnect: true } : { connect: { id: parseInt(endAddressID as string, 10) } };
+        if (volunteerID !== undefined) prismaUpdateData.volunteer = volunteerID === null ? { disconnect: true } : { connect: { id: parseInt(volunteerID as string, 10) } };
+
+        let updatedRide;
+        let finalFormattedData = null;
+
+        if (Object.keys(prismaUpdateData).length > 0) {
+            updatedRide = await prisma.ride.update({
+                where: { id: parseInt(id, 10) },
+                data: prismaUpdateData,
+                include: {
+                    customer: true,
+                    addrStart: true,
+                    addrEnd: true,
+                    volunteer: { include: { user: true } }
+                }
+            });
+
+            finalFormattedData = {
+                id: updatedRide.id,
+                customerID: updatedRide.customerID,
+                customerName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
+                customerPhone: updatedRide.customer?.customerPhone || '',
+                startAddressID: updatedRide.startAddressID,
+                endAddressID: updatedRide.endAddressID,
+                startLocation: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
+                endLocation: updatedRide.addrEnd ? `${updatedRide.addrEnd.street}, ${updatedRide.addrEnd.city}, ${updatedRide.addrEnd.state} ${updatedRide.addrEnd.postalCode}` : '',
+                date: updatedRide.date,
+                startTime: updatedRide.pickupTime ? updatedRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                status: updatedRide.status,
+                totalTime: updatedRide.totalTime,
+                specialNote: updatedRide.specialNote
+            };
+            
+            if (isCompletion && ADMIN_EMAIL && updatedRide.customer && sendEmail) {
+                
+                // 1. Get the email of the assigned volunteer from the database (mandatory, if it exists)
+                const ASSIGNED_VOLUNTEER_EMAIL = updatedRide.volunteer?.user?.email;
+                
+                // 2. Combine Admin, Assigned Volunteer, and the hardcoded VOLUNTEER_EMAIL (from .env)
+                const recipients = [ADMIN_EMAIL, ASSIGNED_VOLUNTEER_EMAIL, VOLUNTEER_EMAIL]
+                    .filter((email, index, self): email is string => 
+                        !!email && self.indexOf(email) === index
+                    ); // Filters out null/undefined and removes duplicates
+                
+                if (recipients.length > 0) {
+                    const mailOptions: SendMailOptions = {
+                        to: recipients, 
+                        subject: `Ride Completed: ${finalFormattedData.customerName}`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
+                                <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">Ride Marked as Complete</h2>
+
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Total Drive Time:</strong> ${updatedRide.totalTime}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Completed On:</strong> ${new Date().toLocaleString()}</td></tr>
+                                </table>
+
+                                <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c;">Ride Route:</p>
+                                <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 14px; color: #4a5568;">
+                                    <strong>Start:</strong> ${finalFormattedData.startLocation} <br/>
+                                    <strong>End:</strong> ${finalFormattedData.endLocation}
+                                </div>
+                                
+                                <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c; margin-top: 20px;">Volunteer Notes:</p>
+                                <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 14px; color: #4a5568;">
+                                    ${updatedRide.specialNote || 'No special notes provided.'}
+                                </div>
+                            </div>
+                        `,
+                    };
+
+                    try {
+                        await sendEmail(mailOptions);
+                        console.log(`Email sent for completed ride ${updatedRide.id} to ${recipients.join(', ')}`);
+                    } catch (emailError) {
+                        console.error(`ERROR: Failed to send completion email for ride ${updatedRide.id}:`, emailError);
+                        return NextResponse.json({ 
+                            message: 'Ride updated to Completed, but failed to send admin email notification.', 
+                            updatedRide: updatedRide,
+                            formattedData: finalFormattedData,
+                            emailError: true 
+                        }, { status: 200 });
+                    }
+                } else {
+                    console.warn(`Email not sent for completed ride ${updatedRide.id}: No valid ADMIN_EMAIL or VOLUNTEER_EMAIL found.`);
+                }
+            }
+
+            return NextResponse.json({ 
+                message: isCompletion ? 'Ride completed successfully!' : 'Ride updated successfully', 
+                updatedRide: updatedRide,
+                formattedData: finalFormattedData,
+            }, { status: 200 });
+            
+        } else {
+
+            const rideWithUpdatedData = await prisma.ride.findUnique({
+                where: { id: parseInt(id, 10) },
+                include: {
+                    customer: true,
+                    addrStart: true,
+                    addrEnd: true,
+                    volunteer: { include: { user: true } }
+                }
+            });
+            const finalFormattedDataForNoUpdate = rideWithUpdatedData ? {
+                id: rideWithUpdatedData.id,
+                customerID: rideWithUpdatedData.customerID,
+                customerName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
+                customerPhone: rideWithUpdatedData.customer?.customerPhone || '',
+                startAddressID: rideWithUpdatedData.startAddressID,
+                endAddressID: rideWithUpdatedData.endAddressID,
+                startLocation: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
+                endLocation: rideWithUpdatedData.addrEnd ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}` : '',
+                date: rideWithUpdatedData.date,
+                startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                status: rideWithUpdatedData.status,
+                totalTime: rideWithUpdatedData.totalTime,
+                specialNote: rideWithUpdatedData.specialNote
+            } : null;
+
+            return NextResponse.json({ 
+                message: 'No ride data to update, but related records may have been updated',
+                updatedRide: rideWithUpdatedData,
+                formattedData: finalFormattedDataForNoUpdate
+            }, { status: 200 });
+        }
+
+    } catch (error: any) {
+        console.error('Error updating ride:', error);
+        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
     }
 
     // Extract just the time portion from pickupTime DateTime
