@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSearchParams, useRouter, useParams } from "next/navigation";
 import RideMap from "../../components/RideMap";
-import { Search, Plus } from "lucide-react"; // Assuming lucide-react or similar icon library is available
+import { Search, Plus } from "lucide-react";
 
 export default function Page() {
   const { id: rideIdFromParams } = useParams();
@@ -24,7 +24,6 @@ export default function Page() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("available");
   const [searchTerm, setSearchTerm] = useState("");
-  // State for checkbox selection
   const [selectedRides, setSelectedRides] = useState([]);
 
   const convertTo12Hour = (time24) => {
@@ -40,7 +39,6 @@ export default function Page() {
     return `${hours12}:${minutes} ${ampm}`;
   };
 
-  // Handler to toggle individual ride selection
   const handleToggleRideSelection = (rideId) => {
     setSelectedRides((prevSelected) => {
       if (prevSelected.includes(rideId)) {
@@ -51,11 +49,9 @@ export default function Page() {
     });
   };
 
-  // Handler to toggle all visible rides in a tab
   const handleToggleAllRides = (currentTableRides, isChecked) => {
     if (isChecked) {
       const allIds = currentTableRides.map((ride) => ride.id);
-      // This implementation simplifies by just setting the selected IDs for the current filtered list
       setSelectedRides(allIds);
     } else {
       setSelectedRides([]);
@@ -66,13 +62,11 @@ export default function Page() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/getAvailableRides");
+      const response = await fetch("/api/rides");
       if (!response.ok) {
         throw new Error(`Failed to fetch rides: ${response.status}`);
       }
       const rawData = await response.json();
-
-      // console.log("=== RAW API DATA ===", rawData[0]);
 
       const formattedData = rawData.map((ride) => ({
         id: ride.id,
@@ -90,8 +84,6 @@ export default function Page() {
         startTime: ride.startTime,
         status: ride.status || "Unreserved",
       }));
-
-      // console.log("=== FORMATTED DATA ===", formattedData[0]);
 
       setRidesData(formattedData);
     } catch (error) {
@@ -118,8 +110,7 @@ export default function Page() {
 
   const fetchAddresses = async () => {
     try {
-      // NOTE: It seems strange to use /api/getAvailableRides for addresses, but kept it as per original code.
-      const response = await fetch("/api/getAvailableRides");
+      const response = await fetch("/api/rides");
       if (response.ok) {
         const data = await response.json();
         setAddresses(data);
@@ -131,7 +122,7 @@ export default function Page() {
 
   const fetchRideDetails = async (id) => {
     try {
-      const response = await fetch(`/api/ride/get/${id}`);
+      const response = await fetch(`/api/rides/${id}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch ride details: ${response.status}`);
       }
@@ -160,6 +151,7 @@ export default function Page() {
 
   const handleReserveClick = async (rideId) => {
     try {
+      // ALREADY CORRECT: Uses /api/rides/${id}
       const response = await fetch(`/api/rides/${rideId}`, {
         method: "PUT",
         headers: {
@@ -177,9 +169,8 @@ export default function Page() {
 
       toast.success("Ride reserved successfully!");
 
-      // Move the user to the reserved tab and refresh data
       setActiveTab("reserved");
-      router.push("/Dashboard/rides?tab=reserved", undefined, {
+      router.push("/Dashboard/rides-volunteer?tab=reserved", undefined, {
         shallow: true,
       });
       await fetchRides();
@@ -215,8 +206,8 @@ export default function Page() {
           throw new Error(`Failed to update ride status: ${response.status}`);
         }
         toast.success("Ride reserved successfully!");
-        setRideDetails({ ...rideDetails, status: "Reserved" }); // Update local state
-        router.push("/Dashboard/rides?tab=reserved");
+        setRideDetails({ ...rideDetails, status: "Reserved" });
+        router.push("/Dashboard/rides-volunteer?tab=reserved");
       } catch (err) {
         console.error("Error updating ride status:", err);
         toast.error("Failed to reserve ride.");
@@ -242,8 +233,8 @@ export default function Page() {
           );
         }
         toast.success("Ride completed successfully!");
-        setRideDetails({ ...rideDetails, status: "Completed" }); // Update local state
-        router.push("/Dashboard/rides?tab=completed");
+        setRideDetails({ ...rideDetails, status: "Completed" });
+        router.push("/Dashboard/rides-volunteer?tab=completed");
       } catch (err) {
         console.error("Error updating ride status to Completed:", err);
         toast.error("Failed to mark ride as completed.");
@@ -267,11 +258,6 @@ export default function Page() {
     );
   }
 
-  /**
-   * Filters the rides data based on status and the search term.
-   * @param {string|string[]} statusFilter - The status or array of statuses to filter by.
-   * @returns {object[]} The filtered array of ride objects.
-   */
   const filterRides = (statusFilter) => {
     return ridesData.filter((ride) => {
       const statusMatch = Array.isArray(statusFilter)
@@ -284,7 +270,6 @@ export default function Page() {
 
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-      // Search logic: customer name, start location, or volunteer name
       return (
         (ride.customerName &&
           ride.customerName.toLowerCase().includes(lowerCaseSearchTerm)) ||
@@ -308,9 +293,6 @@ export default function Page() {
         <AddRidesTable
           initialContacts={availableRides}
           convertTime={convertTo12Hour}
-          //onEditRide={handleEditRide}
-          //onDeleteRide={handleDeleteRide}
-          // FIX: Pass the new handleReserveClick function
           handleReserveClick={handleReserveClick}
           customers={customers}
           addresses={addresses}
@@ -327,8 +309,6 @@ export default function Page() {
         <ReservedRidesTable
           initialContacts={reservedRides}
           convertTime={convertTo12Hour}
-          //onRideDeleted={handleDeleteRide}
-          //onRideUpdated={handleEditRide}
           selectedRides={selectedRides}
           onToggleSelect={handleToggleRideSelection}
           onToggleAll={handleToggleAllRides}
@@ -343,7 +323,6 @@ export default function Page() {
         <CompletedRidesTable
           initialContacts={completedRides}
           convertTime={convertTo12Hour}
-          //onDeleteRide={handleDeleteRide}
           selectedRides={selectedRides}
           onToggleSelect={handleToggleRideSelection}
           onToggleAll={handleToggleAllRides}
@@ -352,17 +331,13 @@ export default function Page() {
     },
   ];
 
-  // --- Main Rides Page UI with Search and New Layout ---
   return (
     <div className="h-full w-full p-10 bg-[#f4f4f4] flex justify-center">
-      {/* The main content container (max-w-6xl for better desktop display) */}
       <div className="max-w-6xl w-full">
-        {/* Header and Add Button */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-light text-gray-800">Rides</h1>
         </div>
 
-        {/* Search Bar */}
         <div className="flex items-center space-x-4 mb-8">
           <div className="relative flex-grow">
             <input
@@ -377,24 +352,19 @@ export default function Page() {
               size={20}
             />
           </div>
-          {/* Filter is live on change, so keeping this button for aesthetics/alignment */}
           <button
             type="button"
             className="py-3 px-8 text-lg font-semibold rounded-lg text-white bg-[#419902] hover:bg-[#378300] transition-colors shadow-md"
-            onClick={() => {
-              /* No action needed, search is live */
-            }}
+            onClick={() => {}}
           >
             Search
           </button>
         </div>
 
-        {/* Tabs */}
         <SimpleTab
           activeKey={activeTab}
           onChange={(key) => {
             setActiveTab(key);
-            // Update the URL query parameter for persistence across refreshes
             router.push(`/Dashboard/rides-volunteer?tab=${key}`, undefined, {
               shallow: true,
             });
@@ -410,7 +380,6 @@ export default function Page() {
           ))}
         </SimpleTab>
       </div>
-      {/* Notification is handled by toast, so this block is likely redundant */}
       {notification && (
         <div className="absolute top-4 right-4 z-50">{notification}</div>
       )}

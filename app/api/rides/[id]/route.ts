@@ -18,11 +18,6 @@ function parseAddressString(addressString: string) {
         
         return { street, city, state, postalCode };
     }
-    return null;
-}
-
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-    const { id } = params;
 
     if (!ADMIN_EMAIL) {
         console.error("ADMIN_EMAIL environment variable is not set.");
@@ -280,4 +275,32 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     } finally {
         await prisma.$disconnect();
     }
+
+    // Extract just the time portion from pickupTime DateTime
+    const pickupDate = new Date(ride.pickupTime);
+    const hours = pickupDate.getHours().toString().padStart(2, '0');
+    const minutes = pickupDate.getMinutes().toString().padStart(2, '0');
+    const timeString = `${hours}:${minutes}`;
+
+    const formattedRide = {
+      id: ride.id,
+      pickupAddress: origin || 'N/A',
+      dropoffAddress: destination || 'N/A',
+      pickupTime: timeString, // HH:MM format
+      customer: ride.customer ? { name: `${ride.customer.firstName} ${ride.customer.lastName}` } : { name: 'N/A' },
+      mileage,
+      status: ride.status,
+      driveTimeAB,
+      totalTime: ride.totalTime,
+      notes: ride.specialNote,
+      date: ride.date.toISOString(),
+    };
+
+    return NextResponse.json(formattedRide);
+  } catch (error: any) {
+    console.error('Error fetching ride details:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
+  }
 }

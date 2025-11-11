@@ -1,4 +1,3 @@
-// C:\Users\Deethya Janjanam\temp\Wellness-Center-Older-Adults\app\api\editVolunteer\route.ts
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -29,6 +28,7 @@ export async function PUT(req: Request) {
       message: 'Invalid JSON body in request',
     });
   }
+  
   try {
     const { id, firstName, lastName, email, phone } = requestBody as EditVolunteerParams;
 
@@ -119,5 +119,7 @@ export async function PUT(req: Request) {
       status: 500,
       message: 'Internal Server Error',
     });
+  } finally {
+    await prisma.$disconnect();
   }
 }

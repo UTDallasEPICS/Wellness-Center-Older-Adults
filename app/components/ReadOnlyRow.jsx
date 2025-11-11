@@ -27,7 +27,12 @@ const ReadOnlyRow = ({
     const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().slice(-2)}`;
+        // Check if date is valid
+        if (isNaN(date.getTime())) return '';
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const year = date.getFullYear().toString().slice(-2);
+        return `${month}/${day}/${year}`;
     }
 
     // UPDATED LOGIC: Only show Volunteer column if status is Reserved or Completed
@@ -39,16 +44,16 @@ const ReadOnlyRow = ({
         <tr className="cursor-pointer hover:bg-gray-100 transition-colors duration-200 border-b border-gray-100">
             
             {/* 0. CHECKBOX COLUMN */}
-	    { isAdmin &&
-            <td className="p-3 text-center bg-[#fffdf5] w-12" onClick={(e) => e.stopPropagation()}>
-                <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() => onToggleSelect(contact.id)} 
-                    className="h-5 w-5 rounded border-gray-300 text-[#419902] focus:ring-[#419902]"
-                />
-            </td>
-	    }
+            {isAdmin && (
+                <td className="p-3 text-center bg-[#fffdf5] w-12" onClick={(e) => e.stopPropagation()}>
+                    <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => onToggleSelect(contact.id)} 
+                        className="h-5 w-5 rounded border-gray-300 text-[#419902] focus:ring-[#419902]"
+                    />
+                </td>
+            )}
             
             {/* 1. Client Name + Date (Combined for display) */}
             <td 
@@ -110,7 +115,7 @@ const ReadOnlyRow = ({
                                 type="button"
                                 title="Edit Ride"
                                 onClick={(event) => {
-                                    event.stopPropagation(); //Stop propagation here
+                                    event.stopPropagation();
                                     handleEditClick(event, contact);
                                 }}
                             >
@@ -121,7 +126,7 @@ const ReadOnlyRow = ({
                                 type="button"
                                 title="Delete Ride"
                                 onClick={(e) => {
-                                    e.stopPropagation(); //Stop propagation here
+                                    e.stopPropagation();
                                     handleDeleteClick(contact.id);
                                 }}
                             >
@@ -136,7 +141,7 @@ const ReadOnlyRow = ({
                             className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                             type="button"
                             onClick={(e) => {
-                                e.stopPropagation(); // FIX: Must be called as a function!
+                                e.stopPropagation();
                                 handleReserveClick(contact.id);
                             }}
                         >

@@ -82,8 +82,6 @@ async function main() {
       volunteerID: volunteerInfo.id,
     },
   });
-
-  console.log("Seeding completed successfully with real addresses.");
 }
 
 main()

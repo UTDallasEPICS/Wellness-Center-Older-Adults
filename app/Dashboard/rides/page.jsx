@@ -63,16 +63,12 @@ export default function Page() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch("/api/getAvailableRides");
+            const response = await fetch("/api/rides");
             if (!response.ok) {
                 throw new Error(`Failed to fetch rides: ${response.status}`);
             }
             const rawData = await response.json();
             
-            console.log("=== RAW API DATA ===");
-            console.log("First ride from API:", rawData[0]);
-            console.log("Has volunteerName?", rawData[0]?.volunteerName);
-            console.log("Has startAddress?", rawData[0]?.startAddress);
 
             const formattedData = rawData.map((ride) => ({
                 id: ride.id,
@@ -90,9 +86,6 @@ export default function Page() {
                 startTime: ride.startTime,
                 status: ride.status || "Unreserved",
             }));
-            
-            console.log("=== FORMATTED DATA ===");
-            console.log("First formatted ride:", formattedData[0]);
             
             setRidesData(formattedData);
         } catch (error) {
@@ -117,7 +110,7 @@ export default function Page() {
 
     const fetchAddresses = async () => {
         try {
-            const response = await fetch("/api/getAvailableRides");
+            const response = await fetch("/api/rides");
             if (response.ok) {
                 const data = await response.json();
                 setAddresses(data);
@@ -129,7 +122,7 @@ export default function Page() {
 
     const fetchRideDetails = async (id) => {
         try {
-            const response = await fetch(`/api/ride/get/${id}`);
+            const response = await fetch(`/api/rides/${id}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch ride details: ${response.status}`);
             }
@@ -155,7 +148,7 @@ export default function Page() {
 
     const handleAddRide = async (newRideData) => {
         try {
-            const response = await fetch('/api/createRide', {
+            const response = await fetch('/api/rides', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,8 +200,6 @@ export default function Page() {
             }
 
             const responseData = await rideResponse.json();
-            console.log("=== RIDE UPDATE RESPONSE ===");
-            console.log("Response data:", responseData);
 
             if (responseData.formattedData) {
                 setRidesData(currentRides => 
@@ -235,7 +226,7 @@ export default function Page() {
     const handleDeleteRide = async (rideId) => {
         if (window.confirm("Are you sure you want to delete this ride?")) {
             try {
-                const response = await fetch(`/api/deleteRides/${rideId}`, {
+                const response = await fetch(`/api/rides/${rideId}`, {
                     method: "DELETE",
                 });
                 if (!response.ok) {
@@ -273,8 +264,6 @@ export default function Page() {
         }
 
         try {
-            console.log(`Attempting to reserve ride ${rideId}...`);
-            
             const response = await fetch(`/api/rides/${rideId}`, {
                 method: 'PUT',
                 headers: {
@@ -289,7 +278,6 @@ export default function Page() {
             }
 
             const result = await response.json();
-            console.log('Reserve response:', result);
             
             toast.success("Ride reserved successfully!");
             
@@ -320,9 +308,6 @@ export default function Page() {
         }
 
         try {
-            console.log(`Attempting to unreserve ride ${rideId}...`);
-            console.log('Current ride status:', ride.status);
-            
             const response = await fetch(`/api/rides/${rideId}`, {
                 method: 'PUT',
                 headers: {
@@ -330,11 +315,10 @@ export default function Page() {
                 },
                 body: JSON.stringify({ 
                     status: 'AVAILABLE',
-                    volunteerID: null  // Clear the volunteer assignment
+                    volunteerID: null
                 }),
             });
 
-            console.log('Response status:', response.status);
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -343,7 +327,6 @@ export default function Page() {
             }
 
             const result = await response.json();
-            console.log('Unreserve response:', result);
             
             toast.success("Ride unreserved successfully!");
             
@@ -554,8 +537,6 @@ export default function Page() {
                             <Plus size={28} />
                         </button>
                     </div>
-
-                    
                 </div>
 
                 <div className="flex items-center space-x-4 mb-8">

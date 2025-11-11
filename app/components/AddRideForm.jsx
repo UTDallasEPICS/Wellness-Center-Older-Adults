@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
@@ -32,7 +31,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 setCustomers(data);
                 const names = data.map((customer) => customer.firstName);
                 setCustomerNames(names);
-                console.log("Fetched Customers:", data);
             } catch (error) {
                 console.error("Error fetching customers:", error);
             }
@@ -89,7 +87,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     };
 
     const handleSubmit = async (e) => {
-        console.log("handleSubmit function called!");
         e.preventDefault();
 
         try {
@@ -99,12 +96,11 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
 
             if (!selectedCustomer) {
                 console.error("Error: Selected customer not found.");
-                // Optionally display an error message to the user
                 return;
             }
 
             const rideDataToSend = {
-                customerId: selectedCustomer.id, // <---- ADD THIS LINE
+                customerId: selectedCustomer.id,
                 customerName: formData.customerName,
                 pickupStreet: formData.pickupStreet,
                 pickupCity: formData.pickupCity,
@@ -119,9 +115,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 extraInfo: formData.extraInfo,
             };
 
-            console.log("Data being sent:", rideDataToSend); // Add this for verification
+            console.log("Data being sent:", rideDataToSend);
 
-            const response = await fetch("/api/createRide", {
+            const response = await fetch("/api/rides", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -132,17 +128,14 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Error adding ride:", errorData);
-                // Optionally display an error message to the user within this component
                 return;
             }
 
             const newRide = await response.json();
-            console.log("Ride added successfully!", newRide);
             onClose();
             handleAddFormSubmit(newRide);
         } catch (error) {
             console.error("Error sending ride data:", error);
-            // Optionally display an error message to the user within this component
         }
     };
 
@@ -162,7 +155,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                         </button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[70vh]">
-                        {/* Customer Name */}
                         <div>
                             <label htmlFor="customerName" className="block text-sm font-medium text-gray-700">
                                 Customer Name
@@ -182,7 +174,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             </select>
                         </div>
 
-                        {/* Pick-Up Street */}
                         <div>
                             <label htmlFor="pickupStreet" className="block text-sm font-medium text-gray-700">
                                 Pick-Up Street
@@ -197,7 +188,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Pick-Up City */}
                         <div>
                             <label htmlFor="pickupCity" className="block text-sm font-medium text-gray-700">
                                 Pick-Up City
@@ -212,7 +202,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Pick-Up State */}
                         <div>
                             <label htmlFor="pickupState" className="block text-sm font-medium text-gray-700">
                                 Pick-Up State
@@ -227,7 +216,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Pick-Up Zip */}
                         <div>
                             <label htmlFor="pickupZip" className="block text-sm font-medium text-gray-700">
                                 Pick-Up Zip
@@ -242,7 +230,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Destination Street */}
                         <div>
                             <label htmlFor="destinationStreet" className="block text-sm font-medium text-gray-700">
                                 Destination Street
@@ -257,7 +244,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Destination City */}
                         <div>
                             <label htmlFor="destinationCity" className="block text-sm font-medium text-gray-700">
                                 Destination City
@@ -272,7 +258,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Destination State */}
                         <div>
                             <label htmlFor="destinationState" className="block text-sm font-medium text-gray-700">
                                 Destination State
@@ -287,7 +272,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Destination Zip */}
                         <div>
                             <label htmlFor="destinationZip" className="block text-sm font-medium text-gray-700">
                                 Destination Zip
@@ -302,7 +286,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Pick-Up Time */}
                         <div>
                             <label htmlFor="pickUpTime" className="block text-sm font-medium text-gray-700">
                                 Pick-Up Time
@@ -316,7 +299,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-                        {/* Date */}
                         <div>
                             <label htmlFor="date" className="block text-sm font-medium text-gray-700">
                                 Date
@@ -330,8 +312,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
-
-                        {/* Notes? */}
                         <div className="flex items-center space-x-2">
                             <input
                                 type="checkbox"
@@ -346,7 +326,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             </label>
                         </div>
 
-                        {/* Other Notes (if notes is checked) */}
                         {isExtraOptionChecked && (
                             <div>
                                 <label htmlFor="extraInfo" className="block text-sm font-medium text-gray-700">

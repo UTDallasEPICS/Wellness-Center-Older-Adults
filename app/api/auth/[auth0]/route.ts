@@ -105,9 +105,6 @@ export async function POST(
       }
 
       const redirectTo = `/Dashboard`;
-      // if (user.isAdmin) {
-      //   redirectTo = "/Dashboard";
-      // }
 
       const maxAge = 60 * 60 * 24;
       const redirectResponse = NextResponse.redirect(

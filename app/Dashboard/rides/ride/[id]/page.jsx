@@ -1,8 +1,8 @@
 "use client";
-import RideMap from "../../../../components/RideMap";
+import RideMap from "/app/components/RideMap";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import TotalTimeModal from "../../../../components/TotalTimeModal.jsx";
+import TotalTimeModal from "/app/components/TotalTimeModal";
 
 export default function Ride() {
   const { id } = useParams();
@@ -12,19 +12,15 @@ export default function Ride() {
   const [pickupAddress, setPickupAddress] = useState("");
   const [dropoffAddress, setDropoffAddress] = useState("");
   const [pickupTime, setPickupTime] = useState("");
-  // driveTimeAB state holds the ESTIMATED time (A->B)
   const [driveTimeAB, setDriveTimeAB] = useState("");
   const [mileage, setMileage] = useState("");
-  // totalTime state holds the LOGGED/ACTUAL time (from DB 'totalTime' field)
   const [totalTime, setTotalTime] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState(null);
-
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
-  // === HELPER FUNCTIONS (DEFINED BEFORE USE) ===
-
-  // Formats time from 24-hour string (e.g., "21:30") to "9:30 pm"
+  // === HELPER FUNCTIONS ===
   function formatTime(timeString) {
     if (!timeString) return "";
     try {
@@ -43,7 +39,6 @@ export default function Ride() {
     }
   }
 
-  // Formats date to match the image: e.g., "7/7/25"
   function formatDate(dateInput) {
     if (!dateInput) return "";
     const date = new Date(dateInput);
@@ -54,14 +49,11 @@ export default function Ride() {
     const day = date.getDate();
     return `${month}/${day}/${year}`;
   }
-  // === END HELPER FUNCTIONS ===
-
-  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch(`/api/ride/get/${id}`);
+        const response = await fetch(`/api/rides/${id}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch ride details: ${response.status}`);
         }
@@ -72,8 +64,8 @@ export default function Ride() {
           finalAddress: data.finalAddress || data.pickupAddress || "",
           wait_time: data.wait_time || "",
           mileage: data.mileage || "",
-          driveTimeAB: data.driveTimeAB || "", // Estimated time (used as base for modal)
-          totalTime: data.totalTime || "", // Logged time (DB field)
+          driveTimeAB: data.driveTimeAB || "",
+          totalTime: data.totalTime || "",
           pickupTime: data.pickupTime || "",
           customer: data.customer || { name: "" },
           notes: data.notes || "",
@@ -86,8 +78,6 @@ export default function Ride() {
         setDriveTimeAB(enrichedData.driveTimeAB || "");
         setMileage(enrichedData.mileage || "");
         setNotes(enrichedData.notes || "");
-
-        // Initialization for the LOGGED time display field
         setTotalTime(enrichedData.totalTime || "");
       } catch (err) {
         setError(err.message);
@@ -104,7 +94,7 @@ export default function Ride() {
         setUserRole(role);
       } catch (e) {
         console.error("Could not load user role:", e);
-        setUserRole("GUEST"); // Set a fallback role in case of failure
+        setUserRole("GUEST");
       }
     })();
   }, [id]);
@@ -235,9 +225,7 @@ export default function Ride() {
     setIsTimeModalOpen(true);
   };
 
-  // NEW HANDLER: Opens the modal specifically for editing the logged time
   const handleEditLoggedTime = () => {
-    // Only allow editing if the ride status is Reserved or Completed
     if (
       rideDetails.status === "Reserved" ||
       rideDetails.status === "Completed"
@@ -252,7 +240,6 @@ export default function Ride() {
         const newTotalTimeString = `${driveData.hours} hr ${driveData.minutes} min`;
         const newNotes = driveData.notes.trim();
 
-        // Determine status: If already Completed, keep it. Otherwise, mark as Completed.
         const statusToUse =
           rideDetails.status === "Completed" ? "Completed" : "Completed";
 
@@ -278,7 +265,6 @@ export default function Ride() {
         const responseData = await response.json();
         const { updatedRide } = responseData;
 
-        // --- FIX 1: Update state to reflect changes ---
         setTotalTime(updatedRide.totalTime);
         setNotes(updatedRide.specialNote);
 
@@ -289,15 +275,11 @@ export default function Ride() {
           notes: updatedRide.specialNote,
         }));
 
-        // Close the modal, allowing the page to re-render with the new time visible
         setIsTimeModalOpen(false);
 
-        // --- FIX 2: Conditional Redirection ---
-        // Only redirect if the status actually changed to 'Completed' from something else.
         if (statusToUse === "Completed" && rideDetails.status !== "Completed") {
           router.push("/Dashboard/rides-volunteer?tab=completed");
         }
-        // If the ride was already 'Completed' (editing time), we stay on the page.
       } catch (err) {
         console.error("Error saving logged time:", err);
         setError("Failed to save time/notes.");
@@ -342,7 +324,6 @@ export default function Ride() {
 
               {/* Details Grid */}
               <div className="grid grid-cols-2 gap-x-12 gap-y-6 pt-4">
-                {/* Row 1: Client and Pick-up Time */}
                 <div className="flex flex-col">
                   <p className="text-xl font-bold mb-1">Client</p>
                   <p className="text-gray-700 text-base">
@@ -356,21 +337,17 @@ export default function Ride() {
                   </p>
                 </div>
 
-                {/* Row 2: Total Mileage and Drive Time (Estimated) */}
                 <div className="flex flex-col">
                   <p className="text-xl font-bold mb-1">Total Mileage</p>
                   <p className="text-gray-700 text-base">{mileage}</p>
                 </div>
 
-                {/* DISPLAY 1: DRIVE TIME (ESTIMATE) */}
                 <div className="flex flex-col">
                   <p className="text-xl font-bold mb-1">Drive Time (Est.)</p>
                   <p className="text-gray-700 text-base">{driveTimeAB}</p>
                 </div>
 
-                {/* DISPLAY 2: TOTAL TIME (LOGGED TIME) */}
                 <div className="flex flex-col">
-                  {/* MAKE THE LABEL CLICKABLE */}
                   <p
                     className={`text-xl font-bold mb-1 ${totalTime ? "cursor-pointer text-blue-600 hover:text-blue-800 transition-colors" : "text-gray-800"}`}
                     onClick={handleEditLoggedTime}
@@ -385,7 +362,6 @@ export default function Ride() {
                   </p>
                 </div>
 
-                {/* Row 4: Notes (Using the updated 'notes' state) */}
                 <div className="flex flex-col col-span-2">
                   <p className="text-xl font-bold mb-1">Notes</p>
                   <p className="text-gray-700 text-base">{notes}</p>
@@ -395,7 +371,6 @@ export default function Ride() {
           ) : (
             // --- EDITING MODE ---
             <div className="space-y-6">
-              {/* Trip Edit */}
               <div className="pt-2">
                 <p className="font-light text-gray-700 text-lg mb-2">Trip</p>
                 <div className="space-y-3 pl-4 border-l-4 border-green-600 text-sm">
@@ -431,7 +406,6 @@ export default function Ride() {
                   </label>
                 </div>
               </div>
-              {/* Other Edit Fields Grid */}
               <div className="grid grid-cols-2 gap-x-12 gap-y-4 pt-4 border-t border-gray-100">
                 <label className="col-span-1">
                   <span className="font-light text-gray-700 text-lg block mb-1">
@@ -485,7 +459,6 @@ export default function Ride() {
                   ></textarea>
                 </div>
               </div>
-              {/* Edit Action Buttons */}
               <div className="flex gap-4 pt-4 border-t border-gray-200">
                 <button
                   className="flex-grow px-5 py-3 bg-green-600 text-white font-semibold rounded-md shadow-lg hover:bg-green-700 transition-colors"
@@ -504,9 +477,7 @@ export default function Ride() {
           )}
         </div>
 
-        {/* Footer/Action Buttons - Removed Status Bars */}
         <div className="pt-4 mt-auto">
-          {/* Action Buttons */}
           {!isEditing && userRole === "VOLUNTEER" && (
             <div className="flex gap-4">
               {rideDetails.status === "AVAILABLE" ||
@@ -556,13 +527,10 @@ export default function Ride() {
         )}
       </div>
 
-      {/* 3. Pass the current LOGGED totalTime when editing, or estimated time when completing */}
       <TotalTimeModal
         isOpen={isTimeModalOpen}
         onClose={handleCloseTimeModal}
         onSave={handleSaveCompletion}
-        // Logic: If opening for the first time (totalTime is empty), use driveTimeAB.
-        // If opening to edit (totalTime is set), use totalTime.
         initialDriveTime={totalTime || driveTimeAB}
       />
     </div>

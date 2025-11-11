@@ -16,7 +16,6 @@ const AddRidesTable = ({
   onToggleSelect,
   onToggleAll,
 }) => {
-  // Filter contacts to only show unreserved/available rides in this table
   const unreservedContacts = initialContacts.filter(
     (contact) =>
       contact.status === "Unreserved" ||
@@ -32,7 +31,7 @@ const AddRidesTable = ({
     phoneNumber: "",
     date: "",
     startAddress: "",
-    pickupTime: "",
+    startTime: "",
     volunteerName: "",
   });
 
@@ -40,7 +39,6 @@ const AddRidesTable = ({
     setContacts(unreservedContacts);
   }, [initialContacts]);
 
-  // --- Role Fetching Logic ---
   useEffect(() => {
     (async () => {
       try {
@@ -50,17 +48,15 @@ const AddRidesTable = ({
         setUserRole(role);
       } catch (e) {
         console.error("Could not load user role:", e);
-        setUserRole("GUEST"); // Set a fallback role in case of failure
+        setUserRole("GUEST");
       }
     })();
   }, []);
-  // ---------------------------
 
   const allSelected =
     contacts.length > 0 &&
     contacts.every((ride) => selectedRides.includes(ride.id));
 
-  // Helper function to get volunteer name from ID
   const getVolunteerNameById = (volunteerID) => {
     const volunteer = volunteers?.find((v) => v.id === volunteerID);
     if (volunteer && volunteer.user) {
@@ -69,19 +65,14 @@ const AddRidesTable = ({
     return "";
   };
 
-  // Helper function to find customer ID by name (omitted for brevity, assume implemented)
   const getCustomerIdByName = (customerName) => {
-    // ... implementation assumed
     return null;
   };
 
-  // Helper function to find address ID by address string (omitted for brevity, assume implemented)
   const getAddressIdByString = (addressString) => {
-    // ... implementation assumed
     return null;
   };
 
-  // Helper function to find volunteer ID by name
   const getVolunteerIdByName = (volunteerName) => {
     const volunteer = volunteers?.find((v) => {
       if (v.user) {
@@ -98,10 +89,10 @@ const AddRidesTable = ({
     setEditContactId(contact.id);
     const formValues = {
       customerName: contact.customerName || "",
-      phoneNumber: contact.customerPhone || "",
+      phoneNumber: contact.customerPhone || contact.phoneNumber || "",
       date: contact.date ? contact.date.split("T")[0] : "",
-      startAddress: contact.startLocation || "",
-      pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : "",
+      startAddress: contact.startLocation || contact.startAddress || "",
+      startTime: contact.startTime ? contact.startTime.slice(0, 5) : "",
       volunteerName: getVolunteerNameById(contact.volunteerID),
     };
     setEditFormData(formValues);
@@ -121,8 +112,8 @@ const AddRidesTable = ({
     event.preventDefault();
 
     let pickupDateTimeISO = null;
-    if (editFormData.date && editFormData.pickupTime) {
-      const [hours, minutes] = editFormData.pickupTime.split(":");
+    if (editFormData.date && editFormData.startTime) {
+      const [hours, minutes] = editFormData.startTime.split(":");
       const dateObj = new Date(editFormData.date);
       dateObj.setHours(parseInt(hours, 10));
       dateObj.setMinutes(parseInt(minutes, 10));
@@ -252,7 +243,7 @@ const AddRidesTable = ({
               )}
 
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Client Name
+                Client Name & Date
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Contact Number
@@ -281,6 +272,7 @@ const AddRidesTable = ({
                   customers={customers}
                   addresses={addresses}
                   status={contact.status}
+                  userRole={userRole}
                 />
               ) : (
                 <ReadOnlyRow
@@ -291,7 +283,7 @@ const AddRidesTable = ({
                   handleReserveClick={handleReserveRide}
                   convertTime={convertTime}
                   status={contact.status}
-                  startAddress={contact.startLocation}
+                  startAddress={contact.startLocation || contact.startAddress}
                   userRole={userRole}
                   selected={selectedRides.includes(contact.id)}
                   onToggleSelect={onToggleSelect}
