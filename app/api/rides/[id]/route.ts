@@ -1,11 +1,11 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { sendEmail} from '@/util/nodemail';
+import { sendEmail } from '@/util/nodemail';
 import { SendMailOptions } from 'nodemailer';
 
 const prisma = new PrismaClient();
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL; // Get admin email from .env
-const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL // Get Volunteer email from .env (This is your hardcoded secondary recipient)
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL;
 
 function parseAddressString(addressString: string) {
     const parts = addressString.split(', ');
@@ -18,6 +18,61 @@ function parseAddressString(addressString: string) {
         
         return { street, city, state, postalCode };
     }
+    return null;
+}
+
+// GET - Fetch a single ride by ID
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params;
+
+    try {
+        const ride = await prisma.ride.findUnique({
+            where: {
+                id: parseInt(id, 10),
+            },
+            include: {
+                customer: true,
+                addrStart: true,
+                addrEnd: true,
+                volunteer: { include: { user: true } }
+            }
+        });
+
+        if (!ride) {
+            return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
+        }
+
+        const formattedRide = {
+            id: ride.id,
+            customerID: ride.customerID,
+            customer: {
+                name: ride.customer ? `${ride.customer.firstName} ${ride.customer.lastName}` : '',
+                phone: ride.customer?.customerPhone || ''
+            },
+            pickupAddress: ride.addrStart ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}` : '',
+            dropoffAddress: ride.addrEnd ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}` : '',
+            date: ride.date.toISOString(),
+            pickupTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+            driveTimeAB: ride.totalTime || '',
+            totalTime: ride.totalTime || '',
+            waitTime: typeof ride.waitTime === 'number' ? ride.waitTime : 0,
+            mileage: '',
+            notes: ride.specialNote || '',
+            status: ride.status,
+            volunteerName: ride.volunteer?.user ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}` : ''
+        };
+
+        return NextResponse.json(formattedRide, { status: 200 });
+    } catch (error: any) {
+        console.error('Error fetching ride:', error);
+        return NextResponse.json({ error: 'Failed to fetch ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
+}
+
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params;
 
     if (!ADMIN_EMAIL) {
         console.error("ADMIN_EMAIL environment variable is not set.");
@@ -26,12 +81,11 @@ function parseAddressString(addressString: string) {
     try {
         const updateData = await request.json();
 
-
         const ride = await prisma.ride.findUnique({
             where: {
                 id: parseInt(id, 10),
             },
-            include: { // Fetch required relations
+            include: {
                 customer: true,
                 addrStart: true,
                 addrEnd: true,
@@ -55,7 +109,6 @@ function parseAddressString(addressString: string) {
         }
 
         if (updateData.pickupAddress || updateData.dropoffAddress) {
-            
             if (updateData.pickupAddress && ride.startAddressID) {
                 const pickupParts = parseAddressString(updateData.pickupAddress);
                 if (pickupParts) {
@@ -110,7 +163,20 @@ function parseAddressString(addressString: string) {
             }
         }
 
-        const { customerID, startAddressID, endAddressID, volunteerID, date, pickupTime, status, driveTimeAB, notes } = updateData;
+        // Extract fields including waitTime
+        const { 
+            customerID, 
+            startAddressID, 
+            endAddressID, 
+            volunteerID, 
+            date, 
+            pickupTime, 
+            status, 
+            driveTimeAB, 
+            waitTime,
+            notes 
+        } = updateData;
+        
         const prismaUpdateData: any = {};
 
         if (date !== undefined) {
@@ -131,6 +197,13 @@ function parseAddressString(addressString: string) {
         
         if (driveTimeAB !== undefined) {
             prismaUpdateData.totalTime = driveTimeAB;
+        }
+
+        // Handle waitTime as Float
+        if (waitTime !== undefined) {
+            prismaUpdateData.waitTime = waitTime !== null && waitTime !== '' 
+                ? Number(waitTime) 
+                : 0;
         }
 
         if (notes !== undefined) {
@@ -170,19 +243,17 @@ function parseAddressString(addressString: string) {
                 startTime: updatedRide.pickupTime ? updatedRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
                 status: updatedRide.status,
                 totalTime: updatedRide.totalTime,
+                waitTime: updatedRide.waitTime !== null ? updatedRide.waitTime : 0,
                 specialNote: updatedRide.specialNote
             };
             
             if (isCompletion && ADMIN_EMAIL && updatedRide.customer && sendEmail) {
-                
-                // 1. Get the email of the assigned volunteer from the database (mandatory, if it exists)
                 const ASSIGNED_VOLUNTEER_EMAIL = updatedRide.volunteer?.user?.email;
                 
-                // 2. Combine Admin, Assigned Volunteer, and the hardcoded VOLUNTEER_EMAIL (from .env)
                 const recipients = [ADMIN_EMAIL, ASSIGNED_VOLUNTEER_EMAIL, VOLUNTEER_EMAIL]
                     .filter((email, index, self): email is string => 
                         !!email && self.indexOf(email) === index
-                    ); // Filters out null/undefined and removes duplicates
+                    );
                 
                 if (recipients.length > 0) {
                     const mailOptions: SendMailOptions = {
@@ -195,6 +266,7 @@ function parseAddressString(addressString: string) {
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Total Drive Time:</strong> ${updatedRide.totalTime}</td></tr>
+                                    ${updatedRide.waitTime ? `<tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Wait Time:</strong> ${updatedRide.waitTime} hours</td></tr>` : ''}
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Completed On:</strong> ${new Date().toLocaleString()}</td></tr>
                                 </table>
 
@@ -236,7 +308,6 @@ function parseAddressString(addressString: string) {
             }, { status: 200 });
             
         } else {
-
             const rideWithUpdatedData = await prisma.ride.findUnique({
                 where: { id: parseInt(id, 10) },
                 include: {
@@ -246,6 +317,7 @@ function parseAddressString(addressString: string) {
                     volunteer: { include: { user: true } }
                 }
             });
+            
             const finalFormattedDataForNoUpdate = rideWithUpdatedData ? {
                 id: rideWithUpdatedData.id,
                 customerID: rideWithUpdatedData.customerID,
@@ -259,6 +331,7 @@ function parseAddressString(addressString: string) {
                 startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
                 status: rideWithUpdatedData.status,
                 totalTime: rideWithUpdatedData.totalTime,
+                waitTime: rideWithUpdatedData.waitTime !== null ? rideWithUpdatedData.waitTime : 0,
                 specialNote: rideWithUpdatedData.specialNote
             } : null;
 
@@ -275,32 +348,4 @@ function parseAddressString(addressString: string) {
     } finally {
         await prisma.$disconnect();
     }
-
-    // Extract just the time portion from pickupTime DateTime
-    const pickupDate = new Date(ride.pickupTime);
-    const hours = pickupDate.getHours().toString().padStart(2, '0');
-    const minutes = pickupDate.getMinutes().toString().padStart(2, '0');
-    const timeString = `${hours}:${minutes}`;
-
-    const formattedRide = {
-      id: ride.id,
-      pickupAddress: origin || 'N/A',
-      dropoffAddress: destination || 'N/A',
-      pickupTime: timeString, // HH:MM format
-      customer: ride.customer ? { name: `${ride.customer.firstName} ${ride.customer.lastName}` } : { name: 'N/A' },
-      mileage,
-      status: ride.status,
-      driveTimeAB,
-      totalTime: ride.totalTime,
-      notes: ride.specialNote,
-      date: ride.date.toISOString(),
-    };
-
-    return NextResponse.json(formattedRide);
-  } catch (error: any) {
-    console.error('Error fetching ride details:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
-  }
 }

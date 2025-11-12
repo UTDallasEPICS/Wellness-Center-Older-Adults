@@ -82,6 +82,7 @@ export default function Page() {
         volunteerName: ride.volunteerName,
         date: ride.date,
         startTime: ride.startTime,
+        waitTime: ride.waitTime,
         status: ride.status || "Unreserved",
       }));
 

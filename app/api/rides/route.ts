@@ -15,6 +15,7 @@ interface RideRequestBody {
   destinationZip: string;
   pickUpTime: string;
   date: string;
+  waitTime?: number;
   extraInfo: string;
 }
 
@@ -33,6 +34,7 @@ export async function POST(req: Request) {
       destinationZip,
       pickUpTime,
       date,
+      waitTime,
       extraInfo,
     } = (await req.json()) as RideRequestBody;
 
@@ -105,14 +107,44 @@ export async function POST(req: Request) {
           startAddressID: startAddress.id,
           endAddressID: endAddress.id,
           specialNote: extraInfo,
-          volunteerID: 1, // Replace with your dynamic logic
+          waitTime: waitTime !== undefined && waitTime !== null ? Number(waitTime) : 0,
+          volunteerID: null,
+          status: 'AVAILABLE',
+        },
+        include: {
+          customer: true,
+          addrStart: true,
+          addrEnd: true,
         },
       });
       return ride;
     });
 
+    // Format the response to match what the frontend expects
+    const formattedRide = {
+      id: createdRide.id,
+      customerID: createdRide.customerID,
+      customerName: `${createdRide.customer.firstName} ${createdRide.customer.lastName}`,
+      customerPhone: createdRide.customer.customerPhone,
+      phoneNumber: createdRide.customer.customerPhone,
+      startAddressID: createdRide.startAddressID,
+      endAddressID: createdRide.endAddressID,
+      startLocation: `${createdRide.addrStart.street}, ${createdRide.addrStart.city}, ${createdRide.addrStart.state} ${createdRide.addrStart.postalCode}`,
+      startAddress: `${createdRide.addrStart.street}, ${createdRide.addrStart.city}, ${createdRide.addrStart.state} ${createdRide.addrStart.postalCode}`,
+      endLocation: `${createdRide.addrEnd.street}, ${createdRide.addrEnd.city}, ${createdRide.addrEnd.state} ${createdRide.addrEnd.postalCode}`,
+      date: createdRide.date.toISOString(),
+      startTime: createdRide.pickupTime.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }),
+      waitTime: createdRide.waitTime !== null ? createdRide.waitTime : 0,
+      status: createdRide.status,
+      specialNote: createdRide.specialNote,
+    };
+
     return NextResponse.json(
-      { status: 201, message: 'Ride created successfully', data: createdRide },
+      { status: 201, message: 'Ride created successfully', data: formattedRide },
       { status: 201 }
     );
   } catch (error: any) {
@@ -191,10 +223,13 @@ export async function GET() {
         
         // Date/Time data
         date: ride.date.toISOString(),
-        startTime: timeString, // Just HH:MM format
+        startTime: timeString,
         
-        // Status
+        // Status and other fields
         status: ride.status,
+        totalTime: ride.totalTime || '',
+        waitTime: typeof ride.waitTime === 'number' ? ride.waitTime : 0,
+        specialNote: ride.specialNote || '',
       };
     });
 

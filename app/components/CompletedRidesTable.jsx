@@ -16,13 +16,15 @@ const CompletedRidesTable = ({
     customerName: "",
     phoneNumber: "",
     startAddress: "",
-    startTime: "",
+    pickupTime: "",
+    waitTime: 0,
     volunteerName: "",
   });
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     setContacts(initialContacts);
+    // Update contacts when initialContacts prop changes
     (async () => {
       try {
         const res = await fetch("/api/getRole");
@@ -41,9 +43,10 @@ const CompletedRidesTable = ({
     setEditContactId(contact.id);
     const formValues = {
       customerName: contact.customerName,
-      phoneNumber: contact.customerPhone || contact.phoneNumber,
-      startAddress: contact.startLocation || contact.startAddress,
-      pickupTime: contact.startTime,
+      phoneNumber: contact.phoneNumber,
+      startAddress: contact.startAddress,
+      pickupTime: contact.pickupTime,
+      waitTime: typeof contact.waitTime === 'number' ? contact.waitTime : 0,
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
@@ -61,6 +64,7 @@ const CompletedRidesTable = ({
 
   const handleEditFormSubmit = (event) => {
     event.preventDefault();
+    // Placeholder for edit submission (in a real app, this would call an API)
     setEditContactId(null);
   };
 
@@ -95,7 +99,7 @@ const CompletedRidesTable = ({
                 </th>
               )}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Client Name & Date
+                Client Name
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Contact Number
@@ -105,6 +109,9 @@ const CompletedRidesTable = ({
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Pick-up Time
+              </th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                Wait Time
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Volunteer Name
@@ -127,7 +134,6 @@ const CompletedRidesTable = ({
                         handleEditFormChange={handleEditFormChange}
                         status={contact.status}
                         handleCancelClick={handleCancelClick}
-                        userRole={userRole}
                       />
                     ) : (
                       <ReadOnlyRow

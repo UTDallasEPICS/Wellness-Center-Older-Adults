@@ -25,13 +25,14 @@ model Ride {
   date           DateTime
   pickupTime     DateTime
   totalTime      String?
+  waitTime       Float?
   startAddressID Int
   endAddressID   Int?
   specialNote    String?
   status         String         @default("AVAILABLE")
   volunteerID    Int?
   isArchived     Boolean        @default(false)
-  customer       Customer?      @relation(fields: [customerID], references: [id], onDelete: Cascade) // Added onDelete: Cascade
+  customer       Customer?      @relation(fields: [customerID], references: [id], onDelete: Cascade)
   addrEnd        Address?       @relation("EndAddress", fields: [endAddressID], references: [id])
   addrStart      Address        @relation("StartAddress", fields: [startAddressID], references: [id])
   volunteer      VolunteerInfo? @relation(fields: [volunteerID], references: [id], onDelete: SetNull)
