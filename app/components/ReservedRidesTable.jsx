@@ -12,6 +12,7 @@ const ReservedRidesTable = ({
   onToggleSelect,
   onToggleAll,
 }) => {
+  // Filter contacts to only show reserved rides in this table
   const reservedContacts = initialContacts.filter(
     (contact) => contact.status === "Reserved"
   );
@@ -24,10 +25,12 @@ const ReservedRidesTable = ({
     phoneNumber: "",
     startAddress: "",
     startTime: "",
+    waitTime: 0,
     volunteerName: "",
   });
 
   useEffect(() => {
+    // Update contacts when initialContacts prop changes
     setContacts(reservedContacts);
     (async () => {
       try {
@@ -42,6 +45,7 @@ const ReservedRidesTable = ({
     })();
   }, [initialContacts]);
 
+  // Determine if the "select all" checkbox should be checked.
   const allSelected =
     contacts.length > 0 &&
     contacts.every((ride) => selectedRides.includes(ride.id));
@@ -51,9 +55,10 @@ const ReservedRidesTable = ({
     setEditContactId(contact.id);
     const formValues = {
       customerName: contact.customerName,
-      phoneNumber: contact.customerPhone || contact.phoneNumber,
+      phoneNumber: contact.phoneNumber,
       startAddress: contact.startLocation || contact.startAddress,
-      startTime: contact.startTime ? contact.startTime.slice(0, 5) : "",
+      startTime: contact.startTime,
+      waitTime: typeof contact.waitTime === 'number' ? contact.waitTime : 0,
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
@@ -77,6 +82,9 @@ const ReservedRidesTable = ({
       phoneNumber: editFormData.phoneNumber,
       startAddress: editFormData.startAddress,
       startTime: editFormData.startTime,
+      waitTime: editFormData.waitTime !== null && editFormData.waitTime !== '' 
+        ? Number(editFormData.waitTime) 
+        : null,
       volunteerName: editFormData.volunteerName,
       status: contacts.find((contact) => contact.id === editContactId).status,
     };
@@ -102,6 +110,7 @@ const ReservedRidesTable = ({
         <table className="border-collapse ml-[0.5%] w-[99%]">
           <thead>
             <tr>
+              {/* CHECKBOX HEADER */}
               {userRole === "ADMIN" && (
                 <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal w-12">
                   <input
@@ -113,7 +122,7 @@ const ReservedRidesTable = ({
                 </th>
               )}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Client Name & Date
+                Client Name
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Contact Number
@@ -124,6 +133,10 @@ const ReservedRidesTable = ({
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Pick-up Time
               </th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                Wait Time
+              </th>
+              {/* Volunteer Name column is present for Reserved/Completed rides */}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Volunteer Name
               </th>
@@ -142,7 +155,6 @@ const ReservedRidesTable = ({
                     status={contact.status}
                     handleCancelClick={() => setEditContactId(null)}
                     isVolunteer={isVolunteer}
-                    userRole={userRole}
                   />
                 ) : (
                   <ReadOnlyRow
@@ -152,7 +164,7 @@ const ReservedRidesTable = ({
                     handleDeleteClick={() => handleCancelClick(contact.id)}
                     status={contact.status}
                     convertTime={convertTime}
-                    startAddress={contact.startLocation || contact.startAddress}
+                    startAddress={contact.startAddress}
                     isVolunteer={isVolunteer}
                     selected={selectedRides.includes(contact.id)}
                     onToggleSelect={onToggleSelect}

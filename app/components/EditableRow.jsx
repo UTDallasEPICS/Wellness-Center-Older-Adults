@@ -10,12 +10,9 @@ const EditableRow = ({
     const isAdmin = userRole === "ADMIN";
     const showVolunteerColumn = status === "Reserved" || status === "Completed";
     
-    // Helper to format time for input (convert HH:MM:SS to HH:MM)
     const formatTimeForInput = (timeString) => {
         if (!timeString) return '';
-        // If it's already in HH:MM format, return it
         if (timeString.length === 5) return timeString;
-        // If it's HH:MM:SS, slice to HH:MM
         if (timeString.length >= 5) return timeString.slice(0, 5);
         return timeString;
     };
@@ -83,6 +80,20 @@ const EditableRow = ({
                     type="time"
                     name="startTime"
                     value={formatTimeForInput(editFormData.startTime || editFormData.pickupTime || '')}
+                    onChange={handleEditFormChange}
+                />
+            </td>
+
+            {/* Wait Time column */}
+            <td className="p-2">
+                <input
+                    className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
+                    type="number"
+                    step="0.25"
+                    min="0"
+                    name="waitTime"
+                    placeholder="e.g., 0.5"
+                    value={editFormData.waitTime ?? ''}
                     onChange={handleEditFormChange}
                 />
             </td>

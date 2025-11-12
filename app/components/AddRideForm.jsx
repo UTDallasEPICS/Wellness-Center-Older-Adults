@@ -13,6 +13,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
         destinationZip: "",
         pickUpTime: "",
         date: "",
+        waitTime: 0,
         extraInfo: "",
     });
 
@@ -31,6 +32,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 setCustomers(data);
                 const names = data.map((customer) => customer.firstName);
                 setCustomerNames(names);
+                console.log("Fetched Customers:", data);
             } catch (error) {
                 console.error("Error fetching customers:", error);
             }
@@ -87,6 +89,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     };
 
     const handleSubmit = async (e) => {
+        console.log("handleSubmit function called!");
         e.preventDefault();
 
         try {
@@ -112,6 +115,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 destinationZip: formData.destinationZip,
                 pickUpTime: formData.pickUpTime,
                 date: formData.date,
+                waitTime: formData.waitTime && formData.waitTime !== '' 
+                    ? Number(formData.waitTime) 
+                    : 0,
                 extraInfo: formData.extraInfo,
             };
 
@@ -132,6 +138,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
             }
 
             const newRide = await response.json();
+            console.log("Ride added successfully!", newRide);
             onClose();
             handleAddFormSubmit(newRide);
         } catch (error) {
@@ -155,6 +162,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                         </button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[70vh]">
+                        {/* Customer Name */}
                         <div>
                             <label htmlFor="customerName" className="block text-sm font-medium text-gray-700">
                                 Customer Name
@@ -174,6 +182,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             </select>
                         </div>
 
+                        {/* Pick-Up Street */}
                         <div>
                             <label htmlFor="pickupStreet" className="block text-sm font-medium text-gray-700">
                                 Pick-Up Street
@@ -188,6 +197,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Pick-Up City */}
                         <div>
                             <label htmlFor="pickupCity" className="block text-sm font-medium text-gray-700">
                                 Pick-Up City
@@ -202,6 +212,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Pick-Up State */}
                         <div>
                             <label htmlFor="pickupState" className="block text-sm font-medium text-gray-700">
                                 Pick-Up State
@@ -216,6 +227,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Pick-Up Zip */}
                         <div>
                             <label htmlFor="pickupZip" className="block text-sm font-medium text-gray-700">
                                 Pick-Up Zip
@@ -230,6 +242,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Destination Street */}
                         <div>
                             <label htmlFor="destinationStreet" className="block text-sm font-medium text-gray-700">
                                 Destination Street
@@ -244,6 +257,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Destination City */}
                         <div>
                             <label htmlFor="destinationCity" className="block text-sm font-medium text-gray-700">
                                 Destination City
@@ -258,6 +272,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Destination State */}
                         <div>
                             <label htmlFor="destinationState" className="block text-sm font-medium text-gray-700">
                                 Destination State
@@ -272,6 +287,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Destination Zip */}
                         <div>
                             <label htmlFor="destinationZip" className="block text-sm font-medium text-gray-700">
                                 Destination Zip
@@ -286,6 +302,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Pick-Up Time */}
                         <div>
                             <label htmlFor="pickUpTime" className="block text-sm font-medium text-gray-700">
                                 Pick-Up Time
@@ -299,6 +316,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Date */}
                         <div>
                             <label htmlFor="date" className="block text-sm font-medium text-gray-700">
                                 Date
@@ -312,6 +330,25 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Wait Time Field */}
+                        <div>
+                            <label htmlFor="waitTime" className="block text-sm font-medium text-gray-700">
+                                Wait Time (hours)
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="number"
+                                step="0.25"
+                                min="0"
+                                name="waitTime"
+                                placeholder="e.g., 0.5"
+                                value={formData.waitTime ?? ''}
+                                onChange={handleFormChange}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Enter as decimal (e.g., 0.5 for 30 minutes)</p>
+                        </div>
+
+                        {/* Notes Checkbox */}
                         <div className="flex items-center space-x-2">
                             <input
                                 type="checkbox"
@@ -326,8 +363,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             </label>
                         </div>
 
+                        {/* Other Notes (if notes is checked) */}
                         {isExtraOptionChecked && (
-                            <div>
+                            <div className="col-span-2">
                                 <label htmlFor="extraInfo" className="block text-sm font-medium text-gray-700">
                                     Other Notes
                                 </label>
