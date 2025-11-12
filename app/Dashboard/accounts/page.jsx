@@ -84,12 +84,13 @@ export default function AccountPage() {
     { value: '5 Days', label: '5 days before' },
     { value: '4 Days', label: '4 days before' },
     { value: '3 Days', label: '3 days before' },
-    { value: '2', label: '2 hours before ride' },
-    { value: '6', label: '6 hours before ride' },
+    { value: '2 Days', label: '2 days before' },
+    { value: '1 Day', label: '1 day before' },
+    { value: '14', label: '14 hours before ride'},   
     { value: '12', label: '12 hours before ride'},
-    { value: '14', label: '14 hours before ride'},
-    { value: '24', label: '24 hours before (1 day)' },
-    { value: '48', label: '48 hours before (2 days)' },
+    { value: '6', label: '6 hours before ride' },
+    { value: '2', label: '2 hours before ride' },
+    { value: '1', label: '1 hour before' },
   ];
 
   const showMessage = (type, message) => {
