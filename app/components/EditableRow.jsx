@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, status }) => {
+const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, status, errors = {} }) => {
     return (
         <tr className="bg-white hover:bg-gray-100 transition-colors duration-200">
             <td className="p-2">
@@ -12,6 +12,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                     value={editFormData.customerName || ''}
                     onChange={handleEditFormChange}
                 />
+                {errors.customerName ? (
+                    <div className="text-red-600 text-sm mt-1">{errors.customerName}</div>
+                ) : null}
             </td>
 
             <td className="p-2">
@@ -23,6 +26,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                     value={editFormData.phoneNumber || ''}
                     onChange={handleEditFormChange}
                 />
+                {errors.phoneNumber ? (
+                    <div className="text-red-600 text-sm mt-1">{errors.phoneNumber}</div>
+                ) : null}
             </td>
 
             <td className="p-2">
@@ -34,6 +40,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                     value={editFormData.startAddress || ''}
                     onChange={handleEditFormChange}
                 />
+                {errors.startAddress ? (
+                    <div className="text-red-600 text-sm mt-1">{errors.startAddress}</div>
+                ) : null}
             </td>
 
             <td className="p-2">
@@ -44,6 +53,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                     value={editFormData.pickupTime || ''}
                     onChange={handleEditFormChange}
                 />
+                {errors.pickupTime ? (
+                    <div className="text-red-600 text-sm mt-1">{errors.pickupTime}</div>
+                ) : null}
             </td>
 
             {status === "Reserved" || status === "Completed" ? (
@@ -56,6 +68,9 @@ const EditableRow = ({ editFormData, handleEditFormChange, handleCancelClick, st
                         value={editFormData.volunteerName || ''}
                         onChange={handleEditFormChange}
                     />
+                    {errors.volunteerName ? (
+                        <div className="text-red-600 text-sm mt-1">{errors.volunteerName}</div>
+                    ) : null}
                 </td>
             ) : null}
 

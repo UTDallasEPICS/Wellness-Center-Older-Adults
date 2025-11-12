@@ -35,6 +35,14 @@ const AddRidesTable = ({
     pickupTime: "",
     volunteerName: "",
   });
+  const [editErrors, setEditErrors] = useState({
+    customerName: "",
+    phoneNumber: "",
+    date: "",
+    startAddress: "",
+    pickupTime: "",
+    volunteerName: "",
+  });
 
   useEffect(() => {
     setContacts(unreservedContacts);
@@ -115,10 +123,20 @@ const AddRidesTable = ({
     const newFormData = { ...editFormData };
     newFormData[fieldName] = fieldValue;
     setEditFormData(newFormData);
+    if (editErrors[fieldName]) {
+      setEditErrors({ ...editErrors, [fieldName]: "" });
+    }
   };
 
   const handleEditFormSubmit = (event) => {
     event.preventDefault();
+
+    const errors = validateEditFields(editFormData);
+    const hasErrors = Object.values(errors).some(Boolean);
+    if (hasErrors) {
+      setEditErrors(errors);
+      return;
+    }
 
     let pickupDateTimeISO = null;
     if (editFormData.date && editFormData.pickupTime) {
@@ -212,6 +230,51 @@ const AddRidesTable = ({
     setEditContactId(null);
   };
 
+  const validateEditFields = (data) => {
+    const out = {
+      customerName: "",
+      phoneNumber: "",
+      date: "",
+      startAddress: "",
+      pickupTime: "",
+      volunteerName: "",
+    };
+    const name = (data.customerName || "").trim();
+    const phoneRaw = (data.phoneNumber || "").trim();
+    const date = (data.date || "").trim();
+    const address = (data.startAddress || "").trim();
+    const time = (data.pickupTime || "").trim();
+    const volunteer = (data.volunteerName || "").trim();
+
+    const nameRe = /^[A-Za-z][A-Za-z' -]{0,79}$/;
+    const timeRe = /^([0-1]?\d|2[0-3]):[0-5]\d$/;
+
+    if (!name || !nameRe.test(name)) {
+      out.customerName = "Client name is required and must be valid.";
+    }
+    if (!/^\d{10}$/.test(phoneRaw)) {
+      out.phoneNumber = "Enter a valid 10-digit phone number.";
+    }
+    if (!date || Number.isNaN(new Date(date).getTime())) {
+      out.date = "Select a valid date.";
+    }
+    if (!address) {
+      out.startAddress = "Address is required.";
+    } else {
+      const addrRe = /^.+,\s*[A-Za-z .'-]+,\s*[A-Z]{2}\s+\d{5}$/;
+      if (!addrRe.test(address)) {
+        out.startAddress = "Enter address as 'Street, City, ST 12345'.";
+      }
+    }
+    if (!time || !timeRe.test(time)) {
+      out.pickupTime = "Enter a valid time (HH:MM).";
+    }
+    if (volunteer && !nameRe.test(volunteer)) {
+      out.volunteerName = "Volunteer name must be valid.";
+    }
+    return out;
+  };
+
   const handleCancelClick = () => {
     setEditContactId(null);
   };
@@ -281,6 +344,7 @@ const AddRidesTable = ({
                   customers={customers}
                   addresses={addresses}
                   status={contact.status}
+                  errors={editErrors}
                 />
               ) : (
                 <ReadOnlyRow
