@@ -127,7 +127,7 @@ const ReadOnlyRow = ({
                                 <span className="material-symbols-rounded text-xl">edit</span>
                             </button>
                             <button
-                                className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
+                                className="text-[#fffdf5] bg-red-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                                 type="button"
                                 title="Delete Ride"
                                 onClick={(e) => {
@@ -155,7 +155,7 @@ const ReadOnlyRow = ({
                     )}
                     
                     {/* View Details for Reserved/Completed */}
-                    {(status === "Completed") && (
+                    {(status === "Completed" || status === "Reserved") && (
                         <button
                             className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600 font-medium"
                             type="button"
