@@ -113,7 +113,7 @@ const ReadOnlyRow = ({
                 <div className="flex justify-center items-center h-full space-x-2">
                     
                     {/* ADMIN: Edit and Delete buttons */}
-                    {isAdmin && (status === "Unreserved" || status === "AVAILABLE" || status === "Added") && (
+                    {isAdmin && (status === "Unreserved" || status === "AVAILABLE" || status === "Added"|| status === "Reserved") && (
                         <>
                             <button
                                 className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
@@ -155,7 +155,7 @@ const ReadOnlyRow = ({
                     )}
                     
                     {/* View Details for Reserved/Completed */}
-                    {(status === "Reserved" || status === "Completed") && (
+                    {(status === "Completed") && (
                         <button
                             className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600 font-medium"
                             type="button"
