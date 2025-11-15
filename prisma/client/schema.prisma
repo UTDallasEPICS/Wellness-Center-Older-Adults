@@ -1,0 +1,73 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  output          = "./client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Address {
+  id         Int        @id @default(autoincrement())
+  street     String
+  city       String
+  state      String
+  postalCode String
+  customers  Customer[]
+  endRides   Ride[]     @relation("EndAddress")
+  startRides Ride[]     @relation("StartAddress")
+}
+
+model Ride {
+  id             Int            @id @default(autoincrement())
+  customerID     Int?
+  date           DateTime
+  pickupTime     DateTime
+  totalTime      String?
+  waitTime       Float?
+  startAddressID Int
+  endAddressID   Int?
+  specialNote    String?
+  status         String         @default("AVAILABLE")
+  volunteerID    Int?
+  isArchived     Boolean        @default(false)
+  customer       Customer?      @relation(fields: [customerID], references: [id], onDelete: Cascade)
+  addrEnd        Address?       @relation("EndAddress", fields: [endAddressID], references: [id])
+  addrStart      Address        @relation("StartAddress", fields: [startAddressID], references: [id])
+  volunteer      VolunteerInfo? @relation(fields: [volunteerID], references: [id], onDelete: SetNull)
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  firstName    String
+  lastName     String
+  phone        String?        @unique
+  role         String
+  isAdmin      Boolean        @default(false)
+  isArchived   Boolean        @default(false)
+  reminderTime String?
+  volunteer    VolunteerInfo?
+}
+
+model Customer {
+  id            Int     @id @default(autoincrement())
+  firstName     String
+  middleName    String?
+  lastName      String
+  addressID     Int
+  customerPhone String  @unique
+  isArchived    Boolean @default(false)
+  address       Address @relation(fields: [addressID], references: [id])
+  rides         Ride[]
+}
+
+model VolunteerInfo {
+  id     Int    @id @default(autoincrement())
+  userID Int    @unique
+  status String @default("AVAILABLE")
+  rides  Ride[]
+  user   User   @relation(fields: [userID], references: [id])
+}
