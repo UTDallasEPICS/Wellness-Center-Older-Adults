@@ -1,11 +1,12 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { sendEmail } from '@/util/nodemail';
 import { SendMailOptions } from 'nodemailer';
 
-const prisma = new PrismaClient();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL;
+//import { PrismaClient } from '@prisma/client';
+import prisma from "../../../../util/prisma-client";
+
 
 function parseAddressString(addressString: string) {
     const parts = addressString.split(', ');

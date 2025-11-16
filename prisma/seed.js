@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+ 
 
 async function main() {
   // Clear existing data to prevent conflicts on re-seeding

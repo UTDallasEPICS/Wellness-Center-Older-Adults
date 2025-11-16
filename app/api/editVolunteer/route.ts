@@ -1,6 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+// C:\Users\Deethya Janjanam\temp\Wellness-Center-Older-Adults\app\api\editVolunteer\route.ts
+import prisma from '../../../util/prisma-client';
 
-const prisma = new PrismaClient();
+ 
 
 interface EditVolunteerParams {
   id: number;

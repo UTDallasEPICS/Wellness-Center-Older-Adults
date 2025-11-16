@@ -1,10 +1,10 @@
 // Example of a PUT endpoint to update a ride with total time
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../../util/prisma-client';
 
 const app = express();
 app.use(express.json());
-const prisma = new PrismaClient();
+ 
 
 app.put('/api/ride/:id', async (req, res) => {
   const { id } = req.params;

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../../util/prisma-client';
 import jwt from 'jsonwebtoken';
 
-const prisma = new PrismaClient();
+ 
 
 // Helper to extract JWT from Authorization header or cookie
 function getTokenFromRequest(request) {

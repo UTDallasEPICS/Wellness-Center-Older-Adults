@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { PrismaClient } from "@prisma/client";
 import { jwtVerify, importX509 } from "jose";
 
-const prisma = new PrismaClient();
+ import prisma from "../../../util/prisma-client";
 
 export async function GET() {
   const cookieStore = cookies();

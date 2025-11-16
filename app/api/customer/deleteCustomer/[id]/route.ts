@@ -1,8 +1,7 @@
 // app/api/customer/deleteCustomer/[id]/route.ts
-import { PrismaClient } from '@prisma/client';
+//import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
+import prisma from "../../../../../util/prisma-client";
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
     const customerId = parseInt(params.id, 10);

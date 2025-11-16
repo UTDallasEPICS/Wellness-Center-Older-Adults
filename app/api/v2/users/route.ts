@@ -1,6 +1,6 @@
 // app/api/vs/user/route.ts
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../../util/prisma-client';
 import { NextResponse } from 'next/server';
 import { getManagementApiToken } from '@/app/api/auth/auth0'; // Adjust path as needed
 
@@ -12,7 +12,7 @@ interface UserRequestBody {
   connection: string;
 }
 
-const prisma = new PrismaClient();
+ 
 
 export async function POST(request: Request) {
   try {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+//import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import prisma from "../../../../../util/prisma-client";
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
     const clientId = params.id;
@@ -46,13 +46,34 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         return NextResponse.json(updatedClient, { status: 200 });
         
     } catch (error) {
-        if (error instanceof Error && 'code' in error && error.code === 'P2025') {
-            return NextResponse.json({ message: 'Client not found.' }, { status: 404 });
-        }
+        // if (error instanceof Error && 'code' in error && error.code === 'P2025') {
+        //     return NextResponse.json({ message: 'Client not found.' }, { status: 404 });
+        // }
         
-        console.error('Error updating client archive status:', error);
+        // console.error('Error updating client archive status:', error);
+        // return NextResponse.json(
+        //     { error: `Failed to update client status: ${error.message}` },
+        //     { status: 500 }
+        // );
+
+        // Check if the error is a Prisma "record not found"
+        if (error && typeof error === "object" && "code" in error && error.code === "P2025") {
+            return NextResponse.json({ message: "Client not found." }, { status: 404 });
+        }
+
+        // Generic error handling
+        if (error instanceof Error) {
+            console.error("Error updating client archive status:", error);
+            return NextResponse.json(
+                { error: `Failed to update client status: ${error.message}` },
+                { status: 500 }
+            );
+        }
+
+        // Fallback for non-Error unknown values
+        console.error("Unknown error:", error);
         return NextResponse.json(
-            { error: `Failed to update client status: ${error.message}` },
+            { error: "An unknown error occurred." },
             { status: 500 }
         );
     } finally {
