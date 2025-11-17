@@ -126,9 +126,9 @@ export async function POST(
       return redirectResponse;
     } catch (error) {
       console.error("Error during callback processing:", error);
-      return NextResponse.redirect("/?error=callback_error", { status: 302 });
-    }
+      const baseUrl = process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+      return NextResponse.redirect(`${baseUrl}?error=callback_error`, { status: 302 });
   }
-
+  }
   return NextResponse.json({ error: "Invalid auth0 action" }, { status: 400 });
 }
