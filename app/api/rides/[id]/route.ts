@@ -4,8 +4,8 @@ import { sendEmail } from '@/util/nodemail';
 import { SendMailOptions } from 'nodemailer';
 
 const prisma = new PrismaClient();
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL; // Get admin email from .env
-const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL // Get Volunteer email from .env (This is your hardcoded secondary recipient)
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL;
 
 // Function to fetch all Admin and Volunteer emails dynamically from the database
 async function getAllRecipientEmails() {
@@ -48,6 +48,56 @@ function parseAddressString(addressString: string) {
     return null;
 }
 
+// GET - Fetch a single ride by ID
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params;
+
+    try {
+        const ride = await prisma.ride.findUnique({
+            where: {
+                id: parseInt(id, 10),
+            },
+            include: {
+                customer: true,
+                addrStart: true,
+                addrEnd: true,
+                volunteer: { include: { user: true } }
+            }
+        });
+
+        if (!ride) {
+            return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
+        }
+
+        const formattedRide = {
+            id: ride.id,
+            customerID: ride.customerID,
+            customer: {
+                name: ride.customer ? `${ride.customer.firstName} ${ride.customer.lastName}` : '',
+                phone: ride.customer?.customerPhone || ''
+            },
+            pickupAddress: ride.addrStart ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}` : '',
+            dropoffAddress: ride.addrEnd ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}` : '',
+            date: ride.date.toISOString(),
+            pickupTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+            driveTimeAB: ride.totalTime || '',
+            totalTime: ride.totalTime || '',
+            waitTime: typeof ride.waitTime === 'number' ? ride.waitTime : 0,
+            mileage: '',
+            notes: ride.specialNote || '',
+            status: ride.status,
+            volunteerName: ride.volunteer?.user ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}` : ''
+        };
+
+        return NextResponse.json(formattedRide, { status: 200 });
+    } catch (error: any) {
+        console.error('Error fetching ride:', error);
+        return NextResponse.json({ error: 'Failed to fetch ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
+}
+
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     const { id } = params;
 
@@ -62,7 +112,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             where: {
                 id: parseInt(id, 10),
             },
-            include: { // Fetch required relations
+            include: {
                 customer: true,
                 addrStart: true,
                 addrEnd: true,
@@ -87,7 +137,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         if (updateData.pickupAddress || updateData.dropoffAddress) {
-            
             if (updateData.pickupAddress && ride.startAddressID) {
                 const pickupParts = parseAddressString(updateData.pickupAddress);
                 if (pickupParts) {
@@ -142,7 +191,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
 
-        const { customerID, startAddressID, endAddressID, volunteerID, date, pickupTime, status, driveTimeAB, notes } = updateData;
+        // Extract fields including waitTime
+        const { 
+            customerID, 
+            startAddressID, 
+            endAddressID, 
+            volunteerID, 
+            date, 
+            pickupTime, 
+            status, 
+            driveTimeAB, 
+            waitTime,
+            notes 
+        } = updateData;
+        
         const prismaUpdateData: any = {};
 
         if (date !== undefined) {
@@ -163,6 +225,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         
         if (driveTimeAB !== undefined) {
             prismaUpdateData.totalTime = driveTimeAB;
+        }
+
+        // Handle waitTime as Float
+        if (waitTime !== undefined) {
+            prismaUpdateData.waitTime = waitTime !== null && waitTime !== '' 
+                ? Number(waitTime) 
+                : 0;
         }
 
         if (notes !== undefined) {
@@ -202,6 +271,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 startTime: updatedRide.pickupTime ? updatedRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
                 status: updatedRide.status,
                 totalTime: updatedRide.totalTime,
+                waitTime: updatedRide.waitTime !== null ? updatedRide.waitTime : 0,
                 specialNote: updatedRide.specialNote
             };
             
@@ -270,6 +340,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Total Drive Time:</strong> ${updatedRide.totalTime}</td></tr>
+                                    ${updatedRide.waitTime ? `<tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Wait Time:</strong> ${updatedRide.waitTime} hours</td></tr>` : ''}
                                     <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Completed On:</strong> ${new Date().toLocaleString()}</td></tr>
                                 </table>
 
@@ -317,7 +388,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }, { status: 200 });
             
         } else {
-
             const rideWithUpdatedData = await prisma.ride.findUnique({
                 where: { id: parseInt(id, 10) },
                 include: {
@@ -327,6 +397,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                     volunteer: { include: { user: true } }
                 }
             });
+            
             const finalFormattedDataForNoUpdate = rideWithUpdatedData ? {
                 id: rideWithUpdatedData.id,
                 customerID: rideWithUpdatedData.customerID,
@@ -340,6 +411,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
                 status: rideWithUpdatedData.status,
                 totalTime: rideWithUpdatedData.totalTime,
+                waitTime: rideWithUpdatedData.waitTime !== null ? rideWithUpdatedData.waitTime : 0,
                 specialNote: rideWithUpdatedData.specialNote
             } : null;
 

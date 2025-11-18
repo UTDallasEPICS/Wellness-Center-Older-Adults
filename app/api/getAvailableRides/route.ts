@@ -58,6 +58,9 @@ export async function GET(req: Request) {
         },
         date: true,
         pickupTime: true,
+        totalTime: true,
+        waitTime: true,
+        specialNote: true,
         status: true,
       },
     });
@@ -83,6 +86,8 @@ export async function GET(req: Request) {
         : '',
       date: ride.date.toISOString(),
       startTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+      totalTime: ride.totalTime || '',
+      waitTime: typeof ride.waitTime === 'number' ? ride.waitTime : 0,
       status: ride.status,
     }));
 

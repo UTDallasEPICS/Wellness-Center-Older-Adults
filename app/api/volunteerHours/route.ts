@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 app.put('/api/ride/:id', async (req, res) => {
   const { id } = req.params;
-  const { totalTime } = req.body; // totalTime is now a string like "01:30"
+  const { totalTime } = req.body;
 
   try {
     const updatedRide = await prisma.ride.update({
