@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { sendEmail } from '@/util/nodemail';
+import { SendMailOptions } from 'nodemailer';
 
 const prisma = new PrismaClient();
 
@@ -142,6 +144,68 @@ export async function POST(req: Request) {
       status: createdRide.status,
       specialNote: createdRide.specialNote,
     };
+
+    // Send email to all available volunteers
+    try {
+      // Fetch all available volunteers
+      const availableVolunteers = await prisma.volunteerInfo.findMany({
+        where: {
+          status: 'AVAILABLE',
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // Extract email addresses
+      const volunteerEmails = availableVolunteers
+        .map(volunteer => volunteer.user.email)
+        .filter((email): email is string => !!email);
+
+      if (volunteerEmails.length > 0 && sendEmail) {
+        const mailOptions: SendMailOptions = {
+          to: volunteerEmails,
+          subject: `New Ride Available: ${formattedRide.customerName}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
+              <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">New Ride Available</h2>
+
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
+                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${formattedRide.customerName}</td></tr>
+                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Phone:</strong> ${formattedRide.customerPhone}</td></tr>
+                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Date:</strong> ${new Date(createdRide.date).toLocaleDateString()}</td></tr>
+                <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Pickup Time:</strong> ${formattedRide.startTime}</td></tr>
+                ${formattedRide.waitTime ? `<tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Wait Time:</strong> ${formattedRide.waitTime} hours</td></tr>` : ''}
+              </table>
+
+              <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c;">Ride Route:</p>
+              <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 14px; color: #4a5568;">
+                <strong>Pickup:</strong> ${formattedRide.startLocation} <br/>
+                <strong>Dropoff:</strong> ${formattedRide.endLocation}
+              </div>
+              
+              ${formattedRide.specialNote ? `
+                <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c; margin-top: 20px;">Special Notes:</p>
+                <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 14px; color: #4a5568;">
+                  ${formattedRide.specialNote}
+                </div>
+              ` : ''}
+              
+              <p style="margin-top: 20px; color: #4a5568;">Please log in to the dashboard to claim this ride if you're available.</p>
+            </div>
+          `,
+        };
+
+        await sendEmail(mailOptions);
+        console.log(`New ride notification sent to ${volunteerEmails.length} available volunteers`);
+      } else {
+        console.warn('No available volunteers found to notify about new ride or sendEmail not available');
+      }
+    } catch (emailError) {
+      // Log the error but don't fail the ride creation
+      console.error('Failed to send email notifications to volunteers:', emailError);
+      // The ride was still created successfully, so we continue
+    }
 
     return NextResponse.json(
       { status: 201, message: 'Ride created successfully', data: formattedRide },
