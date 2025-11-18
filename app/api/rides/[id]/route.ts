@@ -7,6 +7,33 @@ const prisma = new PrismaClient();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL;
 
+// Function to fetch all Admin and Volunteer emails dynamically from the database
+async function getAllRecipientEmails() {
+    const users = await prisma.user.findMany({
+        where: {
+            OR: [
+                { role: 'ADMIN' },
+                { role: 'VOLUNTEER' }
+            ],
+            isArchived: false,
+        },
+        select: {
+            email: true,
+        },
+    });
+
+    const emails = users.map(user => user.email).filter((email): email is string => !!email);
+    
+    // Add environment variables as a fallback and deduplicate
+    const uniqueEmails = Array.from(new Set([
+        ...emails,
+        ADMIN_EMAIL,
+        VOLUNTEER_EMAIL
+    ].filter((email): email is string => !!email))); 
+
+    return uniqueEmails;
+}
+
 function parseAddressString(addressString: string) {
     const parts = addressString.split(', ');
     if (parts.length >= 3) {
@@ -98,6 +125,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         const isCompletion = updateData.status === 'Completed';
+        const isCancellation = updateData.status === 'Cancelled'; // Determine cancellation status here
 
         if (isCompletion) {
             if (!updateData.driveTimeAB) {
@@ -247,14 +275,60 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 specialNote: updatedRide.specialNote
             };
             
+            // --- CANCELLATION EMAIL LOGIC START (Now using getAllRecipientEmails) ---
+            if (isCancellation && updatedRide.customer && sendEmail) {
+                
+                // Get ALL Admin and Volunteer emails from the database + environment variables
+                const recipients = await getAllRecipientEmails();
+
+                if (recipients.length > 0) {
+                    const mailOptions: SendMailOptions = {
+                        to: recipients,
+                        subject: `RIDE CANCELLED: ${finalFormattedData.customerName} on ${new Date(updatedRide.date).toLocaleDateString()}`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #cc0000;">
+                                <h2 style="font-size: 24px; color: #cc0000; margin-top: 0;">Ride Has Been Cancelled</h2>
+                                <p>The following ride has been marked as **CANCELLED**.</p>
+
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Date:</strong> ${new Date(updatedRide.date).toLocaleDateString()}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Time:</strong> ${finalFormattedData.startTime}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Status:</strong> <span style="color: #cc0000; font-weight: bold;">CANCELLED</span></td></tr>
+                                </table>
+
+                                <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c;">Ride Route:</p>
+                                <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 14px; color: #4a5568;">
+                                    <strong>Pickup:</strong> ${finalFormattedData.startLocation} <br/>
+                                    <strong>Dropoff:</strong> ${finalFormattedData.endLocation}
+                                </div>
+                                
+                                ${updatedRide.specialNote ? `<p style="font-weight: bold; margin-bottom: 8px; color: #1a202c; margin-top: 20px;">Notes:</p>
+                                <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 14px; color: #4a5568;">
+                                    ${updatedRide.specialNote}
+                                </div>` : ''}
+                            </div>
+                        `,
+                    };
+
+                    try {
+                        await sendEmail(mailOptions);
+                        console.log(`Email sent for cancelled ride ${updatedRide.id} to ${recipients.join(', ')}`);
+                    } catch (emailError) {
+                        console.error(`ERROR: Failed to send cancellation email for ride ${updatedRide.id}:`, emailError);
+                    }
+                } else {
+                    console.warn(`Cancellation email not sent for ride ${updatedRide.id}: No valid ADMIN/VOLUNTEER recipients found.`);
+                }
+            }
+            // --- CANCELLATION EMAIL LOGIC END ---
+            
+            // Existing Completion Logic
             if (isCompletion && ADMIN_EMAIL && updatedRide.customer && sendEmail) {
-                const ASSIGNED_VOLUNTEER_EMAIL = updatedRide.volunteer?.user?.email;
                 
-                const recipients = [ADMIN_EMAIL, ASSIGNED_VOLUNTEER_EMAIL, VOLUNTEER_EMAIL]
-                    .filter((email, index, self): email is string => 
-                        !!email && self.indexOf(email) === index
-                    );
-                
+                // Get ALL Admin and Volunteer emails from the database + environment variables
+                const recipients = await getAllRecipientEmails();
+
                 if (recipients.length > 0) {
                     const mailOptions: SendMailOptions = {
                         to: recipients, 
@@ -272,8 +346,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
                                 <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c;">Ride Route:</p>
                                 <div style="background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 14px; color: #4a5568;">
-                                    <strong>Start:</strong> ${finalFormattedData.startLocation} <br/>
-                                    <strong>End:</strong> ${finalFormattedData.endLocation}
+                                    <strong>Pickup:</strong> ${finalFormattedData.startLocation} <br/>
+                                    <strong>Dropoff:</strong> ${finalFormattedData.endLocation}
                                 </div>
                                 
                                 <p style="font-weight: bold; margin-bottom: 8px; color: #1a202c; margin-top: 20px;">Volunteer Notes:</p>
@@ -297,12 +371,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                         }, { status: 200 });
                     }
                 } else {
-                    console.warn(`Email not sent for completed ride ${updatedRide.id}: No valid ADMIN_EMAIL or VOLUNTEER_EMAIL found.`);
+                    console.warn(`Email not sent for completed ride ${updatedRide.id}: No valid ADMIN/VOLUNTEER recipients found in the database.`);
                 }
             }
 
+            const statusMessage = isCompletion 
+                ? 'Ride completed successfully!' 
+                : isCancellation 
+                ? 'Ride cancelled successfully!' 
+                : 'Ride updated successfully';
+
             return NextResponse.json({ 
-                message: isCompletion ? 'Ride completed successfully!' : 'Ride updated successfully', 
+                message: statusMessage, 
                 updatedRide: updatedRide,
                 formattedData: finalFormattedData,
             }, { status: 200 });
