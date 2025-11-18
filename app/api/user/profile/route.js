@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../util/prisma-client';
+import prisma from '../../../../util/prisma-client.ts';
 import jwt from 'jsonwebtoken';
 
  
