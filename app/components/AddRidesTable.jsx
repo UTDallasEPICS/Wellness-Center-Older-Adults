@@ -33,6 +33,7 @@ const AddRidesTable = ({
     date: "",
     startAddress: "",
     pickupTime: "",
+    waitTime: 0,
     volunteerName: "",
   });
 
@@ -50,7 +51,7 @@ const AddRidesTable = ({
         setUserRole(role);
       } catch (e) {
         console.error("Could not load user role:", e);
-        setUserRole("GUEST"); // Set a fallback role in case of failure
+        setUserRole("GUEST");
       }
     })();
   }, []);
@@ -67,18 +68,6 @@ const AddRidesTable = ({
       return `${volunteer.user.firstName} ${volunteer.user.lastName}`;
     }
     return "";
-  };
-
-  // Helper function to find customer ID by name (omitted for brevity, assume implemented)
-  const getCustomerIdByName = (customerName) => {
-    // ... implementation assumed
-    return null;
-  };
-
-  // Helper function to find address ID by address string (omitted for brevity, assume implemented)
-  const getAddressIdByString = (addressString) => {
-    // ... implementation assumed
-    return null;
   };
 
   // Helper function to find volunteer ID by name
@@ -102,6 +91,7 @@ const AddRidesTable = ({
       date: contact.date ? contact.date.split("T")[0] : "",
       startAddress: contact.startLocation || "",
       pickupTime: contact.startTime ? contact.startTime.slice(0, 5) : "",
+      waitTime: typeof contact.waitTime === 'number' ? contact.waitTime : 0,
       volunteerName: getVolunteerNameById(contact.volunteerID),
     };
     setEditFormData(formValues);
@@ -201,6 +191,9 @@ const AddRidesTable = ({
       startAddressID: originalContact.startAddressID,
       endAddressID: originalContact.endAddressID,
       pickupTime: pickupDateTimeISO,
+      waitTime: editFormData.waitTime && editFormData.waitTime !== '' 
+        ? Number(editFormData.waitTime) 
+        : 0,
       volunteerID: volunteerUpdates?.volunteerID || originalContact.volunteerID,
       status: originalContact.status || "Unreserved",
       customerUpdates: customerUpdates,
@@ -262,6 +255,9 @@ const AddRidesTable = ({
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Pick-up Time
+              </th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                Wait Time
               </th>
 
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">

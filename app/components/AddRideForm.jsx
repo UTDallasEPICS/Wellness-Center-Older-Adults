@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
@@ -14,6 +13,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
         destinationZip: "",
         pickUpTime: "",
         date: "",
+        waitTime: 0,
         extraInfo: "",
     });
 
@@ -99,12 +99,11 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
 
             if (!selectedCustomer) {
                 console.error("Error: Selected customer not found.");
-                // Optionally display an error message to the user
                 return;
             }
 
             const rideDataToSend = {
-                customerId: selectedCustomer.id, // <---- ADD THIS LINE
+                customerId: selectedCustomer.id,
                 customerName: formData.customerName,
                 pickupStreet: formData.pickupStreet,
                 pickupCity: formData.pickupCity,
@@ -116,12 +115,15 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 destinationZip: formData.destinationZip,
                 pickUpTime: formData.pickUpTime,
                 date: formData.date,
+                waitTime: formData.waitTime && formData.waitTime !== '' 
+                    ? Number(formData.waitTime) 
+                    : 0,
                 extraInfo: formData.extraInfo,
             };
 
-            console.log("Data being sent:", rideDataToSend); // Add this for verification
+            console.log("Data being sent:", rideDataToSend);
 
-            const response = await fetch("/api/createRide", {
+            const response = await fetch("/api/rides", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -132,7 +134,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Error adding ride:", errorData);
-                // Optionally display an error message to the user within this component
                 return;
             }
 
@@ -142,7 +143,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
             handleAddFormSubmit(newRide);
         } catch (error) {
             console.error("Error sending ride data:", error);
-            // Optionally display an error message to the user within this component
         }
     };
 
@@ -330,8 +330,25 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                             />
                         </div>
 
+                        {/* Wait Time Field */}
+                        <div>
+                            <label htmlFor="waitTime" className="block text-sm font-medium text-gray-700">
+                                Wait Time (hours)
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="number"
+                                step="0.25"
+                                min="0"
+                                name="waitTime"
+                                placeholder="e.g., 0.5"
+                                value={formData.waitTime ?? ''}
+                                onChange={handleFormChange}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Enter as decimal (e.g., 0.5 for 30 minutes)</p>
+                        </div>
 
-                        {/* Notes? */}
+                        {/* Notes Checkbox */}
                         <div className="flex items-center space-x-2">
                             <input
                                 type="checkbox"
@@ -348,7 +365,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
 
                         {/* Other Notes (if notes is checked) */}
                         {isExtraOptionChecked && (
-                            <div>
+                            <div className="col-span-2">
                                 <label htmlFor="extraInfo" className="block text-sm font-medium text-gray-700">
                                     Other Notes
                                 </label>

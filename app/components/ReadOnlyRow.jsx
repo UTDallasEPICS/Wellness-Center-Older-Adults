@@ -9,7 +9,7 @@ const ReadOnlyRow = ({
     status, 
     convertTime, 
     startAddress, 
-    userRole = "ADMIN", // Default role for safety
+    userRole = "ADMIN",
     selected,
     onToggleSelect
 }) => {
@@ -18,19 +18,20 @@ const ReadOnlyRow = ({
     const isVolunteer = userRole === "VOLUNTEER";
     const isAdmin = userRole === "ADMIN";
     
-    // Logic to handle row click (navigation)
     const handleRowClick = () => {
         router.push(`/Dashboard/rides/ride/${contact.id}`);
     };
 
-    // Helper to format the date to M/D/YY
     const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().slice(-2)}`;
+        if (isNaN(date.getTime())) return '';
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const year = date.getFullYear().toString().slice(-2);
+        return `${month}/${day}/${year}`;
     }
 
-    // UPDATED LOGIC: Only show Volunteer column if status is Reserved or Completed
     const showVolunteerColumn = status === "Reserved" || status === "Completed";
     
     const contactNumber = contact.customerPhone || contact.phoneNumber;
@@ -38,19 +39,19 @@ const ReadOnlyRow = ({
     return (
         <tr className="cursor-pointer hover:bg-gray-100 transition-colors duration-200 border-b border-gray-100">
             
-            {/* 0. CHECKBOX COLUMN */}
-	    { isAdmin &&
-            <td className="p-3 text-center bg-[#fffdf5] w-12" onClick={(e) => e.stopPropagation()}>
-                <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() => onToggleSelect(contact.id)} 
-                    className="h-5 w-5 rounded border-gray-300 text-[#419902] focus:ring-[#419902]"
-                />
-            </td>
-	    }
+            {/* Checkbox Column */}
+            {isAdmin && (
+                <td className="p-3 text-center bg-[#fffdf5] w-12" onClick={(e) => e.stopPropagation()}>
+                    <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => onToggleSelect(contact.id)} 
+                        className="h-5 w-5 rounded border-gray-300 text-[#419902] focus:ring-[#419902]"
+                    />
+                </td>
+            )}
             
-            {/* 1. Client Name + Date (Combined for display) */}
+            {/* Client Name + Date */}
             <td 
                 className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-800"
                 onClick={handleRowClick}
@@ -63,7 +64,7 @@ const ReadOnlyRow = ({
                 </div>
             </td>
             
-            {/* 2. Contact Number */}
+            {/* Contact Number */}
             <td 
                 className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600"
                 onClick={handleRowClick}
@@ -71,7 +72,7 @@ const ReadOnlyRow = ({
                 {contactNumber}
             </td>
 
-            {/* 3. Address (using startAddress prop which contains startLocation string) */}
+            {/* Address */}
             <td 
                 className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600"
                 onClick={handleRowClick}
@@ -79,16 +80,25 @@ const ReadOnlyRow = ({
                 {startAddress}
             </td>
 
-            {/* 4. Pick-up Time */}
+            {/* Pick-up Time */}
             <td 
                 className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600"
                 onClick={handleRowClick}
             >
                 {typeof convertTime === 'function' ? convertTime(contact.startTime) : contact.startTime}
             </td>
+
+            {/* Wait Time Column */}
+            <td 
+                className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-600"
+                onClick={handleRowClick}
+            >
+                {typeof contact.waitTime === 'number' 
+                    ? `${contact.waitTime} hrs` 
+                    : '0 hrs'}
+            </td>
             
-            {/* 5. Volunteer Name (Conditional) */}
-            {/* This cell will only render if the status is Reserved or Completed */}
+            {/* Volunteer Name (Conditional) */}
             {showVolunteerColumn && (
                 <td 
                     className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light text-gray-800"
@@ -98,30 +108,30 @@ const ReadOnlyRow = ({
                 </td>
             )}
             
-            {/* 6. ACTION COLUMN */}
+            {/* ACTION COLUMN */}
             <td className="text-center bg-[#fffdf5] text-[15px] py-3 px-2 font-light"> 
                 <div className="flex justify-center items-center h-full space-x-2">
                     
-                    {/* ADMIN: Edit and Delete buttons (Only for unreserved/available/added rides) */}
-                    {isAdmin && (status === "Unreserved" || status === "AVAILABLE" || status === "Added") && (
+                    {/* ADMIN: Edit and Delete buttons */}
+                    {isAdmin && (status === "Unreserved" || status === "AVAILABLE" || status === "Added"|| status === "Reserved") && (
                         <>
                             <button
                                 className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                                 type="button"
                                 title="Edit Ride"
                                 onClick={(event) => {
-                                    event.stopPropagation(); //Stop propagation here
+                                    event.stopPropagation();
                                     handleEditClick(event, contact);
                                 }}
                             >
                                 <span className="material-symbols-rounded text-xl">edit</span>
                             </button>
                             <button
-                                className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
+                                className="text-[#fffdf5] bg-red-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                                 type="button"
                                 title="Delete Ride"
                                 onClick={(e) => {
-                                    e.stopPropagation(); //Stop propagation here
+                                    e.stopPropagation();
                                     handleDeleteClick(contact.id);
                                 }}
                             >
@@ -130,13 +140,13 @@ const ReadOnlyRow = ({
                         </>
                     )}
 
-                    {/* VOLUNTEER: Reserve button (Only for unreserved/available/added rides) */}
+                    {/* VOLUNTEER: Reserve button */}
                     {isVolunteer && (status === "Unreserved" || status === "AVAILABLE" || status === "Added") && (
                         <button
                             className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
                             type="button"
                             onClick={(e) => {
-                                e.stopPropagation(); // FIX: Must be called as a function!
+                                e.stopPropagation();
                                 handleReserveClick(contact.id);
                             }}
                         >
@@ -144,8 +154,8 @@ const ReadOnlyRow = ({
                         </button>
                     )}
                     
-                    {/* View Details/Status for Reserved/Completed (Admin/Volunteer) */}
-                    {(status === "Reserved" || status === "Completed") && (
+                    {/* View Details for Reserved/Completed */}
+                    {(status === "Completed" || status === "Reserved") && (
                         <button
                             className="text-[#fffdf5] bg-green-600 cursor-pointer border-none mx-1 px-3 py-1 rounded-md text-sm hover:bg-gray-600 font-medium"
                             type="button"

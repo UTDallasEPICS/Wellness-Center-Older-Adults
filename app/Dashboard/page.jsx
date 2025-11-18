@@ -71,8 +71,6 @@ export default function Page() {
           ride => new Date(ride.date).getFullYear() === currentYear
         );
 
-        console.log("Rides this year:", ridesThisYear);
-
         setRidesData(ridesThisYear);
 
         // Calculate percentage

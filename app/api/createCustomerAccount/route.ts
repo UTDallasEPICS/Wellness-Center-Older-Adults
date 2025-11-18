@@ -26,7 +26,6 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json()) as UserRequestBody;
-    console.log('Received request body:', body);
 
     // Normalize/trim
     const first = (body.firstName || '').trim();

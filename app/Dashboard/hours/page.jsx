@@ -9,7 +9,7 @@ export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/volunteer-hours');
+        const response = await fetch('/api/volunteerHours');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
