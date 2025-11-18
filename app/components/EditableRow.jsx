@@ -59,6 +59,9 @@ const EditableRow = ({
                     value={editFormData.phoneNumber || ''}
                     onChange={handleEditFormChange}
                 />
+                {errors.phoneNumber ? (
+                    <div className="text-red-600 text-sm mt-1">{errors.phoneNumber}</div>
+                ) : null}
             </td>
 
             {/* Address */}
@@ -71,6 +74,9 @@ const EditableRow = ({
                     value={editFormData.startAddress || ''}
                     onChange={handleEditFormChange}
                 />
+                {errors.startAddress ? (
+                    <div className="text-red-600 text-sm mt-1">{errors.startAddress}</div>
+                ) : null}
             </td>
 
             {/* Pick-up Time */}
@@ -96,6 +102,9 @@ const EditableRow = ({
                     value={editFormData.waitTime ?? ''}
                     onChange={handleEditFormChange}
                 />
+                {errors.pickupTime ? (
+                    <div className="text-red-600 text-sm mt-1">{errors.pickupTime}</div>
+                ) : null}
             </td>
 
             {/* Volunteer Name (conditional) */}
@@ -109,6 +118,9 @@ const EditableRow = ({
                         value={editFormData.volunteerName || ''}
                         onChange={handleEditFormChange}
                     />
+                    {errors.volunteerName ? (
+                        <div className="text-red-600 text-sm mt-1">{errors.volunteerName}</div>
+                    ) : null}
                 </td>
             )}
 

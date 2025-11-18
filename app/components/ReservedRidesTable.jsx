@@ -28,6 +28,13 @@ const ReservedRidesTable = ({
     waitTime: 0,
     volunteerName: "",
   });
+  const [editErrors, setEditErrors] = useState({
+    customerName: "",
+    phoneNumber: "",
+    startAddress: "",
+    startTime: "",
+    volunteerName: "",
+  });
 
   useEffect(() => {
     // Update contacts when initialContacts prop changes
@@ -71,6 +78,9 @@ const ReservedRidesTable = ({
     const newFormData = { ...editFormData };
     newFormData[fieldName] = fieldValue;
     setEditFormData(newFormData);
+    if (editErrors[fieldName]) {
+      setEditErrors({ ...editErrors, [fieldName]: "" });
+    }
   };
 
   const handleEditFormSubmit = async (event) => {
@@ -95,6 +105,46 @@ const ReservedRidesTable = ({
     setContacts(newContacts);
     setEditContactId(null);
     if (onRideUpdated) onRideUpdated(updatedRide);
+  };
+
+  const validateEditFields = (data) => {
+    const out = {
+      customerName: "",
+      phoneNumber: "",
+      startAddress: "",
+      startTime: "",
+      volunteerName: "",
+    };
+    const name = (data.customerName || "").trim();
+    const phoneRaw = (data.phoneNumber || "").trim();
+    const address = (data.startAddress || "").trim();
+    const time = (data.pickupTime || data.startTime || "").toString().trim();
+    const volunteer = (data.volunteerName || "").trim();
+
+    const nameRe = /^[A-Za-z][A-Za-z' -]{0,79}$/;
+    const timeRe = /^([0-1]?\d|2[0-3]):[0-5]\d$/;
+
+    if (!name || !nameRe.test(name)) {
+      out.customerName = "Client name is required and must be valid.";
+    }
+    if (!/^\d{10}$/.test(phoneRaw)) {
+      out.phoneNumber = "Enter a valid 10-digit phone number.";
+    }
+    if (!address) {
+      out.startAddress = "Address is required.";
+    } else {
+      const addrRe = /^.+,\s*[A-Za-z .'-]+,\s*[A-Z]{2}\s+\d{5}$/;
+      if (!addrRe.test(address)) {
+        out.startAddress = "Enter address as 'Street, City, ST 12345'.";
+      }
+    }
+    if (!time || !timeRe.test(time)) {
+      out.startTime = "Enter a valid time (HH:MM).";
+    }
+    if (volunteer && !nameRe.test(volunteer)) {
+      out.volunteerName = "Volunteer name must be valid.";
+    }
+    return out;
   };
 
   const handleCancelClick = async (contactId) => {
@@ -155,6 +205,7 @@ const ReservedRidesTable = ({
                     status={contact.status}
                     handleCancelClick={() => setEditContactId(null)}
                     isVolunteer={isVolunteer}
+                    errors={editErrors}
                   />
                 ) : (
                   <ReadOnlyRow
