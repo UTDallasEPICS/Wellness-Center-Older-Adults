@@ -32,10 +32,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid JSON format or missing request body.' }, { status: 400 });
     }
 
-    // FIX: Destructure email from the body
+    //Destructure email from the body
     const { name, email, message } = body;
 
-    // FIX: Add email to the required field validation check
+    //Add email to the required field validation check
     if (!name || !email || !message) {
         return NextResponse.json(
             { error: 'Missing required fields: name, email, and message are required.' },
@@ -43,10 +43,10 @@ export async function POST(request: Request) {
         );
     }
 
-    // 3. Prepare Email Options
+    //Prepare Email Options
     const mailOptions: SendMailOptions = {
         to: ADMIN_EMAIL,
-        replyTo: email, // Optional: Use this to make replying easy in your inbox
+        replyTo: email, //Use this to make replying easy in your inbox
         subject: `Wellness Center For Older Adults from ${name}`,
 
         // Plain text version

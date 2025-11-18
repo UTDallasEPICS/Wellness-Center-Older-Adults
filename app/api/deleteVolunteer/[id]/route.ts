@@ -40,8 +40,6 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
         });
       } catch (userUpdateError: any) {
         console.error('Error archiving user:', userUpdateError);
-        // Optionally, you could decide whether to consider the overall operation a failure
-        // if user archiving fails. For now, we'll log the error and continue.
       }
     }
 

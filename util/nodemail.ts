@@ -35,8 +35,6 @@ export async function sendEmail(mailOptions: SendMailOptions): Promise<void> {
     try {
         // This is the line that sends the actual email.
         const info = await transporter.sendMail(mailOptions);
-        // log statement if the email is sent successfully
-        console.log(`Email sent successfully to ${mailOptions.to}. Message ID: ${info.messageId}`);
     } catch (error) {
         console.error("Error sending email:", error);
         // Log statement if the email is not sent successfully.

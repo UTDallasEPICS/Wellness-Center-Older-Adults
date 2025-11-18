@@ -22,16 +22,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
         if (!existingCustomer) {
             return NextResponse.json({ status: 404, message: 'Customer not found' }, { status: 404 });
         }
-
-        // Consider deleting related rides first if necessary, depending on your requirements
-        // and Prisma schema onDelete rules. If you have onDelete: Cascade set on the relation,
-        // Prisma will handle the deletion of related rides automatically.
         if (existingCustomer.rides.length > 0) {
-            // If you don't have onDelete: Cascade, you might want to handle this explicitly
-            // For example, you could return an error or delete the rides first.
-            // This example assumes onDelete: Cascade or that you want to allow deletion
-            // even if rides exist (which might lead to data inconsistencies if not handled).
-            // A safer approach might be to archive rides or prevent deletion if active rides exist.
             console.warn(`Customer ${customerId} has associated rides. Ensure your onDelete strategy is appropriate.`);
         }
 

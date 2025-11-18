@@ -1,4 +1,3 @@
-// app/components/CompletedRidesTable.jsx
 import { useState, Fragment, useEffect } from "react";
 import ReadOnlyRow from "./ReadOnlyRow";
 import EditableRow from "./EditableRow";
@@ -8,6 +7,8 @@ const CompletedRidesTable = ({
   convertTime,
   onDeleteRide,
   selectedRides,
+  onToggleSelect,
+  onToggleAll,
 }) => {
   const [contacts, setContacts] = useState(initialContacts);
   const [editContactId, setEditContactId] = useState(null);
@@ -16,6 +17,7 @@ const CompletedRidesTable = ({
     phoneNumber: "",
     startAddress: "",
     pickupTime: "",
+    waitTime: 0,
     volunteerName: "",
   });
   const [editErrors, setEditErrors] = useState({
@@ -26,9 +28,6 @@ const CompletedRidesTable = ({
     volunteerName: "",
   });
   const [userRole, setUserRole] = useState(null);
-
-  // useEffect(() => {
-  // }, [initialContacts]);
 
   useEffect(() => {
     setContacts(initialContacts);
@@ -41,7 +40,7 @@ const CompletedRidesTable = ({
         setUserRole(role);
       } catch (e) {
         console.error("Could not load user role:", e);
-        setUserRole("GUEST"); // Set a fallback role in case of failure
+        setUserRole("GUEST");
       }
     })();
   }, [initialContacts]);
@@ -54,6 +53,7 @@ const CompletedRidesTable = ({
       phoneNumber: contact.phoneNumber,
       startAddress: contact.startAddress,
       pickupTime: contact.pickupTime,
+      waitTime: typeof contact.waitTime === 'number' ? contact.waitTime : 0,
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
@@ -157,17 +157,17 @@ const CompletedRidesTable = ({
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Client Name
               </th>
-              {/* <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Date
-              </th> */}
-              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
-                Time
-              </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Contact Number
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Address
+              </th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                Pick-up Time
+              </th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                Wait Time
               </th>
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Volunteer Name
@@ -204,7 +204,8 @@ const CompletedRidesTable = ({
                         }
                         convertTime={convertTime}
                         userRole={userRole}
-                        // userRole="ADMIN"
+                        selected={selectedRides.includes(contact.id)}
+                        onToggleSelect={onToggleSelect}
                       />
                     )}
                   </Fragment>
