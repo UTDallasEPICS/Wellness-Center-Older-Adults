@@ -86,107 +86,25 @@ const ReservedRidesTable = ({
   const handleEditFormSubmit = async (event) => {
     event.preventDefault();
 
-    // Validate front-end fields first
-    const errs = validateEditFields(editFormData);
-    const hasErrors = Object.values(errs).some(Boolean);
-    if (hasErrors) {
-      setEditErrors(errs);
-      return;
-    }
-
-    const current = contacts.find((c) => c.id === editContactId);
-    if (!current) {
-      console.error('Edit submit failed: ride not found in local state');
-      return;
-    }
-
-    // Build pickupTime as a Date using the existing ride date and edited HH:MM
-    let pickupTimeISO = undefined;
-    try {
-      // current.date may be ISO string; default to today if missing
-      const base = current.date ? new Date(current.date) : new Date();
-      const [hh, mm] = (editFormData.startTime || '').split(':');
-      if (hh !== undefined && mm !== undefined) {
-        base.setHours(Number(hh), Number(mm), 0, 0);
-        pickupTimeISO = base.toISOString();
-      }
-    } catch (_) {
-      // leave undefined if parsing fails; API will ignore
-    }
-
-    // Prepare payload for API
-    const payload = {
-      // Update address text; backend will parse and update existing address row
-      pickupAddress: editFormData.startAddress,
-      // Persist wait time
-      waitTime:
-        editFormData.waitTime !== null && editFormData.waitTime !== ''
-          ? Number(editFormData.waitTime)
-          : 0,
-      // Update pickupTime if parsed
-      ...(pickupTimeISO ? { pickupTime: pickupTimeISO } : {}),
-      // Keep status as-is so backend can detect reserved changes and send emails
-      status: current.status,
+    const updatedRide = {
+      id: editContactId,
+      customerName: editFormData.customerName,
+      phoneNumber: editFormData.phoneNumber,
+      startAddress: editFormData.startAddress,
+      startTime: editFormData.startTime,
+      waitTime: editFormData.waitTime !== null && editFormData.waitTime !== '' 
+        ? Number(editFormData.waitTime) 
+        : null,
+      volunteerName: editFormData.volunteerName,
+      status: contacts.find((contact) => contact.id === editContactId).status,
     };
 
-    // If customer fields were edited and we have a customerID, include customerUpdates
-    if (current.customerID) {
-      const fullName = (editFormData.customerName || '').trim();
-      const parts = fullName.split(/\s+/);
-      const firstName = parts[0] || '';
-      const lastName = parts.slice(1).join(' ') || '';
-      payload.customerUpdates = {
-        id: String(current.customerID),
-        firstName,
-        lastName,
-        customerPhone: (editFormData.phoneNumber || '').trim(),
-      };
-    }
-
-    try {
-      const res = await fetch(`/api/rides/${editContactId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error('Failed to update ride:', err);
-        return;
-      }
-
-      const data = await res.json();
-      // Prefer formattedData if present; fallback to merging locally
-      const updatedRide = {
-        ...current,
-        ...(data.formattedData || {}),
-        // Keep UI fields aligned
-        customerName: data.formattedData?.customerName ?? current.customerName,
-        phoneNumber: data.formattedData?.customerPhone ?? current.phoneNumber,
-        startAddress:
-          data.formattedData?.startLocation || data.formattedData?.startAddress || editFormData.startAddress,
-        startTime:
-          data.formattedData?.startTime || editFormData.startTime || current.startTime,
-        waitTime:
-          data.formattedData?.waitTime ?? payload.waitTime,
-        status: data.updatedRide?.status || current.status,
-      };
-
-      const newContacts = contacts.map((contact) =>
-        contact.id === editContactId ? updatedRide : contact
-      );
-      setContacts(newContacts);
-      setEditContactId(null);
-      if (onRideUpdated) onRideUpdated(updatedRide);
-      console.log('[ReservedRidesTable] Ride updated via API', {
-        id: editContactId,
-        toVolunteer: data?.updatedRide?.volunteer?.user?.email,
-        status: updatedRide.status,
-      });
-    } catch (e) {
-      console.error('Error submitting edit to API:', e);
-    }
+    const newContacts = contacts.map((contact) =>
+      contact.id === editContactId ? updatedRide : contact
+    );
+    setContacts(newContacts);
+    setEditContactId(null);
+    if (onRideUpdated) onRideUpdated(updatedRide);
   };
 
   const validateEditFields = (data) => {

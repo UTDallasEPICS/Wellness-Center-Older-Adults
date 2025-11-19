@@ -5,8 +5,7 @@ const EditableRow = ({
     handleEditFormChange, 
     handleCancelClick, 
     status,
-    userRole = "ADMIN",
-    errors = {}
+    userRole = "ADMIN" 
 }) => {
     const isAdmin = userRole === "ADMIN";
     const showVolunteerColumn = status === "Reserved" || status === "Completed";
