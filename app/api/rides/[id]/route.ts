@@ -80,6 +80,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     try {
         const updateData = await request.json();
+        console.log('[RideUpdate] PUT hit', {
+          id,
+          bodyKeys: Object.keys(updateData || {}),
+          status: updateData?.status,
+        });
 
         const ride = await prisma.ride.findUnique({
             where: {
@@ -255,8 +260,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             const recipients: string[] = [];
             if (ADMIN_EMAIL) recipients.push(ADMIN_EMAIL);
             if (volunteerEmail) recipients.push(volunteerEmail);
+            const recipientsUnique = Array.from(new Set(recipients.filter(Boolean)));
             const dateString = new Date(updatedRide.date).toLocaleDateString();
             const timeString = updatedRide.pickupTime ? updatedRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '';
+            console.log('[RideUpdateEmail] Recipients resolved (unique):', recipientsUnique);
 
             // Reservation confirmation to assigned volunteer when status becomes Reserved
             if (isReserving && volunteerEmail && sendEmail) {
@@ -287,55 +294,55 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 }
             }
 
-            // Editing a ride while Reserved: notify assigned volunteer of changes
+            // Editing a ride while Reserved: always email recipients about the edit
             const wasReserved = ride.status === 'Reserved';
             const isStillReserved = updatedRide.status === 'Reserved';
-            if (wasReserved && isStillReserved && volunteerEmail && sendEmail) {
-                const beforeStart = ride.addrStart ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}` : '';
-                const beforeEnd = ride.addrEnd ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}` : '';
-                const beforeDate = new Date(ride.date).toLocaleDateString();
-                const beforeTime = ride.pickupTime ? ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '';
-                const beforeNote = ride.specialNote || '';
-
-                const changed = (
-                    beforeStart !== finalFormattedData.startLocation ||
-                    beforeEnd !== finalFormattedData.endLocation ||
-                    beforeDate !== dateString ||
-                    beforeTime !== timeString ||
-                    beforeNote !== (updatedRide.specialNote || '')
-                );
-
-                if (changed) {
-                    const mailOptions: SendMailOptions = {
-                        to: volunteerEmail,
-                        subject: `Ride Updated: Ride #${updatedRide.id} (Reserved)`,
-                        html: `
-                            <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f59e0b;">
-                                <h2 style="font-size: 24px; color: #f59e0b; margin-top: 0;">Reserved Ride Details Updated</h2>
-                                <p>The details for your reserved ride have changed:</p>
-                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
-                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
-                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Date:</strong> ${dateString}</td></tr>
-                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Pick-up Time:</strong> ${timeString}</td></tr>
-                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Pick-up Address:</strong> ${finalFormattedData.startLocation}</td></tr>
-                                    <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Drop-off Address:</strong> ${finalFormattedData.endLocation}</td></tr>
-                                </table>
-                                ${updatedRide.specialNote ? `<p style=\"font-weight: bold; margin-bottom: 8px; color: #1a202c;\">Notes:</p><div style=\"background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 14px; color: #4a5568;\">${updatedRide.specialNote}</div>` : ''}
-                            </div>
-                        `,
-                    };
-                    try {
-                        await sendEmail(mailOptions);
-                        console.log(`Volunteer update email sent for reserved ride ${updatedRide.id} to ${volunteerEmail}.`);
-                    } catch (emailError) {
-                        console.error(`ERROR: Failed to send volunteer update email for ride ${updatedRide.id}:`, emailError);
+            if (wasReserved && isStillReserved && sendEmail) {
+                if (recipientsUnique.length === 0) {
+                    console.warn(`[RideUpdateEmail] No recipients found for reserved ride update ${updatedRide.id}.`);
+                } else {
+                    // Debounce duplicate sends that can happen if the client issues two quick PUTs
+                    const g: any = global as any;
+                    if (!g._recentRideEmailDebounce) g._recentRideEmailDebounce = new Map<string, number>();
+                    const recentMap: Map<string, number> = g._recentRideEmailDebounce;
+                    const key = `update:${updatedRide.id}`;
+                    const now = Date.now();
+                    const last = recentMap.get(key) || 0;
+                    if (now - last < 4000) {
+                        console.log(`[RideUpdateEmail] Skipping duplicate update email for ride ${updatedRide.id} (debounced)`);
+                    } else {
+                        recentMap.set(key, now);
+                        const mailOptions: SendMailOptions = {
+                            to: recipientsUnique,
+                            subject: `Ride Updated: Ride #${updatedRide.id} (Reserved)`,
+                            html: `
+                                <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f59e0b;">
+                                    <h2 style="font-size: 24px; color: #f59e0b; margin-top: 0;">Reserved Ride Details Updated</h2>
+                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
+                                        <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
+                                        <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Date:</strong> ${dateString}</td></tr>
+                                        <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Pick-up Time:</strong> ${timeString}</td></tr>
+                                        <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Pick-up Address:</strong> ${finalFormattedData.startLocation}</td></tr>
+                                        <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Drop-off Address:</strong> ${finalFormattedData.endLocation}</td></tr>
+                                        ${(updatedRide as any).waitTime ? `<tr><td style=\"padding: 5px 0;\"><strong style=\"color: #4a5568;\">Wait Time:</strong> ${(updatedRide as any).waitTime} hours</td></tr>` : ''}
+                                    </table>
+                                    ${updatedRide.specialNote ? `<p style=\"font-weight: bold; margin-bottom: 8px; color: #1a202c;\">Notes:</p><div style=\"background-color: #f7fafc; padding: 15px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 14px; color: #4a5568;\">${updatedRide.specialNote}</div>` : ''}
+                                </div>
+                            `,
+                        };
+                        try {
+                            await sendEmail(mailOptions);
+                            console.log(`Update email sent for reserved ride ${updatedRide.id} to ${recipientsUnique.join(', ')}.`);
+                        } catch (emailError) {
+                            console.error(`ERROR: Failed to send reserved ride update email for ride ${updatedRide.id}:`, emailError);
+                        }
                     }
                 }
             }
 
             // --- CANCELLATION EMAIL LOGIC START ---
             if (isCancellation && updatedRide.customer && sendEmail) {
-                const cancelRecipients = recipients;
+                const cancelRecipients = recipientsUnique;
                 if (cancelRecipients.length > 0) {
                     const mailOptions: SendMailOptions = {
                         to: cancelRecipients,
@@ -373,7 +380,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
             // Existing Completion Logic (send to admin and assigned volunteer if available)
             if (isCompletion && updatedRide.customer && sendEmail) {
-                const completeRecipients = recipients;
+                const completeRecipients = recipientsUnique;
                 if (completeRecipients.length > 0) {
                     const mailOptions: SendMailOptions = {
                         to: completeRecipients,
