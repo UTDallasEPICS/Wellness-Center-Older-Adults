@@ -25,6 +25,7 @@ model Ride {
   date           DateTime
   pickupTime     DateTime
   totalTime      String?
+  waitTime       Float?
   startAddressID Int
   endAddressID   Int?
   specialNote    String?

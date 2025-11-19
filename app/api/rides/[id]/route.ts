@@ -2,6 +2,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
+
 const prisma = new PrismaClient();
 
 // Helper function to parse address string
@@ -18,6 +19,43 @@ function parseAddressString(addressString: string) {
     }
     return null;
 }
+
+
+async function sendUnreserveEmail(volunteerEmail: string, rideDetails: any) {
+    try {
+        // Dynamic import to avoid build-time issues
+        const { default: nodemailer } = await import('nodemailer');
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', // or your email provider
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: volunteerEmail,
+            subject: 'Ride Unreserved Notification',
+            text: `Hello,
+
+The ride scheduled on ${rideDetails.date?.toDateString()} from ${rideDetails.addrStart?.street} to ${rideDetails.addrEnd?.street} has been unreserved.
+
+Thank you.`,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Unreserve email sent successfully to ${volunteerEmail}`);
+    } catch (error) {
+        console.error('Failed to send unreserve email:', error);
+        throw error; // Re-throw so calling code can handle it
+    }
+}
+
+export { sendUnreserveEmail };
+
+
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     const { id } = params;
@@ -164,6 +202,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                     volunteer: { include: { user: true } }
                 }
             });
+
+
+            // Send email notification if ride was unreserved (status changed from Reserved to Available)
+            if (ride.status === 'Reserved' && updatedRide.status === 'AVAILABLE' && updatedRide.volunteer?.user?.email) {
+                try {
+                    await sendUnreserveEmail(updatedRide.volunteer.user.email, updatedRide);
+                } catch (emailError) {
+                    console.error('Email notification failed, but ride update succeeded:', emailError);
+                    // Don't fail the ride update if email fails
+                }
+            }
 
             console.log("=== FINAL RIDE UPDATE LOG ===");
             console.log("Updated Status:", updatedRide.status);

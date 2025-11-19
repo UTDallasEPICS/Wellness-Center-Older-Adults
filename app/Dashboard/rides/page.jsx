@@ -344,7 +344,7 @@ export default function Page() {
 
             const result = await response.json();
             console.log('Unreserve response:', result);
-            
+
             toast.success("Ride unreserved successfully!");
             
             setSelectedRides([]);
