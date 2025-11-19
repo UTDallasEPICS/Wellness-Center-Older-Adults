@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient, UserRole } from '@prisma/client';
+// Removed UserRole import as it's not defined as an enum in your schema
+import { PrismaClient } from '@prisma/client'; 
 import { sendEmail } from '@/util/nodemail';
 import { SendMailOptions } from 'nodemailer';
 
@@ -21,13 +22,13 @@ function parseAddressString(addressString: string) {
     return null;
 }
 
+// Updated filtering logic to use isAdmin and role String field
 async function getAllRecipientEmails(): Promise<string[]> {
     const adminEmails = (
         await prisma.user.findMany({
             where: {
                 role: 'ADMIN',
-                isActive: true,
-                email: { not: null }
+                isAdmin: true,
             },
             select: { email: true }
         })
@@ -37,8 +38,7 @@ async function getAllRecipientEmails(): Promise<string[]> {
         await prisma.user.findMany({
             where: {
                 role: 'VOLUNTEER',
-                isActive: true,
-                email: { not: null }
+                isAdmin: false,
             },
             select: { email: true }
         })
@@ -131,7 +131,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         let NEWLY_ASSIGNED_VOLUNTEER_EMAIL = null;
         
         if (isReserving && updateData.volunteerID) {
-            const newVolunteer = await prisma.volunteer.findUnique({
+            // FIX: Changed prisma.volunteer to prisma.volunteerInfo
+            const newVolunteer = await prisma.volunteerInfo.findUnique({
                 where: { id: parseInt(updateData.volunteerID as string, 10) },
                 include: { user: true }
             });
@@ -266,7 +267,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 customerName: updatedRide.customer ? `${updatedRide.customer.firstName} ${updatedRide.customer.lastName}` : '',
                 customerPhone: updatedRide.customer?.customerPhone || '',
                 startAddressID: updatedRide.startAddressID,
-                endAddressID: updatedRide.addressID, 
+                // FIX: Changed updatedRide.addressID to updatedRide.endAddressID
+                endAddressID: updatedRide.endAddressID, 
                 startLocation: updatedRide.addrStart ? `${updatedRide.addrStart.street}, ${updatedRide.addrStart.city}, ${updatedRide.addrStart.state} ${updatedRide.addrStart.postalCode}` : '',
                 endLocation: updatedRide.addrEnd ? `${updatedRide.addrEnd.street}, ${updatedRide.addrEnd.city}, ${updatedRide.addrEnd.state} ${updatedRide.addrEnd.postalCode}` : '',
                 date: updatedRide.date,
