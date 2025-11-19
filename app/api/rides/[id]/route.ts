@@ -316,8 +316,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                             to: recipientsUnique,
                             subject: `Ride Updated: Ride #${updatedRide.id} (Reserved)`,
                             html: `
-                                <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f59e0b;">
-                                    <h2 style="font-size: 24px; color: #f59e0b; margin-top: 0;">Reserved Ride Details Updated</h2>
+                                <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
+                                    <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">Reserved Ride Details Updated</h2>
                                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
                                         <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
                                         <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Date:</strong> ${dateString}</td></tr>
