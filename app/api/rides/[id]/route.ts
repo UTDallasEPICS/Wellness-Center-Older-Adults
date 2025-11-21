@@ -122,7 +122,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             if (updateData.pickupAddress && ride.startAddressID) {
                 const pickupParts = parseAddressString(updateData.pickupAddress);
                 if (pickupParts) {
-                    await prisma.address.update({
+                    // Updates Address model based on startAddressID
+                    await prisma.address.update({ 
                         where: { id: ride.startAddressID },
                         data: pickupParts
                     });
@@ -132,6 +133,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             if (updateData.dropoffAddress && ride.endAddressID) {
                 const dropoffParts = parseAddressString(updateData.dropoffAddress);
                 if (dropoffParts) {
+                    // Updates Address model based on endAddressID
                     await prisma.address.update({
                         where: { id: ride.endAddressID },
                         data: dropoffParts
@@ -141,6 +143,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         if (updateData.customerUpdates) {
+            // Logic to update Customer model
             const customer = await prisma.customer.findUnique({
                 where: { id: parseInt(updateData.customerUpdates.id, 10) },
             });
@@ -157,6 +160,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         if (updateData.addressUpdates) {
+            // Logic to update Address model (for general address updates, likely redundant given pickup/dropoff logic above)
             const address = await prisma.address.findUnique({
                 where: { id: parseInt(updateData.addressUpdates.id, 10) },
             });
@@ -480,7 +484,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         let body: any = {};
         try { body = await request.json(); } catch { body = {}; }
 
-        // --- Existing testSendEmail logic (omitted for brevity, assume it is present) ---
+        // --- Existing testSendEmail logic ---
         if (body && body.testSendEmail) {
             const allowTest = process.env.DEV_ALLOW_TEST_EMAIL === 'true' || process.env.NODE_ENV !== 'production';
             if (!allowTest) return NextResponse.json({ success: false, message: 'Test email not allowed in this environment' }, { status: 403 });
@@ -524,8 +528,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
             include: { 
                 customer: true, 
                 addrStart: true, 
-                addrEnd: true, // 💡 NEW: Include end address
-                volunteer: { include: { user: true } } // 💡 NEW: Include volunteer details
+                addrEnd: true, 
+                volunteer: { include: { user: true } }
             }
         });
 
@@ -542,8 +546,15 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         }
 
         // Collect recipients: all volunteers and all admins
-        const volunteerInfos = await prisma.volunteerInfo.findMany({ where: { user: { isArchived: false, NOT: { email: null } } }, include: { user: true } });
-        const admins = await prisma.user.findMany({ where: { isAdmin: true, isArchived: false, NOT: { email: null } }, select: { email: true } });
+        // The query uses includes based on the schema: user -> volunteerInfo, user -> isAdmin
+        const volunteerInfos = await prisma.volunteerInfo.findMany({ 
+            where: { user: { isArchived: false, NOT: { email: null } } }, 
+            include: { user: true } 
+        });
+        const admins = await prisma.user.findMany({ 
+            where: { isAdmin: true, isArchived: false, NOT: { email: null } }, 
+            select: { email: true } 
+        });
 
         const recipientSet = new Set<string>();
         volunteerInfos.forEach(v => { if (v.user?.email) recipientSet.add(v.user.email); });
@@ -556,20 +567,21 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
         if (!mailFrom || recipients.length === 0) {
             console.warn(`Emergency email not sent for ride ${ride.id}. MailFrom: ${mailFrom}, Recipients count: ${recipients.length}`);
-            return NextResponse.json({ success: false, message: 'Failed to find a sender email or recipients' }, { status: 500 });
+            return NextResponse.json({ success: false, message: 'Failed to find a sender email or configured recipients.' }, { status: 500 });
         }
 
         const subject = `🚨 URGENT EMERGENCY RIDE ALERT: Ride #${ride.id}`;
         const customerName = `${ride.customer?.firstName || ''} ${ride.customer?.lastName || ''}`;
         const appointmentDate = ride.date instanceof Date ? ride.date.toLocaleDateString() : String(ride.date);
-        const appointmentTime = ride.pickupTime instanceof Date ? ride.pickupTime.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }) : String(ride.pickupTime);
+        // Using hour12: true for appointmentTime in the email content for better readability.
+        const appointmentTime = ride.pickupTime instanceof Date ? ride.pickupTime.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }) : String(ride.pickupTime); 
         const pickupAddress = ride.addrStart ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}` : 'N/A';
         const dropoffAddress = ride.addrEnd ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}` : 'N/A';
         const volunteerName = ride.volunteer?.user ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}` : 'Unassigned';
-        const volunteerPhone = ride.volunteer?.user?.phoneNumber || 'N/A';
+        const volunteerPhone = ride.volunteer?.user?.phone || 'N/A'; // Fetches phone from User model nested in VolunteerInfo
         const notes = ride.specialNote || 'No special notes provided for this ride.';
         
-        // 💡 NEW: HTML Email Content for the Emergency Alert
+        // HTML Email Content for the Emergency Alert
         const htmlContent = `
             <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 4px solid #f59e0b; background-color: #fffbeb;">
                 <h1 style="font-size: 28px; color: #cc0000; margin-top: 0; text-align: center;">🚨 EMERGENCY RIDE ALERT 🚨</h1>
@@ -588,7 +600,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
                         <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Assigned Volunteer:</td><td style="padding: 5px 0;">${volunteerName}</td></tr>
                         <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Volunteer Phone:</td><td style="padding: 5px 0;">${volunteerPhone}</td></tr>
                     </table>
-                </div>
+                </div>  
 
                 <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
                     <h3 style="font-size: 18px; color: #1a202c; margin-top: 0;">Route & Notes</h3>
@@ -605,10 +617,10 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         `;
 
         await sendEmail({
-            to: mailFrom, // Primary recipient (often admin/system address)
-            bcc: bccRecipients, // BCC's everyone else to keep email addresses private
+            to: mailFrom, // Primary recipient (sender address)
+            bcc: bccRecipients, // BCC's all active admins/volunteers
             subject,
-            html: htmlContent, // Send the new structured HTML email
+            html: htmlContent, 
         });
 
         console.log(`Emergency HTML email sent for ride ${ride.id}. BCC'd: ${recipients.length} recipients.`);
