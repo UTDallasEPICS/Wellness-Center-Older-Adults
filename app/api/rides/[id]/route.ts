@@ -684,20 +684,20 @@ export async function POST(
       );
 
     // Validate <24 hours rule
-    const rideTime =
-      ride.pickupTime instanceof Date
-        ? ride.pickupTime
-        : new Date(ride.pickupTime as any);
-    const now = new Date();
-    const hoursDiff = (rideTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+    // const rideTime =
+    //   ride.pickupTime instanceof Date
+    //     ? ride.pickupTime
+    //     : new Date(ride.pickupTime as any);
+    // const now = new Date();
+    // const hoursDiff = (rideTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-    // Refined 24-hour check: must be in the future AND within 24 hours
-    if (rideTime.getTime() < now.getTime() || hoursDiff > 24) {
-      return NextResponse.json({
-        success: false,
-        message: "Emergency allowed only for upcoming rides within 24 hours",
-      });
-    }
+    // // Refined 24-hour check: must be in the future AND within 24 hours
+    // if (rideTime.getTime() < now.getTime() || hoursDiff > 24) {
+    //   return NextResponse.json({
+    //     success: false,
+    //     message: "Emergency allowed only for upcoming rides within 24 hours",
+    //   });
+    // }
 
     // Collect recipients: all volunteers and all admins
     // The query uses includes based on the schema: user -> volunteerInfo, user -> isAdmin
@@ -783,9 +783,6 @@ export async function POST(
                         <tr><td style="padding: 5px 0; width: 40%; font-weight: bold; color: #4a5568;">Client Name:</td><td style="padding: 5px 0;">${customerName}</td></tr>
                         <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Client Phone:</td><td style="padding: 5px 0; color: #cc0000; font-weight: bold;">${ride.customer?.customerPhone || "N/A"}</td></tr>
                         <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Date/Time:</td><td style="padding: 5px 0;">${appointmentDate} at ${appointmentTime}</td></tr>
-                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Status:</td><td style="padding: 5px 0;"><span style="color: #cc0000; font-weight: bold;">${ride.status}</span></td></tr>
-                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Assigned Volunteer:</td><td style="padding: 5px 0;">${volunteerName}</td></tr>
-                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Volunteer Phone:</td><td style="padding: 5px 0;">${volunteerPhone}</td></tr>
                     </table>
                 </div>  
 

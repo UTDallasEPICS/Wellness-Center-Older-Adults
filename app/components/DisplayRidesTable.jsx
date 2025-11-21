@@ -28,7 +28,7 @@ const DisplayRidesTable = ({
         }
 
         try {
-            const res = await fetch(`/api/rides/emergency`, {
+            const res = await fetch(`/api/rides/${rideId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ride }),

@@ -284,7 +284,6 @@ const AddRidesTable = ({
 
   const handleEmergencyClick = async (rideId) => {
     console.log("Emergency clicked for ride:", rideId);
-    // you can later fill in the real logic
   };
 
 
