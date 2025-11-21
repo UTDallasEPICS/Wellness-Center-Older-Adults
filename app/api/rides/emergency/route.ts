@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'No volunteer or admin email recipients configured' });
     }
 
-    // 🔥 Send emergency notification email to all recipients (BCC)
     const subject = `🚨 EMERGENCY: Ride within 24hrs – ${foundRide.customer?.firstName || ''} ${foundRide.customer?.lastName || ''}`;
 
     const appointmentTime = foundRide.pickupTime instanceof Date
@@ -76,7 +75,8 @@ export async function POST(req: NextRequest) {
     const address = foundRide.addrStart ? `${foundRide.addrStart.street}, ${foundRide.addrStart.city}, ${foundRide.addrStart.state} ${foundRide.addrStart.postalCode}` : 'N/A';
 
     await sendEmail({
-      to: process.env.MAIL_FROM || process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.NOTIFY_EMAIL,
+        //process.env.MAIL_FROM || process.env.EMAIL_FROM || process.env.EMAIL_USER || 
+      to: process.env.NOTIFY_EMAIL,
       bcc: recipients.join(','),
       subject,
       text: `Emergency Ride Alert!\n\nClient: ${foundRide.customer?.firstName || ''} ${foundRide.customer?.lastName || ''}\nPhone: ${foundRide.customer?.customerPhone || ''}\nAddress: ${address}\nAppointment Time: ${appointmentTime} on ${appointmentDate}\n\nVolunteer needs immediate notification.`,
