@@ -1,41 +1,6 @@
 import React, { useState } from "react";
 import CancelRidesModel from "/app/components/CancelRidesModel.jsx"
-import { format } from 'date-fns';
-
-function formatDateTime(rideDate, startTime) {
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return isNaN(date.getTime()) ? 'Invalid Date' : format(date, 'MM/dd/yyyy');
-    } catch (e) {
-      return 'Invalid Date';
-    }
-  };
-
-  const formatTime = (timeString) => {
-    if (!timeString) return 'No time specified';
-    
-    try {
-      // If timeString is just time (e.g., '14:30'), we need to combine it with a date
-      let dateTime = timeString;
-      if (!isNaN(Date.parse(timeString))) {
-        dateTime = timeString;
-      } else if (rideDate) {
-        // Combine date and time if they're separate
-        dateTime = `${rideDate.split('T')[0]}T${timeString}`;
-      }
-      const date = new Date(dateTime);
-      return isNaN(date.getTime()) ? 'No time specified' : format(date, 'h:mm a');
-    } catch (e) {
-      return 'No time specified';
-    }
-  };
-
-  return {
-    formattedDate: formatDate(rideDate),
-    formattedTime: formatTime(startTime),
-  };
-}
+import { formatDateLong, formatTimeFromStrings } from "../utils/dateUtils";
 
 
 const ViewOnlyRow = ({ 
@@ -83,7 +48,8 @@ const ViewOnlyRow = ({
     }
   };
 
-  const { formattedDate, formattedTime } = formatDateTime(contact.date, contact.pickupTime);
+  const formattedDate = formatDateLong(contact.date);
+  const formattedTime = formatTimeFromStrings(contact.date, contact.pickupTime);
 
   // Logic for conditional rendering of buttons
   const rideStatus = contact.status; 

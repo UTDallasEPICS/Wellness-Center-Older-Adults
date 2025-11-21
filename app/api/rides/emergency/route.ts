@@ -41,21 +41,46 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 🔥 Send emergency notification email
+    // Collect recipients: all active volunteers and admins
+    const volunteerInfos = await prisma.volunteerInfo.findMany({
+      where: { user: { isArchived: false } },
+      include: { user: true },
+    });
+
+    const admins = await prisma.user.findMany({
+      where: { isAdmin: true, isArchived: false },
+      select: { email: true, firstName: true, lastName: true },
+    });
+
+    const recipientSet = new Set<string>();
+    volunteerInfos.forEach(v => { if (v.user?.email) recipientSet.add(v.user.email); });
+    admins.forEach(a => { if (a.email) recipientSet.add(a.email); });
+
+    const recipients = Array.from(recipientSet);
+
+    if (recipients.length === 0) {
+      return NextResponse.json({ success: false, message: 'No volunteer or admin email recipients configured' });
+    }
+
+    // 🔥 Send emergency notification email to all recipients (BCC)
+    const subject = `🚨 EMERGENCY: Ride within 24hrs – ${foundRide.customer?.firstName || ''} ${foundRide.customer?.lastName || ''}`;
+
+    const appointmentTime = foundRide.pickupTime instanceof Date
+      ? foundRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
+      : String(foundRide.pickupTime);
+
+    const appointmentDate = foundRide.date instanceof Date
+      ? foundRide.date.toLocaleDateString()
+      : String(foundRide.date);
+
+    const address = foundRide.addrStart ? `${foundRide.addrStart.street}, ${foundRide.addrStart.city}, ${foundRide.addrStart.state} ${foundRide.addrStart.postalCode}` : 'N/A';
+
     await sendEmail({
-    to: process.env.NOTIFY_EMAIL,
-    subject: `🚨 EMERGENCY: Ride within 24hrs – ${foundRide.customer?.firstName} ${foundRide.customer?.lastName}`,
-    text: `
-        Emergency Ride Alert!
-
-        Client: ${foundRide.customer?.firstName} ${foundRide.customer?.lastName}
-        Phone: ${foundRide.customer?.customerPhone}
-        Address: ${foundRide.addrStart.street}, ${foundRide.addrStart.city}, ${foundRide.addrStart.state} ${foundRide.addrStart.postalCode}
-        Appointment Time: ${foundRide.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })} on ${foundRide.date.toLocaleDateString()}
-
-        Volunteer needs immediate notification.
-    `
-});
+      to: process.env.MAIL_FROM || process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.NOTIFY_EMAIL,
+      bcc: recipients.join(','),
+      subject,
+      text: `Emergency Ride Alert!\n\nClient: ${foundRide.customer?.firstName || ''} ${foundRide.customer?.lastName || ''}\nPhone: ${foundRide.customer?.customerPhone || ''}\nAddress: ${address}\nAppointment Time: ${appointmentTime} on ${appointmentDate}\n\nVolunteer needs immediate notification.`,
+    });
 
 
 
@@ -66,4 +91,7 @@ export async function POST(req: NextRequest) {
         const message = error instanceof Error ? error.message : String(error);
         return NextResponse.json({ success: false, message });
     }
+  finally {
+    try { await prisma.$disconnect(); } catch (e) { /* ignore disconnect errors */ }
+  }
 }
