@@ -214,7 +214,7 @@ export default function Ride() {
         const response = await fetch(`/api/rides/${rideDetails.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "AVAILABLE", volunteerID: null }),
+          body: JSON.stringify({ status: "AVAILABLE"}),
         });
         if (!response.ok) {
           const errorData = await response.json();

@@ -14,20 +14,21 @@ function parseAddressString(addressString: string) {
         const stateZip = parts[2].split(' ');
         const state = stateZip[0];
         const postalCode = stateZip.slice(1).join(' ');
-        
+
         return { street, city, state, postalCode };
     }
     return null;
 }
 
 
+// Helper function to send unreserve email
 async function sendUnreserveEmail(volunteerEmail: string, rideDetails: any) {
     try {
-        // Dynamic import to avoid build-time issues
-        const { default: nodemailer } = await import('nodemailer');
+        // Dynamic import (important for Next.js Serverless)
+        const { default: nodemailer } = await import("nodemailer");
 
         const transporter = nodemailer.createTransport({
-            service: 'gmail', // or your email provider
+            service: "gmail",
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
@@ -37,25 +38,35 @@ async function sendUnreserveEmail(volunteerEmail: string, rideDetails: any) {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: volunteerEmail,
-            subject: 'Ride Unreserved Notification',
-            text: `Hello,
+            subject: "Ride Unreserved",
+            text: `
+Hello,
 
-The ride scheduled on ${rideDetails.date?.toDateString()} from ${rideDetails.addrStart?.street} to ${rideDetails.addrEnd?.street} has been unreserved.
+The ride you previously reserved has been unreserved.
 
-Thank you.`,
+Date: ${rideDetails?.date ? rideDetails.date.toDateString() : "N/A"}
+Pickup: ${rideDetails?.addrStart?.street || ""}
+Dropoff: ${rideDetails?.addrEnd?.street || ""}
+
+Thank you.
+`
         };
 
         await transporter.sendMail(mailOptions);
-        console.log(`Unreserve email sent successfully to ${volunteerEmail}`);
-    } catch (error) {
-        console.error('Failed to send unreserve email:', error);
-        throw error; // Re-throw so calling code can handle it
+
+        console.log("Unreserve email sent to:", volunteerEmail);
+    } catch (err) {
+        console.error("Error sending unreserve email:", err);
+        throw err;
     }
 }
 
+
+
+
+
+
 export { sendUnreserveEmail };
-
-
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     const { id } = params;
@@ -73,11 +84,24 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             where: {
                 id: parseInt(id, 10),
             },
+            include: {
+                volunteer: { include: { user: true } }
+            }
         });
+
+        
+
 
         if (!ride) {
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
+
+        console.log("=== EMAIL CONDITION CHECK ===");
+        console.log("Original ride status:", ride.status);
+        console.log("Updated ride status:", updateData.status);
+        console.log("Original ride has volunteer:", ride.volunteerID);
+        console.log("Original ride volunteer email:", ride.volunteer?.user?.email); 
+
 
         // --- RIDE COMPLETION VALIDATION (Check for Total Time) ---
         if (updateData.status === 'Completed') {
@@ -189,6 +213,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         if (endAddressID !== undefined) prismaUpdateData.addrEnd = endAddressID === null ? { disconnect: true } : { connect: { id: parseInt(endAddressID as string, 10) } };
         if (volunteerID !== undefined) prismaUpdateData.volunteer = volunteerID === null ? { disconnect: true } : { connect: { id: parseInt(volunteerID as string, 10) } };
 
+
+        
+
+        // Send email BEFORE updating the ride (while volunteer is still connected)
+        if (ride.status === 'Reserved' && updateData.status === 'AVAILABLE' && ride.volunteer?.user?.email) {
+            try {
+                await sendUnreserveEmail(ride.volunteer.user.email, ride);
+                console.log("Email sent successfully for ride unreservation");
+            } catch (emailError) {
+                console.error('Email notification failed, but ride update will proceed:', emailError);
+                // Continue with ride update even if email fails
+            }
+        }
+
         let updatedRide;
 
         if (Object.keys(prismaUpdateData).length > 0) {
@@ -202,22 +240,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                     volunteer: { include: { user: true } }
                 }
             });
-
-
-            // Send email notification if ride was unreserved (status changed from Reserved to Available)
-            if (ride.status === 'Reserved' && updatedRide.status === 'AVAILABLE' && updatedRide.volunteer?.user?.email) {
-                try {
-                    await sendUnreserveEmail(updatedRide.volunteer.user.email, updatedRide);
-                } catch (emailError) {
-                    console.error('Email notification failed, but ride update succeeded:', emailError);
-                    // Don't fail the ride update if email fails
-                }
-            }
-
-            console.log("=== FINAL RIDE UPDATE LOG ===");
-            console.log("Updated Status:", updatedRide.status);
-            console.log("Updated Total Time:", updatedRide.totalTime);
-            console.log("Updated Special Note:", updatedRide.specialNote);
 
             return NextResponse.json({ 
                 message: 'Ride updated successfully', 
