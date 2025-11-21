@@ -282,6 +282,12 @@ const AddRidesTable = ({
     }
   };
 
+  const handleEmergencyClick = async (rideId) => {
+    console.log("Emergency clicked for ride:", rideId);
+    // you can later fill in the real logic
+  };
+
+
   if (userRole === null) {
     return (
       <div className="flex justify-center items-center h-40 bg-[#fffdf5] font-sans text-xl text-gray-500 rounded-lg shadow-inner">
@@ -349,6 +355,7 @@ const AddRidesTable = ({
                   handleEditClick={handleEditClick}
                   handleDeleteClick={handleDeleteClick}
                   handleReserveClick={handleReserveRide}
+                  handleEmergencyClick={handleEmergencyClick}
                   convertTime={convertTime}
                   status={contact.status}
                   startAddress={contact.startLocation}

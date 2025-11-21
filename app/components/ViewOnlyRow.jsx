@@ -43,6 +43,7 @@ const ViewOnlyRow = ({
     handleReserveClick, // Renamed 'onReserve' to match the original prop name
     handleEditClick,    // 🔑 NEW: Required for Admin view
     handleDeleteClick,  // 🔑 NEW: Required for Admin view
+    handleEmergencyClick, // 🔑 NEW: Required for Admin view
     isVolunteer         // 🔑 NEW: The prop that controls the button set
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -142,6 +143,17 @@ const ViewOnlyRow = ({
                         }}
                     >
                         <span className="material-symbols-rounded">delete</span>
+                    </button>
+                    {/* Emergency Button */}
+                    <button
+                        className="text-white bg-red-500 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-700"
+                        type="button"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            handleEmergencyClick(contact.id);
+                        }}
+                    >
+                        <span className="material-symbols-rounded">emergency</span>
                     </button>
                 </>
             )}

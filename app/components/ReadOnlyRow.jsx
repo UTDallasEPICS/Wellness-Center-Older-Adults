@@ -6,6 +6,7 @@ const ReadOnlyRow = ({
     handleEditClick, 
     handleDeleteClick, 
     handleReserveClick, 
+    handleEmergencyClick,
     status, 
     convertTime, 
     startAddress, 
@@ -136,6 +137,17 @@ const ReadOnlyRow = ({
                                 }}
                             >
                                 <span className="material-symbols-rounded text-xl">delete</span>
+                            </button>
+                            <button
+                                className="text-[#fffdf5] bg-red-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-green-700 text-sm font-medium"
+                                type="button"
+                                title="Emergency"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEmergencyClick(contact.id);
+                                }}
+                            >
+                                <span className="material-symbols-rounded text-xl">emergency</span>
                             </button>
                         </>
                     )}
