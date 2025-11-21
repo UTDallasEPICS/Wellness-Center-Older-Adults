@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { sendEmail } from '@/util/nodemail';
 import { SendMailOptions } from 'nodemailer';
+import { cookies } from 'next/headers';
+import { jwtVerify, importX509 } from 'jose';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +21,32 @@ interface RideRequestBody {
   date: string;
   waitTime?: number;
   extraInfo: string;
+}
+
+// Helper function to get current user email from JWT token
+async function getCurrentUserEmail(): Promise<string | null> {
+  try {
+    const cookieStore = cookies();
+    const id_token = cookieStore.get('cvtoken')?.value;
+
+    if (!id_token) {
+      return null;
+    }
+
+    const certPem = process.env.CERT_PEM;
+    if (!certPem) {
+      console.error('CERT_PEM environment variable not found');
+      return null;
+    }
+
+    const key = await importX509(certPem, 'RS256');
+    const decoded = await jwtVerify(id_token, key);
+    
+    return (decoded.payload.email as string) || null;
+  } catch (error) {
+    console.error('Error verifying JWT token:', error);
+    return null;
+  }
 }
 
 // POST - Create a new ride
@@ -226,10 +254,70 @@ export async function POST(req: Request) {
   }
 }
 
-// GET - Fetch all rides
-export async function GET() {
+// GET - Fetch rides with optional volunteer filtering
+export async function GET(req: Request) {
   try {
+    // Parse query parameters
+    const { searchParams } = new URL(req.url);
+    const volunteerOnly = searchParams.get('volunteerOnly') === 'true';
+
+    let whereClause: any = {};
+
+    // If volunteer-only filter is requested, get the current user's volunteer info
+    if (volunteerOnly) {
+      try {
+        // Get the current user's email from JWT token
+        const userEmail = await getCurrentUserEmail();
+        
+        if (!userEmail) {
+          return NextResponse.json(
+            { error: 'Unauthorized - no valid session found' },
+            { status: 401 }
+          );
+        }
+
+        // Find the volunteer info for this user
+        const volunteerInfo = await prisma.volunteerInfo.findFirst({
+          where: {
+            user: {
+              email: userEmail,
+            },
+          },
+        });
+
+        if (!volunteerInfo) {
+          // If user is not a volunteer, return empty array
+          return NextResponse.json([]);
+        }
+
+        // Filter rides to only show:
+        // 1. Available rides (unassigned - any volunteer can claim)
+        // 2. Rides assigned to this specific volunteer
+        whereClause = {
+          OR: [
+            {
+              status: {
+                in: ['AVAILABLE', 'Added', 'Unreserved']
+              },
+              volunteerID: null,
+            },
+            {
+              volunteerID: volunteerInfo.id,
+            },
+          ],
+        };
+      } catch (authError) {
+        console.error('Error getting user email or volunteer info:', authError);
+        return NextResponse.json(
+          { error: 'Failed to authenticate user' },
+          { status: 401 }
+        );
+      }
+    }
+
+    // Fetch rides with the appropriate filter
     const rides = await prisma.ride.findMany({
+      where: whereClause,
       include: {
         customer: true,
         addrStart: true,
