@@ -1,11 +1,13 @@
-// app/api/rides/[id]/route.ts
 import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { sendEmail } from '@/util/nodemail';
+import { SendMailOptions } from 'nodemailer';
 
 
 const prisma = new PrismaClient();
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL
 
-// Helper function to parse address string
 function parseAddressString(addressString: string) {
     const parts = addressString.split(', ');
     if (parts.length >= 3) {
@@ -71,14 +73,17 @@ export { sendUnreserveEmail };
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     const { id } = params;
 
+    if (!ADMIN_EMAIL) {
+        console.error("ADMIN_EMAIL environment variable is not set.");
+    }
+
     try {
         const updateData = await request.json();
-        
-        console.log("=== RECEIVED UPDATE DATA ===");
-        console.log("Status:", updateData.status);
-        console.log("Drive Time (from FE modal, via driveTimeAB):", updateData.driveTimeAB); // New log for modal data
-        console.log("Notes (from FE modal, via notes):", updateData.notes);         // New log for modal data
-        console.log("Full updateData:", updateData);
+        console.log('[RideUpdate] PUT hit', {
+          id,
+          bodyKeys: Object.keys(updateData || {}),
+          status: updateData?.status,
+        });
 
         const ride = await prisma.ride.findUnique({
             where: {
@@ -113,12 +118,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 );
             }
         }
-        // --- END COMPLETION VALIDATION ---
 
-        // Handle Address String Updates (retaining original complex logic)
         if (updateData.pickupAddress || updateData.dropoffAddress) {
             
-            // Parse pickup address
             if (updateData.pickupAddress && ride.startAddressID) {
                 const pickupParts = parseAddressString(updateData.pickupAddress);
                 if (pickupParts) {
@@ -129,7 +131,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 }
             }
             
-            // Parse dropoff address  
             if (updateData.dropoffAddress && ride.endAddressID) {
                 const dropoffParts = parseAddressString(updateData.dropoffAddress);
                 if (dropoffParts) {
@@ -141,7 +142,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
 
-        // Handle customer updates if provided (retaining original logic)
         if (updateData.customerUpdates) {
             const customer = await prisma.customer.findUnique({
                 where: { id: parseInt(updateData.customerUpdates.id, 10) },
@@ -158,7 +158,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
 
-        // Handle address updates if provided (retaining original logic)
         if (updateData.addressUpdates) {
             const address = await prisma.address.findUnique({
                 where: { id: parseInt(updateData.addressUpdates.id, 10) },
@@ -176,11 +175,22 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
 
-        // --- Build Prisma Update Data for Ride Model ---
-        const { customerID, startAddressID, endAddressID, volunteerID, date, pickupTime, status, driveTimeAB, notes } = updateData;
+        // Extract fields including waitTime
+        const { 
+            customerID, 
+            startAddressID, 
+            endAddressID, 
+            volunteerID, 
+            date, 
+            pickupTime, 
+            status, 
+            driveTimeAB, 
+            waitTime,
+            notes 
+        } = updateData;
+        
         const prismaUpdateData: any = {};
 
-        // Handle basic fields
         if (date !== undefined) {
             const parsedDate = new Date(date);
             if (!isNaN(parsedDate.getTime())) {
@@ -197,17 +207,21 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         
         if (status !== undefined) prismaUpdateData.status = status;
         
-        // MAPPING: driveTimeAB (FE payload) -> totalTime (Prisma field)
         if (driveTimeAB !== undefined) {
             prismaUpdateData.totalTime = driveTimeAB;
         }
 
-        // MAPPING: notes (FE payload) -> specialNote (Prisma field)
+        // Handle waitTime as Float
+        if (waitTime !== undefined) {
+            prismaUpdateData.waitTime = waitTime !== null && waitTime !== '' 
+                ? Number(waitTime) 
+                : 0;
+        }
+
         if (notes !== undefined) {
             prismaUpdateData.specialNote = notes;
         }
 
-        // Handle relations (retaining original logic)
         if (customerID !== undefined) prismaUpdateData.customer = customerID === null ? { disconnect: true } : { connect: { id: parseInt(customerID as string, 10) } };
         if (startAddressID !== undefined) prismaUpdateData.addrStart = startAddressID === null ? { disconnect: true } : { connect: { id: parseInt(startAddressID as string, 10) } };
         if (endAddressID !== undefined) prismaUpdateData.addrEnd = endAddressID === null ? { disconnect: true } : { connect: { id: parseInt(endAddressID as string, 10) } };
@@ -228,6 +242,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         let updatedRide;
+        let finalFormattedData = null;
 
         if (Object.keys(prismaUpdateData).length > 0) {
             updatedRide = await prisma.ride.update({
@@ -260,9 +275,21 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                     totalTime: updatedRide.totalTime,       // <-- Include new field
                     specialNote: updatedRide.specialNote    // <-- Include new field
                 }
+            }
+
+            const statusMessage = isCompletion 
+                ? 'Ride completed successfully!' 
+                : isCancellation 
+                ? 'Ride cancelled successfully!' 
+                : 'Ride updated successfully';
+
+            return NextResponse.json({ 
+                message: statusMessage, 
+                updatedRide: updatedRide,
+                formattedData: finalFormattedData,
             }, { status: 200 });
+            
         } else {
-            // Handle case where no ride-specific fields were updated
             const rideWithUpdatedData = await prisma.ride.findUnique({
                 where: { id: parseInt(id, 10) },
                 include: {
@@ -272,32 +299,35 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                     volunteer: { include: { user: true } }
                 }
             });
+            
+            const finalFormattedDataForNoUpdate = rideWithUpdatedData ? {
+                id: rideWithUpdatedData.id,
+                customerID: rideWithUpdatedData.customerID,
+                customerName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
+                customerPhone: rideWithUpdatedData.customer?.customerPhone || '',
+                startAddressID: rideWithUpdatedData.startAddressID,
+                endAddressID: rideWithUpdatedData.endAddressID,
+                startLocation: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
+                endLocation: rideWithUpdatedData.addrEnd ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}` : '',
+                date: rideWithUpdatedData.date,
+                startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                status: rideWithUpdatedData.status,
+                totalTime: rideWithUpdatedData.totalTime,
+                waitTime: (rideWithUpdatedData as any).waitTime !== null ? (rideWithUpdatedData as any).waitTime : 0,
+                specialNote: rideWithUpdatedData.specialNote
+            } : null;
 
-            return NextResponse.json({ 
-                message: 'No ride data to update, but related records may have been updated',
-                updatedRide: rideWithUpdatedData,
-                formattedData: rideWithUpdatedData ? {
-                    id: rideWithUpdatedData.id,
-                    customerID: rideWithUpdatedData.customerID,
-                    customerName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
-                    customerPhone: rideWithUpdatedData.customer?.customerPhone || '',
-                    startAddressID: rideWithUpdatedData.startAddressID,
-                    endAddressID: rideWithUpdatedData.endAddressID,
-                    startLocation: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
-                    endLocation: rideWithUpdatedData.addrEnd ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}` : '',
-                    date: rideWithUpdatedData.date,
-                    startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
-                    status: rideWithUpdatedData.status,
-                    totalTime: rideWithUpdatedData.totalTime,
-                    specialNote: rideWithUpdatedData.specialNote
-                } : null
-            }, { status: 200 });
-        }
+            return NextResponse.json({ 
+                message: 'No ride data to update, but related records may have been updated',
+                updatedRide: rideWithUpdatedData,
+                formattedData: finalFormattedDataForNoUpdate
+            }, { status: 200 });
+        }
 
-    } catch (error: any) {
-        console.error('Error updating ride:', error);
-        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
-    }
+    } catch (error: any) {
+        console.error('Error updating ride:', error);
+        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
 }

@@ -41,7 +41,6 @@ export default function Page() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Customer created successfully:', data);
         setIsAddCustomerModalOpen(false); // Close the modal on success
         // Optionally, update the customers list immediately without re-fetching
         setCustomers((prevCustomers) => [...prevCustomers, data.data]);

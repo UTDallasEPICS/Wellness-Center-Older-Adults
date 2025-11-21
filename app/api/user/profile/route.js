@@ -4,14 +4,11 @@ import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
-// Helper to extract JWT from Authorization header or cookie
 function getTokenFromRequest(request) {
-  // Try Authorization header
   const authHeader = request.headers.get('authorization');
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7);
   }
-  // Try cookie (cvtoken)
   const cookie = request.headers.get('cookie');
   if (cookie) {
     const match = cookie.match(/cvtoken=([^;]+)/);
@@ -20,20 +17,15 @@ function getTokenFromRequest(request) {
   return null;
 }
 
-// This API route fetches a user's profile and volunteer status (if applicable).
 export async function GET(request) {
   try {
-    // 1. Extract and verify Auth0 JWT
     const token = getTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
     }
     let decoded;
     try {
-      // Use your Auth0 domain as the issuer
       decoded = jwt.decode(token);
-      // Optionally, verify signature with Auth0 public key (for production)
-      // For now, just decode and trust (not secure for production)
     } catch (err) {
       return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
     }
@@ -42,7 +34,6 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Unauthorized: Email missing in token' }, { status: 401 });
     }
 
-    // 2. Find the base User record by email
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -50,7 +41,6 @@ export async function GET(request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // 3. Find the VolunteerInfo (Optional)
     const volunteerInfo = await prisma.volunteerInfo.findUnique({
       where: { userID: user.id },
       include: {
@@ -61,7 +51,6 @@ export async function GET(request) {
       },
     });
 
-    // 4. Construct the user data payload
     const isVolunteer = !!volunteerInfo;
     const userData = {
       firstName: user.firstName,
@@ -70,15 +59,18 @@ export async function GET(request) {
       email: user.email,
       phone: user.phone || '',
       birthdate: user.birthdate || '',
-      profilePicUrl: user.profilePicUrl || null, 
+      profilePicUrl: user.profilePicUrl || null,
+      notificationSettings: user.notificationSettings || [],
       isVolunteer: isVolunteer,
-      volunteerStatus: isVolunteer ? volunteerInfo.status : '',
-      assignedRides: isVolunteer ? volunteerInfo.rides : [],
+      volunteerStatus: isVolunteer ? volunteerInfo?.status : '',
+      assignedRides: isVolunteer ? volunteerInfo?.rides : [],
     };
 
     return NextResponse.json({ user: userData });
   } catch (error) {
     console.error('API Error during profile fetch:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

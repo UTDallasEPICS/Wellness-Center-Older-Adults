@@ -1,4 +1,3 @@
-// Updated ReservedRidesTable.jsx with correct field mappings
 import { useState, Fragment, useEffect } from "react";
 import ReadOnlyRow from "./ReadOnlyRow";
 import EditableRow from "./EditableRow";
@@ -9,7 +8,6 @@ const ReservedRidesTable = ({
   onRideUpdated,
   convertTime,
   isVolunteer,
-  // NEW PROPS FOR CHECKBOX SELECTION
   selectedRides,
   onToggleSelect,
   onToggleAll,
@@ -23,6 +21,14 @@ const ReservedRidesTable = ({
   const [contacts, setContacts] = useState(reservedContacts);
   const [editContactId, setEditContactId] = useState(null);
   const [editFormData, setEditFormData] = useState({
+    customerName: "",
+    phoneNumber: "",
+    startAddress: "",
+    startTime: "",
+    waitTime: 0,
+    volunteerName: "",
+  });
+  const [editErrors, setEditErrors] = useState({
     customerName: "",
     phoneNumber: "",
     startAddress: "",
@@ -41,17 +47,15 @@ const ReservedRidesTable = ({
         setUserRole(role);
       } catch (e) {
         console.error("Could not load user role:", e);
-        setUserRole("GUEST"); // Set a fallback role in case of failure
+        setUserRole("GUEST");
       }
     })();
   }, [initialContacts]);
 
-  // ⬇️ CHECKBOX LOGIC ⬇️
   // Determine if the "select all" checkbox should be checked.
   const allSelected =
     contacts.length > 0 &&
     contacts.every((ride) => selectedRides.includes(ride.id));
-  // ----------------------
 
   const handleEditClick = (event, contact) => {
     event.preventDefault();
@@ -59,9 +63,9 @@ const ReservedRidesTable = ({
     const formValues = {
       customerName: contact.customerName,
       phoneNumber: contact.phoneNumber,
-      // Assuming the contact object has startLocation as the full address string
       startAddress: contact.startLocation || contact.startAddress,
       startTime: contact.startTime,
+      waitTime: typeof contact.waitTime === 'number' ? contact.waitTime : 0,
       volunteerName: contact.volunteerName,
     };
     setEditFormData(formValues);
@@ -74,35 +78,160 @@ const ReservedRidesTable = ({
     const newFormData = { ...editFormData };
     newFormData[fieldName] = fieldValue;
     setEditFormData(newFormData);
+    if (editErrors[fieldName]) {
+      setEditErrors({ ...editErrors, [fieldName]: "" });
+    }
   };
 
   const handleEditFormSubmit = async (event) => {
     event.preventDefault();
 
-    // This logic will need enhancement in the future to correctly handle IDs (customerID, addressID, volunteerID)
-    const updatedRide = {
-      id: editContactId,
-      customerName: editFormData.customerName,
-      phoneNumber: editFormData.phoneNumber,
-      startAddress: editFormData.startAddress,
-      startTime: editFormData.startTime,
-      volunteerName: editFormData.volunteerName,
-      status: contacts.find((contact) => contact.id === editContactId).status,
+    // Validate front-end fields first
+    const errs = validateEditFields(editFormData);
+    const hasErrors = Object.values(errs).some(Boolean);
+    if (hasErrors) {
+      setEditErrors(errs);
+      return;
+    }
+
+    const current = contacts.find((c) => c.id === editContactId);
+    if (!current) {
+      console.error('Edit submit failed: ride not found in local state');
+      return;
+    }
+
+    // Build pickupTime as a Date using the existing ride date and edited HH:MM
+    let pickupTimeISO = undefined;
+    try {
+      // current.date may be ISO string; default to today if missing
+      const base = current.date ? new Date(current.date) : new Date();
+      const [hh, mm] = (editFormData.startTime || '').split(':');
+      if (hh !== undefined && mm !== undefined) {
+        base.setHours(Number(hh), Number(mm), 0, 0);
+        pickupTimeISO = base.toISOString();
+      }
+    } catch (_) {
+      // leave undefined if parsing fails; API will ignore
+    }
+
+    // Prepare payload for API
+    const payload = {
+      // Update address text; backend will parse and update existing address row
+      pickupAddress: editFormData.startAddress,
+      // Persist wait time
+      waitTime:
+        editFormData.waitTime !== null && editFormData.waitTime !== ''
+          ? Number(editFormData.waitTime)
+          : 0,
+      // Update pickupTime if parsed
+      ...(pickupTimeISO ? { pickupTime: pickupTimeISO } : {}),
+      // Keep status as-is so backend can detect reserved changes and send emails
+      status: current.status,
     };
 
-    const newContacts = contacts.map((contact) =>
-      contact.id === editContactId ? updatedRide : contact
-    );
-    setContacts(newContacts);
-    setEditContactId(null);
-    if (onRideUpdated) onRideUpdated(updatedRide);
+    // If customer fields were edited and we have a customerID, include customerUpdates
+    if (current.customerID) {
+      const fullName = (editFormData.customerName || '').trim();
+      const parts = fullName.split(/\s+/);
+      const firstName = parts[0] || '';
+      const lastName = parts.slice(1).join(' ') || '';
+      payload.customerUpdates = {
+        id: String(current.customerID),
+        firstName,
+        lastName,
+        customerPhone: (editFormData.phoneNumber || '').trim(),
+      };
+    }
+
+    try {
+      const res = await fetch(`/api/rides/${editContactId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error('Failed to update ride:', err);
+        return;
+      }
+
+      const data = await res.json();
+      // Prefer formattedData if present; fallback to merging locally
+      const updatedRide = {
+        ...current,
+        ...(data.formattedData || {}),
+        // Keep UI fields aligned
+        customerName: data.formattedData?.customerName ?? current.customerName,
+        phoneNumber: data.formattedData?.customerPhone ?? current.phoneNumber,
+        startAddress:
+          data.formattedData?.startLocation || data.formattedData?.startAddress || editFormData.startAddress,
+        startTime:
+          data.formattedData?.startTime || editFormData.startTime || current.startTime,
+        waitTime:
+          data.formattedData?.waitTime ?? payload.waitTime,
+        status: data.updatedRide?.status || current.status,
+      };
+
+      const newContacts = contacts.map((contact) =>
+        contact.id === editContactId ? updatedRide : contact
+      );
+      setContacts(newContacts);
+      setEditContactId(null);
+      if (onRideUpdated) onRideUpdated(updatedRide);
+      console.log('[ReservedRidesTable] Ride updated via API', {
+        id: editContactId,
+        toVolunteer: data?.updatedRide?.volunteer?.user?.email,
+        status: updatedRide.status,
+      });
+    } catch (e) {
+      console.error('Error submitting edit to API:', e);
+    }
+  };
+
+  const validateEditFields = (data) => {
+    const out = {
+      customerName: "",
+      phoneNumber: "",
+      startAddress: "",
+      startTime: "",
+      volunteerName: "",
+    };
+    const name = (data.customerName || "").trim();
+    const phoneRaw = (data.phoneNumber || "").trim();
+    const address = (data.startAddress || "").trim();
+    const time = (data.pickupTime || data.startTime || "").toString().trim();
+    const volunteer = (data.volunteerName || "").trim();
+
+    const nameRe = /^[A-Za-z][A-Za-z' -]{0,79}$/;
+    const timeRe = /^([0-1]?\d|2[0-3]):[0-5]\d$/;
+
+    if (!name || !nameRe.test(name)) {
+      out.customerName = "Client name is required and must be valid.";
+    }
+    if (!/^\d{10}$/.test(phoneRaw)) {
+      out.phoneNumber = "Enter a valid 10-digit phone number.";
+    }
+    if (!address) {
+      out.startAddress = "Address is required.";
+    } else {
+      const addrRe = /^.+,\s*[A-Za-z .'-]+,\s*[A-Z]{2}\s+\d{5}$/;
+      if (!addrRe.test(address)) {
+        out.startAddress = "Enter address as 'Street, City, ST 12345'.";
+      }
+    }
+    if (!time || !timeRe.test(time)) {
+      out.startTime = "Enter a valid time (HH:MM).";
+    }
+    if (volunteer && !nameRe.test(volunteer)) {
+      out.volunteerName = "Volunteer name must be valid.";
+    }
+    return out;
   };
 
   const handleCancelClick = async (contactId) => {
-    // This handles deletion when called by the ReadOnlyRow
     if (onRideDeleted) onRideDeleted(contactId);
 
-    // Optimistic removal from local state (if the delete API call succeeds, parent will update)
     const newContacts = contacts.filter((contact) => contact.id !== contactId);
     setContacts(newContacts);
   };
@@ -113,7 +242,7 @@ const ReservedRidesTable = ({
         <table className="border-collapse ml-[0.5%] w-[99%]">
           <thead>
             <tr>
-              {/* NEW CHECKBOX HEADER  */}
+              {/* CHECKBOX HEADER */}
               {userRole === "ADMIN" && (
                 <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal w-12">
                   <input
@@ -124,7 +253,6 @@ const ReservedRidesTable = ({
                   />
                 </th>
               )}
-              {/* ⬆️ END CHECKBOX HEADER ⬆️ */}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Client Name
               </th>
@@ -137,18 +265,16 @@ const ReservedRidesTable = ({
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Pick-up Time
               </th>
+              <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
+                Wait Time
+              </th>
               {/* Volunteer Name column is present for Reserved/Completed rides */}
-              {/* { && ( */}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Volunteer Name
               </th>
-              {/* )} */}
-              {/* Actions column is visible if the user is NOT a Volunteer */}
-              {/* {!isVolunteer && ( */}
               <th className="bg-[#fffdf5] border-b-[0.5px] border-gray-700 text-center p-2 text-lg font-normal">
                 Actions
               </th>
-              {/* )} */}
             </tr>
           </thead>
           <tbody>
@@ -161,6 +287,7 @@ const ReservedRidesTable = ({
                     status={contact.status}
                     handleCancelClick={() => setEditContactId(null)}
                     isVolunteer={isVolunteer}
+                    errors={editErrors}
                   />
                 ) : (
                   <ReadOnlyRow
@@ -171,7 +298,7 @@ const ReservedRidesTable = ({
                     status={contact.status}
                     convertTime={convertTime}
                     startAddress={contact.startAddress}
-                    isVolunteer={isVolunteer} // This passes down the user role logic
+                    isVolunteer={isVolunteer}
                     selected={selectedRides.includes(contact.id)}
                     onToggleSelect={onToggleSelect}
                     userRole={userRole}

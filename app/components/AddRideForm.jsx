@@ -1,8 +1,22 @@
-
 import { useState, useEffect } from "react";
 
 const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
     const [formData, setFormData] = useState({
+        customerName: "",
+        pickupStreet: "",
+        pickupCity: "",
+        pickupState: "",
+        pickupZip: "",
+        destinationStreet: "",
+        destinationCity: "",
+        destinationState: "",
+        destinationZip: "",
+        pickUpTime: "",
+        date: "",
+        waitTime: 0,
+        extraInfo: "",
+    });
+    const [errors, setErrors] = useState({
         customerName: "",
         pickupStreet: "",
         pickupCity: "",
@@ -86,12 +100,20 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 [name]: value,
             }));
         }
+        if (errors[name]) {
+            setErrors({ ...errors, [name]: "" });
+        }
     };
 
     const handleSubmit = async (e) => {
         console.log("handleSubmit function called!");
         e.preventDefault();
-
+        const validation = validateFields(formData);
+        const hasErrors = Object.values(validation).some(Boolean);
+        if (hasErrors) {
+            setErrors(validation);
+            return;
+        }
         try {
             const selectedCustomer = customers.find(
                 (customer) => customer.firstName === formData.customerName
@@ -99,12 +121,11 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
 
             if (!selectedCustomer) {
                 console.error("Error: Selected customer not found.");
-                // Optionally display an error message to the user
                 return;
             }
 
             const rideDataToSend = {
-                customerId: selectedCustomer.id, // <---- ADD THIS LINE
+                customerId: selectedCustomer.id,
                 customerName: formData.customerName,
                 pickupStreet: formData.pickupStreet,
                 pickupCity: formData.pickupCity,
@@ -116,12 +137,15 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                 destinationZip: formData.destinationZip,
                 pickUpTime: formData.pickUpTime,
                 date: formData.date,
+                waitTime: formData.waitTime && formData.waitTime !== '' 
+                    ? Number(formData.waitTime) 
+                    : 0,
                 extraInfo: formData.extraInfo,
             };
 
-            console.log("Data being sent:", rideDataToSend); // Add this for verification
+            console.log("Data being sent:", rideDataToSend);
 
-            const response = await fetch("/api/createRide", {
+            const response = await fetch("/api/rides", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -132,7 +156,6 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Error adding ride:", errorData);
-                // Optionally display an error message to the user within this component
                 return;
             }
 
@@ -142,8 +165,56 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
             handleAddFormSubmit(newRide);
         } catch (error) {
             console.error("Error sending ride data:", error);
-            // Optionally display an error message to the user within this component
         }
+    };
+
+    const validateFields = (data) => {
+        const out = {
+            customerName: "",
+            pickupStreet: "",
+            pickupCity: "",
+            pickupState: "",
+            pickupZip: "",
+            destinationStreet: "",
+            destinationCity: "",
+            destinationState: "",
+            destinationZip: "",
+            pickUpTime: "",
+            date: "",
+            extraInfo: "",
+        };
+        const name = (data.customerName || "").trim();
+        const pStreet = (data.pickupStreet || "").trim();
+        const pCity = (data.pickupCity || "").trim();
+        const pState = (data.pickupState || "").trim();
+        const pZip = (data.pickupZip || "").toString().trim();
+        const dStreet = (data.destinationStreet || "").trim();
+        const dCity = (data.destinationCity || "").trim();
+        const dState = (data.destinationState || "").trim();
+        const dZip = (data.destinationZip || "").toString().trim();
+        const time = (data.pickUpTime || "").trim();
+        const date = (data.date || "").trim();
+
+        const nameRe = /^[A-Za-z][A-Za-z' -]{0,79}$/;
+        const timeRe = /^([0-1]?\d|2[0-3]):[0-5]\d$/;
+        const stateRe = /^[A-Z]{2}$/;
+        const zipRe = /^\d{5}$/;
+
+        if (!name || !nameRe.test(name)) {
+            out.customerName = "Select a valid customer.";
+        }
+        if (!pStreet) out.pickupStreet = "Pick-up street is required.";
+        if (!pCity) out.pickupCity = "Pick-up city is required.";
+        if (!pState || !stateRe.test(pState)) out.pickupState = "Enter a valid 2-letter state.";
+        if (!pZip || !zipRe.test(pZip)) out.pickupZip = "Enter a valid 5-digit ZIP.";
+        if (!dStreet) out.destinationStreet = "Destination street is required.";
+        if (!dCity) out.destinationCity = "Destination city is required.";
+        if (!dState || !stateRe.test(dState)) out.destinationState = "Enter a valid 2-letter state.";
+        if (!dZip || !zipRe.test(dZip)) out.destinationZip = "Enter a valid 5-digit ZIP.";
+        if (!time || !timeRe.test(time)) out.pickUpTime = "Enter a valid time (HH:MM).";
+        if (!date || Number.isNaN(new Date(date).getTime())) out.date = "Select a valid date.";
+
+        return out;
     };
 
     if (!isOpen) return null;
@@ -180,6 +251,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                     </option>
                                 ))}
                             </select>
+                            {errors.customerName && (
+                                <div className="text-red-600 text-sm mt-1">{errors.customerName}</div>
+                            )}
                         </div>
 
                         {/* Pick-Up Street */}
@@ -195,6 +269,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.pickupStreet}
                                 onChange={handleFormChange}
                             />
+                            {errors.pickupStreet && (
+                                <div className="text-red-600 text-sm mt-1">{errors.pickupStreet}</div>
+                            )}
                         </div>
 
                         {/* Pick-Up City */}
@@ -210,6 +287,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.pickupCity}
                                 onChange={handleFormChange}
                             />
+                            {errors.pickupCity && (
+                                <div className="text-red-600 text-sm mt-1">{errors.pickupCity}</div>
+                            )}
                         </div>
 
                         {/* Pick-Up State */}
@@ -225,6 +305,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.pickupState}
                                 onChange={handleFormChange}
                             />
+                            {errors.pickupState && (
+                                <div className="text-red-600 text-sm mt-1">{errors.pickupState}</div>
+                            )}
                         </div>
 
                         {/* Pick-Up Zip */}
@@ -240,6 +323,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.pickupZip}
                                 onChange={handleFormChange}
                             />
+                            {errors.pickupZip && (
+                                <div className="text-red-600 text-sm mt-1">{errors.pickupZip}</div>
+                            )}
                         </div>
 
                         {/* Destination Street */}
@@ -255,6 +341,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.destinationStreet}
                                 onChange={handleFormChange}
                             />
+                            {errors.destinationStreet && (
+                                <div className="text-red-600 text-sm mt-1">{errors.destinationStreet}</div>
+                            )}
                         </div>
 
                         {/* Destination City */}
@@ -270,6 +359,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.destinationCity}
                                 onChange={handleFormChange}
                             />
+                            {errors.destinationCity && (
+                                <div className="text-red-600 text-sm mt-1">{errors.destinationCity}</div>
+                            )}
                         </div>
 
                         {/* Destination State */}
@@ -285,6 +377,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.destinationState}
                                 onChange={handleFormChange}
                             />
+                            {errors.destinationState && (
+                                <div className="text-red-600 text-sm mt-1">{errors.destinationState}</div>
+                            )}
                         </div>
 
                         {/* Destination Zip */}
@@ -300,6 +395,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.destinationZip}
                                 onChange={handleFormChange}
                             />
+                            {errors.destinationZip && (
+                                <div className="text-red-600 text-sm mt-1">{errors.destinationZip}</div>
+                            )}
                         </div>
 
                         {/* Pick-Up Time */}
@@ -314,6 +412,9 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.pickUpTime}
                                 onChange={handleFormChange}
                             />
+                            {errors.pickUpTime && (
+                                <div className="text-red-600 text-sm mt-1">{errors.pickUpTime}</div>
+                            )}
                         </div>
 
                         {/* Date */}
@@ -328,10 +429,30 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
                                 value={formData.date}
                                 onChange={handleFormChange}
                             />
+                            {errors.date && (
+                                <div className="text-red-600 text-sm mt-1">{errors.date}</div>
+                            )}
                         </div>
 
+                        {/* Wait Time Field */}
+                        <div>
+                            <label htmlFor="waitTime" className="block text-sm font-medium text-gray-700">
+                                Wait Time (hours)
+                            </label>
+                            <input
+                                className="w-full p-2.5 text-sm border border-gray-300 rounded-md placeholder-gray-500"
+                                type="number"
+                                step="0.25"
+                                min="0"
+                                name="waitTime"
+                                placeholder="e.g., 0.5"
+                                value={formData.waitTime ?? ''}
+                                onChange={handleFormChange}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Enter as decimal (e.g., 0.5 for 30 minutes)</p>
+                        </div>
 
-                        {/* Notes? */}
+                        {/* Notes Checkbox */}
                         <div className="flex items-center space-x-2">
                             <input
                                 type="checkbox"
@@ -348,7 +469,7 @@ const AddRideForm = ({ isOpen, onClose, handleAddFormSubmit }) => {
 
                         {/* Other Notes (if notes is checked) */}
                         {isExtraOptionChecked && (
-                            <div>
+                            <div className="col-span-2">
                                 <label htmlFor="extraInfo" className="block text-sm font-medium text-gray-700">
                                     Other Notes
                                 </label>
