@@ -1,5 +1,6 @@
 import React from "react";
 import { formatDateShort, buildLocalDate } from "../utils/dateUtils";
+import { toast } from 'react-toastify'; // 💡 NEW: Import toast
 // Removed: import { useRouter } from "next/navigation"; 
 // This import caused a compilation error in the current environment.
 
@@ -8,7 +9,7 @@ const ReadOnlyRow = ({
     handleEditClick, 
     handleDeleteClick, 
     handleReserveClick, 
-    handleEmergencyClick,
+    handleEmergencyClick, // Note: This prop is now ignored, using local handler below
     status, 
     convertTime, 
     startAddress, 
@@ -44,7 +45,7 @@ const ReadOnlyRow = ({
         if (!rideDate) return false;
         const rideTime = rideDate.getTime();
 
-        // Safety check if the combined string failed to parse
+        const fullDateTimeString = `${contact.date} ${contact.startTime}`; 
         if (isNaN(rideTime)) {
             console.error("Failed to parse date string for emergency check:", fullDateTimeString);
             return false;
@@ -57,6 +58,54 @@ const ReadOnlyRow = ({
         // Check 2: The time difference must be less than 24 hours
         return rideTime > now && (rideTime - now) < twentyFourHoursInMs;
     };
+    
+    // 💡 NEW FUNCTION: Handle the emergency action, API call, and toast notification
+    const handleEmergencyAction = async (event, rideId) => {
+        event.stopPropagation();
+        
+        try {
+            // API route call: POST /api/rides/[rideId]
+            const response = await fetch(`/api/rides/${rideId}`, {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'emergency' }), 
+            });
+
+            if (response.ok) {
+                toast.success('🚨 Emergency Alert Sent! Admins and Volunteers notified.', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+            } else {
+                const errorData = await response.json();
+                toast.error(`Error: ${errorData.message || 'Server error sending alert.'}`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+            }
+        } catch (error) {
+            console.error("API call failed:", error);
+            toast.error('Network error. Failed to send emergency alert.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+        }
+    };
+
 
     const showVolunteerColumn = status === "Reserved" || status === "Completed";
     
@@ -131,7 +180,7 @@ const ReadOnlyRow = ({
                     onClick={handleRowClick}
                 >
                     {contact.volunteerName || 'N/A'}
-                </td>
+                </td >
             )}
             
             {/* ACTION COLUMN */}
@@ -165,16 +214,12 @@ const ReadOnlyRow = ({
                             </button>
                             
                             {/* EMERGENCY BUTTON - Only show if within 24 hours */}
-                            {/* 💡 Now calling isEmergencyAllowed with the full contact object */}
                             {isEmergencyAllowed(contact) && (
                                 <button
                                     className="text-[#fffdf5] bg-yellow-600 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-yellow-700 text-sm font-medium"
                                     type="button"
                                     title="Emergency"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleEmergencyClick(contact.id);
-                                    }}
+                                    onClick={(e) => handleEmergencyAction(e, contact.id)} // 💡 USING NEW LOCAL HANDLER
                                 >
                                     <span className="material-symbols-rounded text-xl">emergency</span>
                                 </button>

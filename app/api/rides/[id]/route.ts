@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { sendEmail } from '@/util/nodemail';
 import { SendMailOptions } from 'nodemailer';
+import nodemailer from 'nodemailer';
 
 const prisma = new PrismaClient();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
@@ -81,9 +82,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     try {
         const updateData = await request.json();
         console.log('[RideUpdate] PUT hit', {
-          id,
-          bodyKeys: Object.keys(updateData || {}),
-          status: updateData?.status,
+            id,
+            bodyKeys: Object.keys(updateData || {}),
+            status: updateData?.status,
         });
 
         const ride = await prisma.ride.findUnique({
@@ -456,17 +457,167 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 specialNote: rideWithUpdatedData.specialNote
             } : null;
 
-            return NextResponse.json({ 
-                message: 'No ride data to update, but related records may have been updated',
-                updatedRide: rideWithUpdatedData,
-                formattedData: finalFormattedDataForNoUpdate
-            }, { status: 200 });
-        }
+            return NextResponse.json({ 
+                message: 'No ride data to update, but related records may have been updated',
+                updatedRide: rideWithUpdatedData,
+                formattedData: finalFormattedDataForNoUpdate
+            }, { status: 200 });
+        }
 
-    } catch (error: any) {
-        console.error('Error updating ride:', error);
-        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
-    }
+    } catch (error: any) {
+        console.error('Error updating ride:', error);
+        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
+}
+
+// POST - Emergency notification for this ride ID: emails all volunteers and admins (BCC)
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params;
+    try {
+        // Support a guarded test-send flow when the request body contains { testSendEmail: true }
+        let body: any = {};
+        try { body = await request.json(); } catch { body = {}; }
+
+        // --- Existing testSendEmail logic (omitted for brevity, assume it is present) ---
+        if (body && body.testSendEmail) {
+            const allowTest = process.env.DEV_ALLOW_TEST_EMAIL === 'true' || process.env.NODE_ENV !== 'production';
+            if (!allowTest) return NextResponse.json({ success: false, message: 'Test email not allowed in this environment' }, { status: 403 });
+
+            const host = (process.env.EMAIL_HOST || '').trim();
+            const user = (process.env.EMAIL_USER || '').trim();
+            const pass = (process.env.EMAIL_PASS || '').trim();
+            const from = (process.env.MAIL_FROM || process.env.EMAIL_FROM || user || '').trim();
+            const to = (body.testTo || process.env.TEST_EMAIL || user || '').trim();
+
+            if (!host || !user || !pass || !from || !to) {
+                return NextResponse.json({ success: false, message: 'Missing SMTP env vars or testTo' }, { status: 400 });
+            }
+
+            const transporter = nodemailer.createTransport({
+                host,
+                port: 587,
+                secure: false,
+                auth: { user, pass },
+            });
+
+            try {
+                const info = await transporter.sendMail({
+                    from,
+                    to,
+                    subject: body.subject || 'Test email from Wellness-Center app',
+                    text: body.text || 'This is a test email sent to verify SMTP settings and credentials.',
+                });
+
+                return NextResponse.json({ success: true, info }, { status: 200 });
+            } catch (err: any) {
+                console.error('Test email send failed:', err);
+                return NextResponse.json({ success: false, message: err?.message || String(err) }, { status: 500 });
+            }
+        }
+        // --- End existing testSendEmail logic ---
+
+        // Normal emergency flow
+        const ride = await prisma.ride.findUnique({
+            where: { id: parseInt(id, 10) },
+            include: { 
+                customer: true, 
+                addrStart: true, 
+                addrEnd: true, // 💡 NEW: Include end address
+                volunteer: { include: { user: true } } // 💡 NEW: Include volunteer details
+            }
+        });
+
+        if (!ride) return NextResponse.json({ success: false, message: 'Ride not found' }, { status: 404 });
+
+        // Validate <24 hours rule
+        const rideTime = ride.pickupTime instanceof Date ? ride.pickupTime : new Date(ride.pickupTime as any);
+        const now = new Date();
+        const hoursDiff = (rideTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+        
+        // Refined 24-hour check: must be in the future AND within 24 hours
+        if (rideTime.getTime() < now.getTime() || hoursDiff > 24) {
+             return NextResponse.json({ success: false, message: 'Emergency allowed only for upcoming rides within 24 hours' });
+        }
+
+        // Collect recipients: all volunteers and all admins
+        const volunteerInfos = await prisma.volunteerInfo.findMany({ where: { user: { isArchived: false, NOT: { email: null } } }, include: { user: true } });
+        const admins = await prisma.user.findMany({ where: { isAdmin: true, isArchived: false, NOT: { email: null } }, select: { email: true } });
+
+        const recipientSet = new Set<string>();
+        volunteerInfos.forEach(v => { if (v.user?.email) recipientSet.add(v.user.email); });
+        admins.forEach(a => { if (a.email) recipientSet.add(a.email); });
+        
+        const recipients = Array.from(recipientSet);
+        const bccRecipients = recipients.join(',');
+        
+        const mailFrom = process.env.MAIL_FROM || process.env.EMAIL_FROM || process.env.EMAIL_USER || process.env.NOTIFY_EMAIL;
+
+        if (!mailFrom || recipients.length === 0) {
+            console.warn(`Emergency email not sent for ride ${ride.id}. MailFrom: ${mailFrom}, Recipients count: ${recipients.length}`);
+            return NextResponse.json({ success: false, message: 'Failed to find a sender email or recipients' }, { status: 500 });
+        }
+
+        const subject = `🚨 URGENT EMERGENCY RIDE ALERT: Ride #${ride.id}`;
+        const customerName = `${ride.customer?.firstName || ''} ${ride.customer?.lastName || ''}`;
+        const appointmentDate = ride.date instanceof Date ? ride.date.toLocaleDateString() : String(ride.date);
+        const appointmentTime = ride.pickupTime instanceof Date ? ride.pickupTime.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }) : String(ride.pickupTime);
+        const pickupAddress = ride.addrStart ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}` : 'N/A';
+        const dropoffAddress = ride.addrEnd ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}` : 'N/A';
+        const volunteerName = ride.volunteer?.user ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}` : 'Unassigned';
+        const volunteerPhone = ride.volunteer?.user?.phoneNumber || 'N/A';
+        const notes = ride.specialNote || 'No special notes provided for this ride.';
+        
+        // 💡 NEW: HTML Email Content for the Emergency Alert
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 4px solid #f59e0b; background-color: #fffbeb;">
+                <h1 style="font-size: 28px; color: #cc0000; margin-top: 0; text-align: center;">🚨 EMERGENCY RIDE ALERT 🚨</h1>
+                <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+                    An admin has manually triggered an **emergency alert** for an upcoming ride. This ride is scheduled 
+                    to occur within the next 24 hours. **Immediate attention is required.**
+                </p>
+                
+                <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; border: 1px solid #fcd34d; margin-bottom: 20px;">
+                    <h3 style="font-size: 20px; color: #92400e; margin-top: 0;">Ride Details (#${ride.id})</h3>
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="font-size: 15px;">
+                        <tr><td style="padding: 5px 0; width: 40%; font-weight: bold; color: #4a5568;">Client Name:</td><td style="padding: 5px 0;">${customerName}</td></tr>
+                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Client Phone:</td><td style="padding: 5px 0; color: #cc0000; font-weight: bold;">${ride.customer?.customerPhone || 'N/A'}</td></tr>
+                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Date/Time:</td><td style="padding: 5px 0;">${appointmentDate} at ${appointmentTime}</td></tr>
+                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Status:</td><td style="padding: 5px 0;"><span style="color: #cc0000; font-weight: bold;">${ride.status}</span></td></tr>
+                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Assigned Volunteer:</td><td style="padding: 5px 0;">${volunteerName}</td></tr>
+                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Volunteer Phone:</td><td style="padding: 5px 0;">${volunteerPhone}</td></tr>
+                    </table>
+                </div>
+
+                <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h3 style="font-size: 18px; color: #1a202c; margin-top: 0;">Route & Notes</h3>
+                    <p style="margin: 5px 0;"><strong style="color: #333;">Pickup:</strong> ${pickupAddress}</p>
+                    <p style="margin: 5px 0;"><strong style="color: #333;">Dropoff:</strong> ${dropoffAddress}</p>
+                    <p style="font-weight: bold; margin-top: 15px; margin-bottom: 5px; color: #1a202c;">Notes:</p>
+                    <div style="background-color: #ffffff; padding: 10px; border-radius: 4px; border: 1px solid #cbd5e0; white-space: pre-wrap; font-size: 14px; color: #4a5568;">${notes}</div>
+                </div>
+
+                <p style="text-align: center; margin-top: 30px; font-size: 14px; color: #718096;">
+                    This alert was sent to all active Admins and Volunteers.
+                </p>
+            </div>
+        `;
+
+        await sendEmail({
+            to: mailFrom, // Primary recipient (often admin/system address)
+            bcc: bccRecipients, // BCC's everyone else to keep email addresses private
+            subject,
+            html: htmlContent, // Send the new structured HTML email
+        });
+
+        console.log(`Emergency HTML email sent for ride ${ride.id}. BCC'd: ${recipients.length} recipients.`);
+
+        return NextResponse.json({ success: true, message: 'Emergency alert email sent' });
+    } catch (error: any) {
+        console.error('Error sending emergency email for ride:', error);
+        return NextResponse.json({ success: false, message: error?.message || String(error) }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
 }

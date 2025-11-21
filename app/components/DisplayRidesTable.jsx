@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from 'react-toastify';
 // Assuming ViewOnlyRow is the same component as ReadOnlyRow in your previous code
 import ViewOnlyRow from "./ViewOnlyRow"; 
 
@@ -16,30 +17,30 @@ const DisplayRidesTable = ({
     const handleDeleteClick = (id) => { console.warn("Delete not available on this volunteer page."); };
     const handleEmergencyClick = async (rideId) => {
         const ride = ridesData.find(r => r.id === rideId);
-            if (!ride) return alert("Ride not found");
+        if (!ride) return toast.error("Ride not found");
 
-            const rideTime = new Date(`${ride.date}T${ride.startTime}`);
-            const now = new Date();
-            const hoursDiff = (rideTime - now) / (1000 * 60 * 60);
+        const rideTime = new Date(`${ride.date}T${ride.startTime}`);
+        const now = new Date();
+        const hoursDiff = (rideTime - now) / (1000 * 60 * 60);
 
-            if (hoursDiff > 24) {
-                return alert("Emergency emails only within 24 hours of ride.");
-            }
+        if (hoursDiff > 24) {
+            return toast.warn("Emergency emails only within 24 hours of ride.");
+        }
 
-            try {
-                const res = await fetch("/api/emergency", {
+        try {
+            const res = await fetch("/api/emergency", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ride }),
-                });
+            });
 
-                const data = await res.json();
-                if (data.success) alert("Emergency email sent!");
-                else alert(data.message || "Failed to send emergency email.");
-            } catch (error) {
-                alert("Error sending emergency email: " + error.message);
-            }
-};
+            const data = await res.json();
+            if (data.success) toast.success("Emergency email sent!");
+            else toast.error(data.message || "Failed to send emergency email.");
+        } catch (error) {
+            toast.error("Error sending emergency email: " + (error.message || error));
+        }
+    };
 
     // --- ------------------------------------------------------------------------------------------ ---
 

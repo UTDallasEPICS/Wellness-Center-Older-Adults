@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 import CancelRidesModel from "/app/components/CancelRidesModel.jsx"
 import { formatDateLong, formatTimeFromStrings } from "../utils/dateUtils";
 
@@ -42,7 +43,7 @@ const ViewOnlyRow = ({
       }
       if (handleReserveClick) handleReserveClick(); // Call parent handler to refresh
     } catch (error) {
-      alert('Error reserving ride: ' + error.message);
+      toast.error('Error reserving ride: ' + (error.message || error));
     } finally {
       setIsLoading(false);
     }
