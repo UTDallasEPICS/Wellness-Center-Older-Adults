@@ -2,10 +2,38 @@ import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { sendEmail } from '@/util/nodemail';
 import { SendMailOptions } from 'nodemailer';
+import { cookies } from 'next/headers';
+import { jwtVerify, importX509 } from 'jose';
 
 const prisma = new PrismaClient();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL
+const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL;
+
+// Helper function to get current user email from JWT token
+async function getCurrentUserEmail(): Promise<string | null> {
+    try {
+        const cookieStore = cookies();
+        const id_token = cookieStore.get('cvtoken')?.value;
+
+        if (!id_token) {
+            return null;
+        }
+
+        const certPem = process.env.CERT_PEM;
+        if (!certPem) {
+            console.error('CERT_PEM environment variable not found');
+            return null;
+        }
+
+        const key = await importX509(certPem, 'RS256');
+        const decoded = await jwtVerify(id_token, key);
+        
+        return (decoded.payload.email as string) || null;
+    } catch (error) {
+        console.error('Error verifying JWT token:', error);
+        return null;
+    }
+}
 
 function parseAddressString(addressString: string) {
     const parts = addressString.split(', ');
@@ -104,8 +132,27 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         const isReserving = ride.status !== "Reserved" && updateData.status === "Reserved";
 
+        // NEW: If a volunteer is reserving this ride, auto-assign them
+        let assignedVolunteerID = updateData.volunteerID;
+        if (isReserving && !assignedVolunteerID) {
+            const userEmail = await getCurrentUserEmail();
+            if (userEmail) {
+                const volunteerInfo = await prisma.volunteerInfo.findFirst({
+                    where: {
+                        user: {
+                            email: userEmail,
+                        },
+                    },
+                });
+                if (volunteerInfo) {
+                    assignedVolunteerID = volunteerInfo.id;
+                    console.log(`[RideUpdate] Auto-assigning volunteer ${volunteerInfo.id} (${userEmail}) to ride ${id}`);
+                }
+            }
+        }
+
         const isCompletion = updateData.status === 'Completed';
-        const isCancellation = updateData.status === 'Cancelled'; // Determine cancellation status here
+        const isCancellation = updateData.status === 'Cancelled';
 
         if (isCompletion) {
             if (!updateData.driveTimeAB) {
@@ -177,7 +224,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             customerID, 
             startAddressID, 
             endAddressID, 
-            volunteerID, 
             date, 
             pickupTime, 
             status, 
@@ -222,7 +268,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         if (customerID !== undefined) prismaUpdateData.customer = customerID === null ? { disconnect: true } : { connect: { id: parseInt(customerID as string, 10) } };
         if (startAddressID !== undefined) prismaUpdateData.addrStart = startAddressID === null ? { disconnect: true } : { connect: { id: parseInt(startAddressID as string, 10) } };
         if (endAddressID !== undefined) prismaUpdateData.addrEnd = endAddressID === null ? { disconnect: true } : { connect: { id: parseInt(endAddressID as string, 10) } };
-        if (volunteerID !== undefined) prismaUpdateData.volunteer = volunteerID === null ? { disconnect: true } : { connect: { id: parseInt(volunteerID as string, 10) } };
+        
+        // Use the assigned volunteer ID (either from updateData or auto-assigned)
+        if (assignedVolunteerID !== undefined) {
+            prismaUpdateData.volunteer = assignedVolunteerID === null 
+                ? { disconnect: true } 
+                : { connect: { id: parseInt(assignedVolunteerID as string, 10) } };
+        }
 
         let updatedRide;
         let finalFormattedData = null;
@@ -253,7 +305,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 status: updatedRide.status,
                 totalTime: updatedRide.totalTime,
                 waitTime: (updatedRide as any).waitTime !== null ? (updatedRide as any).waitTime : 0,
-                specialNote: updatedRide.specialNote
+                specialNote: updatedRide.specialNote,
+                volunteerName: updatedRide.volunteer?.user ? `${updatedRide.volunteer.user.firstName} ${updatedRide.volunteer.user.lastName}` : ''
             };
 
             const volunteerEmail = updatedRide.volunteer?.user?.email || undefined;
@@ -456,17 +509,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 specialNote: rideWithUpdatedData.specialNote
             } : null;
 
-            return NextResponse.json({ 
-                message: 'No ride data to update, but related records may have been updated',
-                updatedRide: rideWithUpdatedData,
-                formattedData: finalFormattedDataForNoUpdate
-            }, { status: 200 });
-        }
+            return NextResponse.json({ 
+                message: 'No ride data to update, but related records may have been updated',
+                updatedRide: rideWithUpdatedData,
+                formattedData: finalFormattedDataForNoUpdate
+            }, { status: 200 });
+        }
 
-    } catch (error: any) {
-        console.error('Error updating ride:', error);
-        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
-    }
+    } catch (error: any) {
+        console.error('Error updating ride:', error);
+        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
 }
