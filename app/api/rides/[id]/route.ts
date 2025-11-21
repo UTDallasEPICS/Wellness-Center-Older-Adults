@@ -5,6 +5,7 @@ import { SendMailOptions } from 'nodemailer';
 import { cookies } from 'next/headers';
 import { jwtVerify, importX509 } from 'jose';
 
+
 const prisma = new PrismaClient();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL;
@@ -43,61 +44,59 @@ function parseAddressString(addressString: string) {
         const stateZip = parts[2].split(' ');
         const state = stateZip[0];
         const postalCode = stateZip.slice(1).join(' ');
-        
+
         return { street, city, state, postalCode };
     }
     return null;
 }
 
-// GET - Fetch a single ride by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-    const { id } = params;
 
+// Helper function to send unreserve email
+async function sendUnreserveEmail(volunteerEmail: string, rideDetails: any) {
     try {
-        const ride = await prisma.ride.findUnique({
-            where: {
-                id: parseInt(id, 10),
+        // Dynamic import (important for Next.js Serverless)
+        const { default: nodemailer } = await import("nodemailer");
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
             },
-            include: {
-                customer: true,
-                addrStart: true,
-                addrEnd: true,
-                volunteer: { include: { user: true } }
-            }
         });
 
-        if (!ride) {
-            return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
-        }
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: volunteerEmail,
+            subject: "Ride Unreserved",
+            text: `
+Hello,
 
-        const formattedRide = {
-            id: ride.id,
-            customerID: ride.customerID,
-            customer: {
-                name: ride.customer ? `${ride.customer.firstName} ${ride.customer.lastName}` : '',
-                phone: ride.customer?.customerPhone || ''
-            },
-            pickupAddress: ride.addrStart ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}` : '',
-            dropoffAddress: ride.addrEnd ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}` : '',
-            date: ride.date.toISOString(),
-            pickupTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
-            driveTimeAB: ride.totalTime || '',
-            totalTime: ride.totalTime || '',
-            waitTime: typeof (ride as any).waitTime === 'number' ? (ride as any).waitTime : 0,
-            mileage: '',
-            notes: ride.specialNote || '',
-            status: ride.status,
-            volunteerName: ride.volunteer?.user ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}` : ''
+The ride you previously reserved has been unreserved.
+
+Date: ${rideDetails?.date ? rideDetails.date.toDateString() : "N/A"}
+Pickup: ${rideDetails?.addrStart?.street || ""}
+Dropoff: ${rideDetails?.addrEnd?.street || ""}
+
+Thank you.
+`
         };
 
-        return NextResponse.json(formattedRide, { status: 200 });
-    } catch (error: any) {
-        console.error('Error fetching ride:', error);
-        return NextResponse.json({ error: 'Failed to fetch ride', details: error.message || error }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
+        await transporter.sendMail(mailOptions);
+
+        console.log("Unreserve email sent to:", volunteerEmail);
+    } catch (err) {
+        console.error("Error sending unreserve email:", err);
+        throw err;
     }
 }
+
+
+
+
+
+
+export { sendUnreserveEmail };
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     const { id } = params;
@@ -119,18 +118,22 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 id: parseInt(id, 10),
             },
             include: {
-                customer: true,
-                addrStart: true,
-                addrEnd: true,
                 volunteer: { include: { user: true } }
             }
         });
+
+        
+
 
         if (!ride) {
             return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
         }
 
-        const isReserving = ride.status !== "Reserved" && updateData.status === "Reserved";
+        console.log("=== EMAIL CONDITION CHECK ===");
+        console.log("Original ride status:", ride.status);
+        console.log("Updated ride status:", updateData.status);
+        console.log("Original ride has volunteer:", ride.volunteerID);
+        console.log("Original ride volunteer email:", ride.volunteer?.user?.email); 
 
         // NEW: If a volunteer is reserving this ride, auto-assign them
         let assignedVolunteerID = updateData.volunteerID;
@@ -154,7 +157,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         const isCompletion = updateData.status === 'Completed';
         const isCancellation = updateData.status === 'Cancelled';
 
-        if (isCompletion) {
+        // --- RIDE COMPLETION VALIDATION (Check for Total Time) ---
+        if (updateData.status === 'Completed') {
+            // updateData.driveTimeAB is the field name sent by the frontend's handleSaveCompletion
             if (!updateData.driveTimeAB) {
                 return NextResponse.json(
                     { error: 'Cannot complete ride. Total drive time is required.' },
@@ -274,6 +279,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             prismaUpdateData.volunteer = assignedVolunteerID === null 
                 ? { disconnect: true } 
                 : { connect: { id: parseInt(assignedVolunteerID as string, 10) } };
+        }
+
+
+        
+
+        // Send email BEFORE updating the ride (while volunteer is still connected)
+        if (ride.status === 'Reserved' && updateData.status === 'AVAILABLE' && ride.volunteer?.user?.email) {
+            try {
+                await sendUnreserveEmail(ride.volunteer.user.email, ride);
+                console.log("Email sent successfully for ride unreservation");
+            } catch (emailError) {
+                console.error('Email notification failed, but ride update will proceed:', emailError);
+                // Continue with ride update even if email fails
+            }
         }
 
         let updatedRide;
