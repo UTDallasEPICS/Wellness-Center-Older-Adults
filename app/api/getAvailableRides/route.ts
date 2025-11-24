@@ -81,8 +81,8 @@ export async function GET(req: Request) {
       startAddress: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
       startLocation: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
       endLocation: `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`,
-      volunteerName: ride.volunteer?.user 
-        ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}` 
+      volunteerName: ride.volunteer?.user
+        ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}`
         : '',
       date: ride.date.toISOString(),
       startTime: ride.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),

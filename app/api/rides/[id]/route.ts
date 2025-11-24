@@ -1,25 +1,93 @@
-import { NextResponse, NextRequest } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { sendEmail } from "@/util/nodemail";
-import { SendMailOptions } from "nodemailer";
+import { NextResponse, NextRequest } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { sendEmail } from '@/util/nodemail';
+import { SendMailOptions } from 'nodemailer';
+import { cookies } from 'next/headers';
+import { jwtVerify, importX509 } from 'jose';
 import nodemailer from "nodemailer";
 
 const prisma = new PrismaClient();
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const VOLUNTEER_EMAIL = process.env.VOLUNTEER_EMAIL;
 
-function parseAddressString(addressString: string) {
-  const parts = addressString.split(", ");
-  if (parts.length >= 3) {
-    const street = parts[0];
-    const city = parts[1];
-    const stateZip = parts[2].split(" ");
-    const state = stateZip[0];
-    const postalCode = stateZip.slice(1).join(" ");
+// Helper function to get current user email from JWT token
+async function getCurrentUserEmail(): Promise<string | null> {
+    try {
+        const cookieStore = cookies();
+        const id_token = cookieStore.get('cvtoken')?.value;
 
-    return { street, city, state, postalCode };
-  }
-  return null;
+        if (!id_token) {
+            return null;
+        }
+
+        const certPem = process.env.CERT_PEM;
+        if (!certPem) {
+            console.error('CERT_PEM environment variable not found');
+            return null;
+        }
+
+        const key = await importX509(certPem, 'RS256');
+        const decoded = await jwtVerify(id_token, key);
+        
+        return (decoded.payload.email as string) || null;
+    } catch (error) {
+        console.error('Error verifying JWT token:', error);
+        return null;
+    }
+}
+
+function parseAddressString(addressString: string) {
+    const parts = addressString.split(', ');
+    if (parts.length >= 3) {
+        const street = parts[0];
+        const city = parts[1];
+        const stateZip = parts[2].split(' ');
+        const state = stateZip[0];
+        const postalCode = stateZip.slice(1).join(' ');
+
+        return { street, city, state, postalCode };
+    }
+    return null;
+}
+
+// Helper function to send unreserve email
+async function sendUnreserveEmail(volunteerEmail: string, rideDetails: any) {
+    try {
+        // Dynamic import (important for Next.js Serverless)
+        const { default: nodemailer } = await import("nodemailer");
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: volunteerEmail,
+            subject: "Ride Unreserved",
+            text: `
+Hello,
+
+The ride you previously reserved has been unreserved.
+
+Date: ${rideDetails?.date ? rideDetails.date.toDateString() : "N/A"}
+Pickup: ${rideDetails?.addrStart?.street || ""}
+Dropoff: ${rideDetails?.addrEnd?.street || ""}
+
+Thank you.
+`
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        console.log("Unreserve email sent to:", volunteerEmail);
+    } catch (err) {
+        console.error("Error sending unreserve email:", err);
+        throw err;
+    }
 }
 
 // GET - Fetch a single ride by ID
@@ -128,16 +196,43 @@ export async function PUT(
     const isReserving =
       ride.status !== "Reserved" && updateData.status === "Reserved";
 
-    const isCompletion = updateData.status === "Completed";
-    const isCancellation = updateData.status === "Cancelled"; // Determine cancellation status here
+    console.log("=== EMAIL CONDITION CHECK ===");
+    console.log("Original ride status:", ride.status);
+    console.log("Updated ride status:", updateData.status);
+    console.log("Original ride has volunteer:", ride.volunteerID);
+    console.log("Original ride volunteer email:", ride.volunteer?.user?.email); 
 
-    if (isCompletion) {
-      if (!updateData.driveTimeAB) {
-        return NextResponse.json(
-          { error: "Cannot complete ride. Total drive time is required." },
-          { status: 400 }
-        );
-      }
+    // NEW: If a volunteer is reserving this ride, auto-assign them
+    let assignedVolunteerID = updateData.volunteerID;
+    if (isReserving && !assignedVolunteerID) {
+        const userEmail = await getCurrentUserEmail();
+        if (userEmail) {
+            const volunteerInfo = await prisma.volunteerInfo.findFirst({
+                where: {
+                    user: {
+                        email: userEmail,
+                    },
+                },
+            });
+            if (volunteerInfo) {
+                assignedVolunteerID = volunteerInfo.id;
+                console.log(`[RideUpdate] Auto-assigning volunteer ${volunteerInfo.id} (${userEmail}) to ride ${id}`);
+            }
+        }
+    }
+
+    const isCompletion = updateData.status === 'Completed';
+    const isCancellation = updateData.status === 'Cancelled';
+
+    // --- RIDE COMPLETION VALIDATION (Check for Total Time) ---
+    if (updateData.status === 'Completed') {
+        // updateData.driveTimeAB is the field name sent by the frontend's handleSaveCompletion
+        if (!updateData.driveTimeAB) {
+            return NextResponse.json(
+                { error: 'Cannot complete ride. Total drive time is required.' },
+                { status: 400 }
+            );
+        }
     }
 
     if (updateData.pickupAddress || updateData.dropoffAddress) {
@@ -181,38 +276,19 @@ export async function PUT(
       }
     }
 
-    if (updateData.addressUpdates) {
-      // Logic to update Address model (for general address updates, likely redundant given pickup/dropoff logic above)
-      const address = await prisma.address.findUnique({
-        where: { id: parseInt(updateData.addressUpdates.id, 10) },
-      });
-      if (address) {
-        await prisma.address.update({
-          where: { id: parseInt(updateData.addressUpdates.id, 10) },
-          data: {
-            street: updateData.addressUpdates.street,
-            city: updateData.addressUpdates.city,
-            state: updateData.addressUpdates.state,
-            postalCode: updateData.addressUpdates.postalCode,
-          },
-        });
-      }
-    }
-
     // Extract fields including waitTime
-    const {
-      customerID,
-      startAddressID,
-      endAddressID,
-      volunteerID,
-      date,
-      pickupTime,
-      status,
-      driveTimeAB,
-      waitTime,
-      notes,
+    const { 
+        customerID, 
+        startAddressID, 
+        endAddressID, 
+        date, 
+        pickupTime, 
+        status, 
+        driveTimeAB, 
+        waitTime,
+        notes 
     } = updateData;
-
+    
     const prismaUpdateData: any = {};
 
     if (date !== undefined) {
@@ -230,7 +306,7 @@ export async function PUT(
     }
 
     if (status !== undefined) prismaUpdateData.status = status;
-
+    
     if (driveTimeAB !== undefined) {
       prismaUpdateData.totalTime = driveTimeAB;
     }
@@ -260,11 +336,24 @@ export async function PUT(
         endAddressID === null
           ? { disconnect: true }
           : { connect: { id: parseInt(endAddressID as string, 10) } };
-    if (volunteerID !== undefined)
-      prismaUpdateData.volunteer =
-        volunteerID === null
-          ? { disconnect: true }
-          : { connect: { id: parseInt(volunteerID as string, 10) } };
+    
+    // Use the assigned volunteer ID (either from updateData or auto-assigned)
+    if (assignedVolunteerID !== undefined) {
+        prismaUpdateData.volunteer = assignedVolunteerID === null 
+            ? { disconnect: true } 
+            : { connect: { id: parseInt(assignedVolunteerID as string, 10) } };
+    }
+
+    // Send email BEFORE updating the ride (while volunteer is still connected)
+    if (ride.status === 'Reserved' && updateData.status === 'AVAILABLE' && ride.volunteer?.user?.email) {
+        try {
+            await sendUnreserveEmail(ride.volunteer.user.email, ride);
+            console.log("Email sent successfully for ride unreservation");
+        } catch (emailError) {
+            console.error('Email notification failed, but ride update will proceed:', emailError);
+            // Continue with ride update even if email fails
+        }
+    }
 
     let updatedRide;
     let finalFormattedData = null;
@@ -311,6 +400,9 @@ export async function PUT(
             ? (updatedRide as any).waitTime
             : 0,
         specialNote: updatedRide.specialNote,
+        volunteerName: updatedRide.volunteer?.user
+          ? `${updatedRide.volunteer.user.firstName} ${updatedRide.volunteer.user.lastName}`
+          : "",
       };
 
       const volunteerEmail = updatedRide.volunteer?.user?.email || undefined;
@@ -392,8 +484,8 @@ export async function PUT(
               to: recipientsUnique,
               subject: `Ride Updated: Ride #${updatedRide.id} (Reserved)`,
               html: `
-                                <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f59e0b;">
-                                    <h2 style="font-size: 24px; color: #f59e0b; margin-top: 0;">Reserved Ride Details Updated</h2>
+                                <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #0da000;">
+                                    <h2 style="font-size: 24px; color: #0da000; margin-top: 0;">Reserved Ride Details Updated</h2>
                                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 20px;">
                                         <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Client:</strong> ${finalFormattedData.customerName}</td></tr>
                                         <tr><td style="padding: 5px 0;"><strong style="color: #4a5568;">Date:</strong> ${dateString}</td></tr>
@@ -567,6 +659,9 @@ export async function PUT(
                 ? (rideWithUpdatedData as any).waitTime
                 : 0,
             specialNote: rideWithUpdatedData.specialNote,
+            volunteerName: rideWithUpdatedData.volunteer?.user
+              ? `${rideWithUpdatedData.volunteer.user.firstName} ${rideWithUpdatedData.volunteer.user.lastName}`
+              : "",
           }
         : null;
 
@@ -682,22 +777,6 @@ export async function POST(
         { success: false, message: "Ride not found" },
         { status: 404 }
       );
-
-    // Validate <24 hours rule
-    // const rideTime =
-    //   ride.pickupTime instanceof Date
-    //     ? ride.pickupTime
-    //     : new Date(ride.pickupTime as any);
-    // const now = new Date();
-    // const hoursDiff = (rideTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-
-    // // Refined 24-hour check: must be in the future AND within 24 hours
-    // if (rideTime.getTime() < now.getTime() || hoursDiff > 24) {
-    //   return NextResponse.json({
-    //     success: false,
-    //     message: "Emergency allowed only for upcoming rides within 24 hours",
-    //   });
-    // }
 
     // Collect recipients: all volunteers and all admins
     // The query uses includes based on the schema: user -> volunteerInfo, user -> isAdmin
