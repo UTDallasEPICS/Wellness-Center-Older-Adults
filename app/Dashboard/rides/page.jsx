@@ -251,6 +251,30 @@ export default function Page() {
         }
     };
 
+    const handleEmergencyClick = async (rideId) => {
+        const ride = rides.find(r => r.id === rideId);
+        if (!ride) return toast.error("Ride not found");
+
+        const rideTime = new Date(`${ride.date}T${ride.startTime}`);
+        const now = new Date();
+        const hoursDiff = (rideTime - now) / (1000 * 60 * 60);
+
+        if (hoursDiff > 24) return toast.warn("Emergency emails only within 24 hours of ride.");
+
+        try {
+            const res = await fetch("/api/emergency", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ride }),
+            });
+            const data = await res.json();
+            if (data.success) toast.success("Emergency email sent!");
+            else toast.error(data.message || "Failed to send emergency email.");
+        } catch (error) {
+            toast.error("Error sending emergency email: " + (error.message || error));
+        }
+    };
+
     const handleReserveClick = async (rideId) => {
         const ride = ridesData.find(r => r.id === rideId);
         
@@ -483,6 +507,7 @@ export default function Page() {
                     convertTime={convertTo12Hour}
                     onEditRide={handleEditRide}
                     onDeleteRide={handleDeleteRide}
+                    handleEmergencyClick={handleEmergencyClick}
                     handleReserveClick={handleReserveClick}
                     customers={customers}
                     addresses={addresses}

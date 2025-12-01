@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from 'react-toastify';
 // Assuming ViewOnlyRow is the same component as ReadOnlyRow in your previous code
 import ViewOnlyRow from "./ViewOnlyRow"; 
 
@@ -14,6 +15,33 @@ const DisplayRidesTable = ({
     // Since this table is for Volunteers, these are placeholders and won't be used.
     const handleEditClick = (event, contact) => { console.warn("Edit not available on this volunteer page."); };
     const handleDeleteClick = (id) => { console.warn("Delete not available on this volunteer page."); };
+    const handleEmergencyClick = async (rideId) => {
+        const ride = ridesData.find(r => r.id === rideId);
+        if (!ride) return toast.error("Ride not found");
+
+        const rideTime = new Date(`${ride.date}T${ride.startTime}`);
+        const now = new Date();
+        const hoursDiff = (rideTime - now) / (1000 * 60 * 60);
+
+        if (hoursDiff > 24) {
+            return toast.warn("Emergency emails only within 24 hours of ride.");
+        }
+
+        try {
+            const res = await fetch(`/api/rides/${rideId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ride }),
+            });
+
+            const data = await res.json();
+            if (data.success) toast.success("Emergency email sent!");
+            else toast.error(data.message || "Failed to send emergency email.");
+        } catch (error) {
+            toast.error("Error sending emergency email: " + (error.message || error));
+        }
+    };
+
     // --- ------------------------------------------------------------------------------------------ ---
 
     
@@ -47,6 +75,7 @@ const DisplayRidesTable = ({
                 handleEditClick={handleEditClick}
                 handleDeleteClick={handleDeleteClick}
                 handleReserveClick={onReserve} // Renamed prop to match ReadOnlyRow signature
+                handleEmergencyClick={handleEmergencyClick}
                 
                 // 🔑 PASS THE UTILITIES REQUIRED BY ReadOnlyRow/ViewOnlyRow
                 convertTime={convertTime}

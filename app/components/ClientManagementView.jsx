@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Edit, Trash2, Archive, RotateCcw } from 'lucide-react';
+import { formatDateLong } from '../utils/dateUtils';
 
 /**
  * Utility function to get a formatted date.
@@ -8,7 +9,8 @@ import { Search, Edit, Trash2, Archive, RotateCcw } from 'lucide-react';
 const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
-        return new Date(dateString).toLocaleDateString();
+        const formatted = formatDateLong(dateString);
+        return formatted || 'Invalid Date';
     } catch {
         return 'Invalid Date';
     }
