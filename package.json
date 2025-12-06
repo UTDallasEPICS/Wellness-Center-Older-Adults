@@ -8,7 +8,7 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "eslint .",
-    "prisma:seed": "node prisma/seed.js",
+    "prisma:seed": "node scripts/seed.js",
     "dev:test": "env-cmd -f .env.test next dev",
     "post-e2e": "docker compose -f docker-compose.e2e.yml down -v",
     "test:e2e": "docker compose -f docker-compose.e2e.yml down -v && docker compose -f docker-compose.e2e.yml up -d e2e_postgres && cross-env node wait.mjs && env-cmd -f .env.test npx prisma db push && env-cmd -f .env.test npm run prisma:seede2e && concurrently --kill-others --success first \"npm run dev:test\" \"wait-on http://localhost:3000 && npx cypress open\" && npm run post-e2e"
@@ -19,7 +19,7 @@
     ]
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.7.0",
