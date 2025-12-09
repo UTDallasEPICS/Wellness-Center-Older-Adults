@@ -182,6 +182,7 @@ export default function Page() {
                     customerID: updatedRideData.customerID,
                     date: updatedRideData.date,
                     pickupTime: updatedRideData.pickupTime,
+                    waitTime: updatedRideData.waitTime,
                     startAddressID: updatedRideData.startAddressID,
                     endAddressID: updatedRideData.endAddressID,
                     volunteerID: updatedRideData.volunteerID,
@@ -201,6 +202,8 @@ export default function Page() {
             }
 
             const responseData = await rideResponse.json();
+            console.log('[handleEditRide] API response:', responseData);
+console.log('[handleEditRide] formattedData:', responseData.formattedData);
 
             if (responseData.formattedData) {
                 setRidesData(currentRides => 

@@ -85,7 +85,7 @@ const EditableRow = ({
                 <input
                     className="w-full p-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     type="time"
-                    name="startTime"
+                    name="pickupTime"
                     value={formatTimeForInput(editFormData.startTime || editFormData.pickupTime || '')}
                     onChange={handleEditFormChange}
                 />

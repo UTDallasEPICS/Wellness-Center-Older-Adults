@@ -276,34 +276,32 @@ export async function PUT(
       }
     }
 
-    // Extract fields including waitTime
-    const { 
-        customerID, 
-        startAddressID, 
-        endAddressID, 
-        date, 
-        pickupTime, 
-        status, 
-        driveTimeAB, 
-        waitTime,
-        notes 
-    } = updateData;
-    
-    const prismaUpdateData: any = {};
+        if (date !== undefined) {
+            const parsedDate = new Date(date);
+            if (!isNaN(parsedDate.getTime())) {
+                prismaUpdateData.date = parsedDate;
+            }
+        }
+        
+        if (status !== undefined) prismaUpdateData.status = status;
+        
+        if (pickupTime !== undefined && pickupTime !== null && pickupTime !== '') {
+            const parsedPickupTime = new Date(pickupTime);
+            if (!isNaN(parsedPickupTime.getTime())) {
+                prismaUpdateData.pickupTime = parsedPickupTime;
+            } else {
+                console.warn('[RideUpdate] Invalid pickupTime received:', pickupTime);
+            }
+        }
+        
+        if (driveTimeAB !== undefined) {
+            prismaUpdateData.totalTime = driveTimeAB;
+        }
 
-    if (date !== undefined) {
-      const parsedDate = new Date(date);
-      if (!isNaN(parsedDate.getTime())) {
-        prismaUpdateData.date = parsedDate;
-      }
-    }
-
-    if (pickupTime !== undefined) {
-      const parsedPickupTime = new Date(pickupTime);
-      if (!isNaN(parsedPickupTime.getTime())) {
-        prismaUpdateData.pickupTime = parsedPickupTime;
-      }
-    }
+        if (waitTime !== undefined && waitTime !== null) {
+            const parsedWaitTime = parseFloat(waitTime);
+            prismaUpdateData.waitTime = !isNaN(parsedWaitTime) ? parsedWaitTime : 0;
+        }
 
     if (status !== undefined) prismaUpdateData.status = status;
     
@@ -597,310 +595,79 @@ export async function PUT(
             );
           }
         } else {
-          console.warn(
-            `Email not sent for completed ride ${updatedRide.id}: No valid ADMIN/VOLUNTEER recipients found in the database.`
-          );
+            const rideWithUpdatedData = await prisma.ride.findUnique({
+                where: { id: parseInt(id, 10) },
+                include: {
+                    customer: true,
+                    addrStart: true,
+                    addrEnd: true,
+                    volunteer: { include: { user: true } }
+                }
+            });
+            
+            const finalFormattedDataForNoUpdate = rideWithUpdatedData ? {
+                id: rideWithUpdatedData.id,
+                customerID: rideWithUpdatedData.customerID,
+                customerName: rideWithUpdatedData.customer ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}` : '',
+                customerPhone: rideWithUpdatedData.customer?.customerPhone || '',
+                startAddressID: rideWithUpdatedData.startAddressID,
+                endAddressID: rideWithUpdatedData.endAddressID,
+                startLocation: rideWithUpdatedData.addrStart ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}` : '',
+                endLocation: rideWithUpdatedData.addrEnd ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}` : '',
+                date: rideWithUpdatedData.date,
+                startTime: rideWithUpdatedData.pickupTime ? rideWithUpdatedData.pickupTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+                status: rideWithUpdatedData.status,
+                totalTime: rideWithUpdatedData.totalTime,
+                waitTime: (rideWithUpdatedData as any).waitTime !== null ? (rideWithUpdatedData as any).waitTime : 0,
+                specialNote: rideWithUpdatedData.specialNote
+            } : null;
+
+            return NextResponse.json({ 
+                message: 'No ride data to update, but related records may have been updated',
+                updatedRide: rideWithUpdatedData,
+                formattedData: finalFormattedDataForNoUpdate
+            }, { status: 200 });
         }
-      }
 
-      const statusMessage = isCompletion
-        ? "Ride completed successfully!"
-        : isCancellation
-          ? "Ride cancelled successfully!"
-          : "Ride updated successfully";
-
-      return NextResponse.json(
-        {
-          message: statusMessage,
-          updatedRide: updatedRide,
-          formattedData: finalFormattedData,
-        },
-        { status: 200 }
-      );
-    } else {
-      const rideWithUpdatedData = await prisma.ride.findUnique({
-        where: { id: parseInt(id, 10) },
-        include: {
-          customer: true,
-          addrStart: true,
-          addrEnd: true,
-          volunteer: { include: { user: true } },
-        },
-      });
-
-      const finalFormattedDataForNoUpdate = rideWithUpdatedData
-        ? {
-            id: rideWithUpdatedData.id,
-            customerID: rideWithUpdatedData.customerID,
-            customerName: rideWithUpdatedData.customer
-              ? `${rideWithUpdatedData.customer.firstName} ${rideWithUpdatedData.customer.lastName}`
-              : "",
-            customerPhone: rideWithUpdatedData.customer?.customerPhone || "",
-            startAddressID: rideWithUpdatedData.startAddressID,
-            endAddressID: rideWithUpdatedData.endAddressID,
-            startLocation: rideWithUpdatedData.addrStart
-              ? `${rideWithUpdatedData.addrStart.street}, ${rideWithUpdatedData.addrStart.city}, ${rideWithUpdatedData.addrStart.state} ${rideWithUpdatedData.addrStart.postalCode}`
-              : "",
-            endLocation: rideWithUpdatedData.addrEnd
-              ? `${rideWithUpdatedData.addrEnd.street}, ${rideWithUpdatedData.addrEnd.city}, ${rideWithUpdatedData.addrEnd.state} ${rideWithUpdatedData.addrEnd.postalCode}`
-              : "",
-            date: rideWithUpdatedData.date,
-            startTime: rideWithUpdatedData.pickupTime
-              ? rideWithUpdatedData.pickupTime.toLocaleTimeString("en-US", {
-                  hour12: false,
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "",
-            status: rideWithUpdatedData.status,
-            totalTime: rideWithUpdatedData.totalTime,
-            waitTime:
-              (rideWithUpdatedData as any).waitTime !== null
-                ? (rideWithUpdatedData as any).waitTime
-                : 0,
-            specialNote: rideWithUpdatedData.specialNote,
-            volunteerName: rideWithUpdatedData.volunteer?.user
-              ? `${rideWithUpdatedData.volunteer.user.firstName} ${rideWithUpdatedData.volunteer.user.lastName}`
-              : "",
-          }
-        : null;
-
-      return NextResponse.json(
-        {
-          message:
-            "No ride data to update, but related records may have been updated",
-          updatedRide: rideWithUpdatedData,
-          formattedData: finalFormattedDataForNoUpdate,
-        },
-        { status: 200 }
-      );
+    } catch (error: any) {
+        console.error('Error updating ride:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        return NextResponse.json({ 
+            error: 'Failed to update ride', 
+            details: error.message || String(error),
+            stack: error.stack 
+        }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
     }
-  } catch (error: any) {
-    console.error("Error updating ride:", error);
-    return NextResponse.json(
-      { error: "Failed to update ride", details: error.message || error },
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
 }
 
-// POST - Emergency notification for this ride ID: emails all volunteers and admins (BCC)
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
-  try {
-    // Support a guarded test-send flow when the request body contains { testSendEmail: true }
-    let body: any = {};
+// DELETE - Delete a ride by ID
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params;
+
     try {
-      body = await request.json();
-    } catch {
-      body = {};
-    }
-
-    // --- Existing testSendEmail logic ---
-    if (body && body.testSendEmail) {
-      const allowTest =
-        process.env.DEV_ALLOW_TEST_EMAIL === "true" ||
-        process.env.NODE_ENV !== "production";
-      if (!allowTest)
-        return NextResponse.json(
-          {
-            success: false,
-            message: "Test email not allowed in this environment",
-          },
-          { status: 403 }
-        );
-
-      const host = (process.env.EMAIL_HOST || "").trim();
-      const user = (process.env.EMAIL_USER || "").trim();
-      const pass = (process.env.EMAIL_PASS || "").trim();
-      const from = (
-        process.env.MAIL_FROM ||
-        process.env.EMAIL_FROM ||
-        user ||
-        ""
-      ).trim();
-      const to = (body.testTo || process.env.TEST_EMAIL || user || "").trim();
-
-      if (!host || !user || !pass || !from || !to) {
-        return NextResponse.json(
-          { success: false, message: "Missing SMTP env vars or testTo" },
-          { status: 400 }
-        );
-      }
-
-      const transporter = nodemailer.createTransport({
-        host,
-        port: 587,
-        secure: false,
-        auth: { user, pass },
-      });
-
-      try {
-        const info = await transporter.sendMail({
-          from,
-          to,
-          subject: body.subject || "Test email from Wellness-Center app",
-          text:
-            body.text ||
-            "This is a test email sent to verify SMTP settings and credentials.",
+        const ride = await prisma.ride.findUnique({
+            where: {
+                id: parseInt(id, 10),
+            },
         });
 
-        return NextResponse.json({ success: true, info }, { status: 200 });
-      } catch (err: any) {
-        console.error("Test email send failed:", err);
-        return NextResponse.json(
-          { success: false, message: err?.message || String(err) },
-          { status: 500 }
-        );
-      }
+        if (!ride) {
+            return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
+        }
+
+        await prisma.ride.delete({
+            where: {
+                id: parseInt(id, 10),
+            },
+        });
+
+        return NextResponse.json({ message: 'Ride deleted successfully' }, { status: 200 });
+    } catch (error: any) {
+        console.error('Error deleting ride:', error);
+        return NextResponse.json({ error: 'Failed to delete ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
     }
-    // --- End existing testSendEmail logic ---
-
-    // Normal emergency flow
-    const ride = await prisma.ride.findUnique({
-      where: { id: parseInt(id, 10) },
-      include: {
-        customer: true,
-        addrStart: true,
-        addrEnd: true,
-        volunteer: { include: { user: true } },
-      },
-    });
-
-    if (!ride)
-      return NextResponse.json(
-        { success: false, message: "Ride not found" },
-        { status: 404 }
-      );
-
-    // Collect recipients: all volunteers and all admins
-    // The query uses includes based on the schema: user -> volunteerInfo, user -> isAdmin
-    const volunteerInfos = await prisma.volunteerInfo.findMany({
-      where: { user: { isArchived: false } },
-      include: { user: true },
-    });
-    const admins = await prisma.user.findMany({
-      where: { isAdmin: true, isArchived: false },
-      select: { email: true },
-    });
-
-    const recipientSet = new Set<string>();
-    volunteerInfos.forEach((v) => {
-      if (v.user?.email) recipientSet.add(v.user.email);
-    });
-    admins.forEach((a) => {
-      if (a.email) recipientSet.add(a.email);
-    });
-
-    const recipients = Array.from(recipientSet);
-    const bccRecipients = recipients.join(",");
-
-    const mailFrom =
-      process.env.MAIL_FROM ||
-      process.env.EMAIL_FROM ||
-      process.env.EMAIL_USER ||
-      process.env.NOTIFY_EMAIL;
-
-    if (!mailFrom || recipients.length === 0) {
-      console.warn(
-        `Emergency email not sent for ride ${ride.id}. MailFrom: ${mailFrom}, Recipients count: ${recipients.length}`
-      );
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Failed to find a sender email or configured recipients.",
-        },
-        { status: 500 }
-      );
-    }
-
-    const subject = `🚨 URGENT EMERGENCY RIDE ALERT: Ride #${ride.id}`;
-    const customerName = `${ride.customer?.firstName || ""} ${ride.customer?.lastName || ""}`;
-    const appointmentDate =
-      ride.date instanceof Date
-        ? ride.date.toLocaleDateString()
-        : String(ride.date);
-    // Using hour12: true for appointmentTime in the email content for better readability.
-    const appointmentTime =
-      ride.pickupTime instanceof Date
-        ? ride.pickupTime.toLocaleTimeString("en-US", {
-            hour12: true,
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : String(ride.pickupTime);
-    const pickupAddress = ride.addrStart
-      ? `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`
-      : "N/A";
-    const dropoffAddress = ride.addrEnd
-      ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`
-      : "N/A";
-    const volunteerName = ride.volunteer?.user
-      ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}`
-      : "Unassigned";
-    const volunteerPhone = ride.volunteer?.user?.phone || "N/A"; // Fetches phone from User model nested in VolunteerInfo
-    const notes =
-      ride.specialNote || "No special notes provided for this ride.";
-
-    // HTML Email Content for the Emergency Alert
-    const htmlContent = `
-            <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 4px solid #f59e0b; background-color: #fffbeb;">
-                <h1 style="font-size: 28px; color: #cc0000; margin-top: 0; text-align: center;">🚨 EMERGENCY RIDE ALERT 🚨</h1>
-                <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
-                    An admin has manually triggered an **emergency alert** for an upcoming ride. This ride is scheduled 
-                    to occur within the next 24 hours. **Immediate attention is required.**
-                </p>
-                
-                <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; border: 1px solid #fcd34d; margin-bottom: 20px;">
-                    <h3 style="font-size: 20px; color: #92400e; margin-top: 0;">Ride Details (#${ride.id})</h3>
-                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="font-size: 15px;">
-                        <tr><td style="padding: 5px 0; width: 40%; font-weight: bold; color: #4a5568;">Client Name:</td><td style="padding: 5px 0;">${customerName}</td></tr>
-                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Client Phone:</td><td style="padding: 5px 0; color: #cc0000; font-weight: bold;">${ride.customer?.customerPhone || "N/A"}</td></tr>
-                        <tr><td style="padding: 5px 0; font-weight: bold; color: #4a5568;">Date/Time:</td><td style="padding: 5px 0;">${appointmentDate} at ${appointmentTime}</td></tr>
-                    </table>
-                </div>  
-
-                <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                    <h3 style="font-size: 18px; color: #1a202c; margin-top: 0;">Route & Notes</h3>
-                    <p style="margin: 5px 0;"><strong style="color: #333;">Pickup:</strong> ${pickupAddress}</p>
-                    <p style="margin: 5px 0;"><strong style="color: #333;">Dropoff:</strong> ${dropoffAddress}</p>
-                    <p style="font-weight: bold; margin-top: 15px; margin-bottom: 5px; color: #1a202c;">Notes:</p>
-                    <div style="background-color: #ffffff; padding: 10px; border-radius: 4px; border: 1px solid #cbd5e0; white-space: pre-wrap; font-size: 14px; color: #4a5568;">${notes}</div>
-                </div>
-
-                <p style="text-align: center; margin-top: 30px; font-size: 14px; color: #718096;">
-                    This alert was sent to all active Admins and Volunteers.
-                </p>
-            </div>
-        `;
-
-    await sendEmail({
-      to: mailFrom, // Primary recipient (sender address)
-      bcc: bccRecipients, // BCC's all active admins/volunteers
-      subject,
-      html: htmlContent,
-    });
-
-    console.log(
-      `Emergency HTML email sent for ride ${ride.id}. BCC'd: ${recipients.length} recipients.`
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: "Emergency alert email sent",
-    });
-  } catch (error: any) {
-    console.error("Error sending emergency email for ride:", error);
-    return NextResponse.json(
-      { success: false, message: error?.message || String(error) },
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
 }
