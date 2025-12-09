@@ -1,41 +1,7 @@
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 import CancelRidesModel from "/app/components/CancelRidesModel.jsx"
-import { format } from 'date-fns';
-
-function formatDateTime(rideDate, startTime) {
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return isNaN(date.getTime()) ? 'Invalid Date' : format(date, 'MM/dd/yyyy');
-    } catch (e) {
-      return 'Invalid Date';
-    }
-  };
-
-  const formatTime = (timeString) => {
-    if (!timeString) return 'No time specified';
-    
-    try {
-      // If timeString is just time (e.g., '14:30'), we need to combine it with a date
-      let dateTime = timeString;
-      if (!isNaN(Date.parse(timeString))) {
-        dateTime = timeString;
-      } else if (rideDate) {
-        // Combine date and time if they're separate
-        dateTime = `${rideDate.split('T')[0]}T${timeString}`;
-      }
-      const date = new Date(dateTime);
-      return isNaN(date.getTime()) ? 'No time specified' : format(date, 'h:mm a');
-    } catch (e) {
-      return 'No time specified';
-    }
-  };
-
-  return {
-    formattedDate: formatDate(rideDate),
-    formattedTime: formatTime(startTime),
-  };
-}
+import { formatDateLong, formatTimeFromStrings } from "../utils/dateUtils";
 
 
 const ViewOnlyRow = ({ 
@@ -43,6 +9,7 @@ const ViewOnlyRow = ({
     handleReserveClick, // Renamed 'onReserve' to match the original prop name
     handleEditClick,    // 🔑 NEW: Required for Admin view
     handleDeleteClick,  // 🔑 NEW: Required for Admin view
+    handleEmergencyClick, // 🔑 NEW: Required for Admin view
     isVolunteer         // 🔑 NEW: The prop that controls the button set
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -76,13 +43,14 @@ const ViewOnlyRow = ({
       }
       if (handleReserveClick) handleReserveClick(); // Call parent handler to refresh
     } catch (error) {
-      alert('Error reserving ride: ' + error.message);
+      toast.error('Error reserving ride: ' + (error.message || error));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const { formattedDate, formattedTime } = formatDateTime(contact.date, contact.pickupTime);
+  const formattedDate = formatDateLong(contact.date);
+  const formattedTime = formatTimeFromStrings(contact.date, contact.pickupTime);
 
   // Logic for conditional rendering of buttons
   const rideStatus = contact.status; 
@@ -142,6 +110,17 @@ const ViewOnlyRow = ({
                         }}
                     >
                         <span className="material-symbols-rounded">delete</span>
+                    </button>
+                    {/* Emergency Button */}
+                    <button
+                        className="text-white bg-red-500 cursor-pointer border-none mx-1 px-4 py-2 rounded-md transition duration-300 hover:bg-red-700"
+                        type="button"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            handleEmergencyClick(contact.id);
+                        }}
+                    >
+                        <span className="material-symbols-rounded">emergency</span>
                     </button>
                 </>
             )}

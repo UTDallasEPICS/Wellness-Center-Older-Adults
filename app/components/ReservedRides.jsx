@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import CancelRidesModel from "./CancelRidesModel";
 import { useRouter } from 'next/navigation'; // Import useRouter
+import { formatDateLong } from "../utils/dateUtils";
 
 const ReservedRides = ({ contact, handleCancelClick, status }) => {
     const [isCancelModelOpen, setIsCancelModelOpen] = useState(false);
@@ -27,7 +28,7 @@ const ReservedRides = ({ contact, handleCancelClick, status }) => {
         <li key={contact.id} className="border border-gray-300 p-4 mb-4 rounded-2xl bg-white grid grid-cols-[1fr_auto] gap-2.5 items-start shadow-md">
             <div className="activity-details">
                 <div className="activity-header">
-                    <strong>{new Date(contact.date).toLocaleDateString()}</strong> at {contact.time}
+                    <strong>{formatDateLong(contact.date)}</strong> at {contact.time}
                 </div>
                 <div><strong>Client Name:</strong> {contact.clientName}</div>
                 <div><strong>Start Time:</strong> {contact.startTime}</div>
