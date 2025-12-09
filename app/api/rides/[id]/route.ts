@@ -195,24 +195,24 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             }
         }
         
-        if (pickupTime !== undefined) {
+        if (status !== undefined) prismaUpdateData.status = status;
+        
+        if (pickupTime !== undefined && pickupTime !== null && pickupTime !== '') {
             const parsedPickupTime = new Date(pickupTime);
             if (!isNaN(parsedPickupTime.getTime())) {
                 prismaUpdateData.pickupTime = parsedPickupTime;
+            } else {
+                console.warn('[RideUpdate] Invalid pickupTime received:', pickupTime);
             }
         }
-        
-        if (status !== undefined) prismaUpdateData.status = status;
         
         if (driveTimeAB !== undefined) {
             prismaUpdateData.totalTime = driveTimeAB;
         }
 
-        // Handle waitTime as Float
-        if (waitTime !== undefined) {
-            prismaUpdateData.waitTime = waitTime !== null && waitTime !== '' 
-                ? Number(waitTime) 
-                : 0;
+        if (waitTime !== undefined && waitTime !== null) {
+            const parsedWaitTime = parseFloat(waitTime);
+            prismaUpdateData.waitTime = !isNaN(parsedWaitTime) ? parsedWaitTime : 0;
         }
 
         if (notes !== undefined) {
@@ -456,17 +456,52 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
                 specialNote: rideWithUpdatedData.specialNote
             } : null;
 
-            return NextResponse.json({ 
-                message: 'No ride data to update, but related records may have been updated',
-                updatedRide: rideWithUpdatedData,
-                formattedData: finalFormattedDataForNoUpdate
-            }, { status: 200 });
-        }
+            return NextResponse.json({ 
+                message: 'No ride data to update, but related records may have been updated',
+                updatedRide: rideWithUpdatedData,
+                formattedData: finalFormattedDataForNoUpdate
+            }, { status: 200 });
+        }
 
-    } catch (error: any) {
-        console.error('Error updating ride:', error);
-        return NextResponse.json({ error: 'Failed to update ride', details: error.message || error }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
-    }
+    } catch (error: any) {
+        console.error('Error updating ride:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        return NextResponse.json({ 
+            error: 'Failed to update ride', 
+            details: error.message || String(error),
+            stack: error.stack 
+        }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
+}
+
+// DELETE - Delete a ride by ID
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params;
+
+    try {
+        const ride = await prisma.ride.findUnique({
+            where: {
+                id: parseInt(id, 10),
+            },
+        });
+
+        if (!ride) {
+            return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
+        }
+
+        await prisma.ride.delete({
+            where: {
+                id: parseInt(id, 10),
+            },
+        });
+
+        return NextResponse.json({ message: 'Ride deleted successfully' }, { status: 200 });
+    } catch (error: any) {
+        console.error('Error deleting ride:', error);
+        return NextResponse.json({ error: 'Failed to delete ride', details: error.message || error }, { status: 500 });
+    } finally {
+        await prisma.$disconnect();
+    }
 }
