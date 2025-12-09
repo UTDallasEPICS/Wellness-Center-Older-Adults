@@ -202,8 +202,6 @@ export default function Page() {
             }
 
             const responseData = await rideResponse.json();
-            console.log('[handleEditRide] API response:', responseData);
-console.log('[handleEditRide] formattedData:', responseData.formattedData);
 
             if (responseData.formattedData) {
                 setRidesData(currentRides => 
