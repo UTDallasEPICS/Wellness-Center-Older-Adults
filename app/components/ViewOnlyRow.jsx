@@ -1,4 +1,6 @@
+"use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify';
 import CancelRidesModel from "/app/components/CancelRidesModel.jsx"
 import { formatDateLong, formatTimeFromStrings } from "../utils/dateUtils";
@@ -14,6 +16,7 @@ const ViewOnlyRow = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCancelModelOpen, setIsCancelModelOpen] = useState(false);
+  const router = useRouter();
 
   const handleDenyCancel = () => setIsCancelModelOpen(false);
   const handleConfirmCancel = () => {
@@ -56,8 +59,16 @@ const ViewOnlyRow = ({
   const rideStatus = contact.status; 
   const isRideAvailable = rideStatus === "AVAILABLE"; 
 
+  const handleRowClick = () => {
+    try {
+      router.push(`/Dashboard/rides/ride/${contact.id}`);
+    } catch (err) {
+      console.error('Navigation failed:', err);
+    }
+  };
+
   return (
-    <tr>
+    <tr className="cursor-pointer hover:bg-gray-100" onClick={handleRowClick}>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerName}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.customerPhone}</td>
       <td className="text-center bg-[#fffdf5] text-[20px] py-4 px-2 font-light">{contact.startLocation}</td>

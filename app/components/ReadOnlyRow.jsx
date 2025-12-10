@@ -1,4 +1,6 @@
+"use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { formatDateShort, buildLocalDate } from "../utils/dateUtils";
 import { toast } from 'react-toastify'; // 💡 NEW: Import toast
 // Removed: import { useRouter } from "next/navigation"; 
@@ -17,16 +19,17 @@ const ReadOnlyRow = ({
     selected,
     onToggleSelect
 }) => {
-    // const router = useRouter(); // Removed the use of Next.js router
+    const router = useRouter();
     
     const isVolunteer = userRole === "VOLUNTEER";
     const isAdmin = userRole === "ADMIN";
     
     const handleRowClick = () => {
-        // Replaced router.push() with a console log to prevent runtime errors
-        console.log(`Navigating to ride detail page for ID: ${contact.id}`);
-        // In a real Next.js app, the original line would be:
-        // router.push(`/Dashboard/rides/ride/${contact.id}`);
+        try {
+            router.push(`/Dashboard/rides/ride/${contact.id}`);
+        } catch (err) {
+            console.error('Navigation failed:', err);
+        }
     };
 
     const formatDate = (dateString) => formatDateShort(dateString);
