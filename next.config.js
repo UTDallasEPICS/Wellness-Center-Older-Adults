@@ -1,6 +1,7 @@
 // next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   webpack(config) {
     config.experiments ??= {};
     config.experiments.asyncWebAssembly = true;
