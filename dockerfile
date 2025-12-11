@@ -12,6 +12,6 @@ RUN pnpm run build
 FROM node:22-alpine AS deployment
 
 COPY --from=builder /.output /
-COPY --from=builder /node_modules/.prisma/client /prisma/client
+COPY --from=builder /prisma/client /prisma/client
 EXPOSE 3000
 CMD ["node", "./server/index.mjs"]
