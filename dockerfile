@@ -7,6 +7,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 COPY package.json pnpm-lock.yaml* ./
+COPY prisma ./prisma/
+
 RUN pnpm i --frozen-lockfile
 
 COPY . .
