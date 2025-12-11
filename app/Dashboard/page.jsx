@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import TextContainer from "/app/components/TextContainer.jsx";
 //import RecentActivity from "/app/components/RecentActivity"; 
-import Leaderboard from "/app/components/leaderboard.jsx";
+import Leaderboard from "/app/components/Leaderboard.jsx";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
