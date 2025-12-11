@@ -75,12 +75,12 @@ export async function GET(req: Request) {
       volunteerID: ride.volunteerID,
     
       // Editable data
-      customerName: `${ride.customer.firstName} ${ride.customer.lastName}`,
-      phoneNumber: ride.customer.customerPhone,
-      customerPhone: ride.customer.customerPhone,
+      customerName: ride.customer ? `${ride.customer.firstName} ${ride.customer.lastName}` : 'Unknown',
+      phoneNumber: ride.customer?.customerPhone || '',
+      customerPhone: ride.customer?.customerPhone || '',
       startAddress: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
       startLocation: `${ride.addrStart.street}, ${ride.addrStart.city}, ${ride.addrStart.state} ${ride.addrStart.postalCode}`,
-      endLocation: `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}`,
+      endLocation: ride.addrEnd ? `${ride.addrEnd.street}, ${ride.addrEnd.city}, ${ride.addrEnd.state} ${ride.addrEnd.postalCode}` : '',
       volunteerName: ride.volunteer?.user
         ? `${ride.volunteer.user.firstName} ${ride.volunteer.user.lastName}`
         : '',

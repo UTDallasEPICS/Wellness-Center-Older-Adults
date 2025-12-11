@@ -31,22 +31,7 @@ export async function GET() {
           },
         },
       },
-    }) as Array<{
-      id: number;
-      user: {
-        firstName: string;
-        lastName: string;
-        email: string;
-        phone: string;
-        role: string;
-      };
-      status: string;
-      rides: Array<{
-        id: number;
-        date: string;
-        status: string;
-      }>;
-    }>;
+    });
 
     const formattedVolunteers = volunteers.map(volunteer => ({
       id: volunteer.id,

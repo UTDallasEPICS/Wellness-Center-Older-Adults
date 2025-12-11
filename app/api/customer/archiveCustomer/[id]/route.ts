@@ -51,8 +51,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         }
         
         console.error('Error updating client archive status:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
-            { error: `Failed to update client status: ${error.message}` },
+            { error: `Failed to update client status: ${errorMessage}` },
             { status: 500 }
         );
     } finally {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
 import AddRidesTable from "/app/components/AddRidesTable.jsx";
 import ReservedRidesTable from "/app/components/ReservedRidesTable.jsx";
@@ -10,7 +10,7 @@ import { useSearchParams, useRouter, useParams } from "next/navigation";
 import RideMap from "../../components/RideMap";
 import { Search, Plus } from "lucide-react";
 
-export default function Page() {
+function RidesVolunteerPageContent() {
   const { id: rideIdFromParams } = useParams();
   const router = useRouter();
   const [rideDetails, setRideDetails] = useState(null);
@@ -385,5 +385,13 @@ export default function Page() {
         <div className="absolute top-4 right-4 z-50">{notification}</div>
       )}
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen"><p>Loading...</p></div>}>
+      <RidesVolunteerPageContent />
+    </Suspense>
   );
 }

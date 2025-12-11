@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import SimpleTab, { Tab } from "/app/components/SimpleTab.jsx";
 import ClientInputForm from "/app/components/ClientInputForm.jsx";
 import DeleteConfirmationModal from "/app/components/DeleteConfirmationModal.jsx";
@@ -46,7 +46,7 @@ const modalCloseButtonStyle = {
 };
 
 
-export default function Page() {
+function ClientPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     
@@ -463,5 +463,13 @@ export default function Page() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center h-screen"><p>Loading...</p></div>}>
+            <ClientPageContent />
+        </Suspense>
     );
 }

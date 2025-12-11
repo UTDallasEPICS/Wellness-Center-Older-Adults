@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse, NextRequest } from 'next/server';
-import { Client, DistanceMatrixResponse, DistanceMatrixRequest } from '@googlemaps/google-maps-services-js';
+import { Client, DistanceMatrixResponse, DistanceMatrixRequest, UnitSystem } from '@googlemaps/google-maps-services-js';
 
 const prisma = new PrismaClient();
 const googleMapsClient = new Client({});
@@ -67,7 +67,7 @@ export async function GET(
                         origins: [origin],
                         destinations: [destination],
                         key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '', // Ensure key is provided
-                        units: 'imperial',
+                        units: UnitSystem.imperial,
                     },
                     timeout: 5000, // Increased timeout to 5 seconds
                 });

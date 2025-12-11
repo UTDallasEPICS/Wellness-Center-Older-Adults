@@ -20,12 +20,14 @@ export async function POST(request: Request) {
       (await request.json()) as UserRequestBody;
 
     // Save user to your local database
-    await prisma.admin.create({
+    await prisma.user.create({
       data: {
         email,
         firstName,
         lastName,
-        phone: '',
+        phone: null,
+        role: 'ADMIN',
+        isAdmin: true,
       },
     });
 
