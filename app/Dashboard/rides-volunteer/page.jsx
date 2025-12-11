@@ -25,7 +25,6 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState("available");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRides, setSelectedRides] = useState([]);
-  const [userRole, setUserRole] = useState(null);
 
   const convertTo12Hour = (time24) => {
     if (!time24) return "";
@@ -59,33 +58,11 @@ export default function Page() {
     }
   };
 
-  // Fetch user role
-  const fetchUserRole = async () => {
-    try {
-      const response = await fetch("/api/getRole");
-      if (response.ok) {
-        const { role } = await response.json();
-        setUserRole(role);
-        return role;
-      }
-    } catch (error) {
-      console.error("Error fetching user role:", error);
-    }
-    return null;
-  };
-
-  const fetchRides = async (role = null) => {
+  const fetchRides = async () => {
     setLoading(true);
     setError(null);
     try {
-      // If volunteer, only fetch their rides for Reserved and Completed
-      // For Available rides, fetch all (volunteers can see all available rides)
-      const isVolunteer = role === "VOLUNTEER";
-      const url = isVolunteer 
-        ? "/api/rides?volunteerOnly=true" 
-        : "/api/rides";
-      
-      const response = await fetch(url);
+      const response = await fetch("/api/rides");
       if (!response.ok) {
         throw new Error(`Failed to fetch rides: ${response.status}`);
       }
@@ -158,32 +135,24 @@ export default function Page() {
   };
 
   useEffect(() => {
-    const initializePage = async () => {
-      const tabFromQuery = searchParams.get("tab");
-      if (
-        tabFromQuery &&
-        ["available", "reserved", "completed"].includes(tabFromQuery)
-      ) {
-        setActiveTab(tabFromQuery);
-      }
-      
-      // Fetch role first, then use it to fetch rides
-      const role = await fetchUserRole();
-      await fetchRides(role);
-      
-      fetchCustomers();
-      fetchAddresses();
-      
-      if (rideIdFromParams) {
-        fetchRideDetails(rideIdFromParams);
-      }
-    };
-    
-    initializePage();
+    const tabFromQuery = searchParams.get("tab");
+    if (
+      tabFromQuery &&
+      ["available", "reserved", "completed"].includes(tabFromQuery)
+    ) {
+      setActiveTab(tabFromQuery);
+    }
+    fetchRides();
+    fetchCustomers();
+    fetchAddresses();
+    if (rideIdFromParams) {
+      fetchRideDetails(rideIdFromParams);
+    }
   }, [searchParams, rideIdFromParams]);
 
   const handleReserveClick = async (rideId) => {
     try {
+      // ALREADY CORRECT: Uses /api/rides/${id}
       const response = await fetch(`/api/rides/${rideId}`, {
         method: "PUT",
         headers: {
@@ -205,7 +174,7 @@ export default function Page() {
       router.push("/Dashboard/rides-volunteer?tab=reserved", undefined, {
         shallow: true,
       });
-      await fetchRides(userRole);
+      await fetchRides();
     } catch (error) {
       console.error("Error reserving ride:", error);
       toast.error(`Failed to reserve ride: ${error.message}`);
@@ -313,8 +282,6 @@ export default function Page() {
     });
   };
 
-  // For volunteers: show all available rides (unassigned)
-  // For reserved/completed: only show their own rides (already filtered by API)
   const availableRides = filterRides(["Added", "Unreserved", "AVAILABLE"]);
   const reservedRides = filterRides("Reserved");
   const completedRides = filterRides("Completed");
