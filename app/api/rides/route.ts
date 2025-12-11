@@ -23,8 +23,8 @@ interface RideRequestBody {
   extraInfo: string;
 }
 
-// Helper function to get current user email from JWT token
-async function getCurrentUserEmail(): Promise<string | null> {
+// Helper function to get current user info from JWT token
+async function getCurrentUserInfo(): Promise<{ email: string; role: string; volunteerID: number | null } | null> {
   try {
     const cookieStore = cookies();
     const id_token = cookieStore.get('cvtoken')?.value;
@@ -42,7 +42,24 @@ async function getCurrentUserEmail(): Promise<string | null> {
     const key = await importX509(certPem, 'RS256');
     const decoded = await jwtVerify(id_token, key);
     
-    return (decoded.payload.email as string) || null;
+    const userEmail = decoded.payload.email as string;
+    if (!userEmail) return null;
+
+    // Get user with their role and volunteer info
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+      include: {
+        volunteer: true,
+      },
+    });
+
+    if (!user) return null;
+
+    return {
+      email: userEmail,
+      role: user.role,
+      volunteerID: user.volunteer?.id || null,
+    };
   } catch (error) {
     console.error('Error verifying JWT token:', error);
     return null;
@@ -254,65 +271,61 @@ export async function POST(req: Request) {
   }
 }
 
-// GET - Fetch rides with optional volunteer filtering
+// GET - Fetch rides with role-based filtering
 export async function GET(req: Request) {
   try {
-    // Parse query parameters
-    const { searchParams } = new URL(req.url);
-    const volunteerOnly = searchParams.get('volunteerOnly') === 'true';
+    // Get current user info (email, role, volunteerID)
+    const userInfo = await getCurrentUserInfo();
+    
+    if (!userInfo) {
+      return NextResponse.json(
+        { error: 'Unauthorized - no valid session found' },
+        { status: 401 }
+      );
+    }
+
+    const { role, volunteerID } = userInfo;
 
     let whereClause: any = {};
 
-    // If volunteer-only filter is requested, get the current user's volunteer info
-    if (volunteerOnly) {
-      try {
-        // Get the current user's email from JWT token
-        const userEmail = await getCurrentUserEmail();
-        
-        if (!userEmail) {
-          return NextResponse.json(
-            { error: 'Unauthorized - no valid session found' },
-            { status: 401 }
-          );
-        }
+    // Role-based filtering
+    if (role === 'ADMIN') {
+      // Admins see all rides (no filter needed)
+      whereClause = {};
+    } else if (role === 'VOLUNTEER') {
+      // Volunteers see:
+      // 1. All unreserved rides (AVAILABLE, Added, Unreserved)
+      // 2. Only their own reserved rides
+      // 3. Only their own completed rides
+      
+      if (!volunteerID) {
+        // If somehow a volunteer has no volunteerID, return empty array
+        return NextResponse.json([]);
+      }
 
-        // Find the volunteer info for this user
-        const volunteerInfo = await prisma.volunteerInfo.findFirst({
-          where: {
-            user: {
-              email: userEmail,
+      whereClause = {
+        OR: [
+          // Unreserved rides (any volunteer can see)
+          {
+            status: {
+              in: ['AVAILABLE', 'Added', 'Unreserved']
             },
           },
-        });
-
-        if (!volunteerInfo) {
-          // If user is not a volunteer, return empty array
-          return NextResponse.json([]);
-        }
-
-        // Filter rides to only show:
-        // 1. Available rides (unassigned - any volunteer can claim)
-        // 2. Rides assigned to this specific volunteer
-        whereClause = {
-          OR: [
-            {
-              status: {
-                in: ['AVAILABLE', 'Added', 'Unreserved']
-              },
-              volunteerID: null,
-            },
-            {
-              volunteerID: volunteerInfo.id,
-            },
-          ],
-        };
-      } catch (authError) {
-        console.error('Error getting user email or volunteer info:', authError);
-        return NextResponse.json(
-          { error: 'Failed to authenticate user' },
-          { status: 401 }
-        );
-      }
+          // Reserved rides assigned to this volunteer
+          {
+            status: 'Reserved',
+            volunteerID: volunteerID,
+          },
+          // Completed rides assigned to this volunteer
+          {
+            status: 'Completed',
+            volunteerID: volunteerID,
+          },
+        ],
+      };
+    } else {
+      // Unknown role - return empty array
+      return NextResponse.json([]);
     }
 
     // Fetch rides with the appropriate filter
