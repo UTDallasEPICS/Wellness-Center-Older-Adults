@@ -52,6 +52,17 @@ export async function GET(request) {
     });
 
     const isVolunteer = !!volunteerInfo;
+    
+    // Parse notificationSettings if it's a string
+    let notificationSettings = user.notificationSettings || [];
+    if (typeof notificationSettings === 'string') {
+      try {
+        notificationSettings = JSON.parse(notificationSettings);
+      } catch (e) {
+        notificationSettings = [];
+      }
+    }
+    
     const userData = {
       firstName: user.firstName,
       lastName: user.lastName,
@@ -60,7 +71,7 @@ export async function GET(request) {
       phone: user.phone || '',
       birthdate: user.birthdate || '',
       profilePicUrl: user.profilePicUrl || null,
-      notificationSettings: user.notificationSettings || [],
+      notificationSettings: notificationSettings,
       isVolunteer: isVolunteer,
       volunteerStatus: isVolunteer ? volunteerInfo?.status : '',
       assignedRides: isVolunteer ? volunteerInfo?.rides : [],
