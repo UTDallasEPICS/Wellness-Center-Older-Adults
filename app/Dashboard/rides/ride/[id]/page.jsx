@@ -331,6 +331,12 @@ export default function Ride() {
                   </p>
                 </div>
                 <div className="flex flex-col">
+                  <p className="text-xl font-bold mb-1">Volunteer</p>
+                  <p className="text-gray-700 text-base">
+                    {rideDetails.volunteerName || rideDetails.volunteer?.user ? `${rideDetails.volunteer?.user?.firstName || ''} ${rideDetails.volunteer?.user?.lastName || ''}`.trim() : 'Unassigned'}
+                  </p>
+                </div>
+                <div className="flex flex-col">
                   <p className="text-xl font-bold mb-1">Pick up Time</p>
                   <p className="text-gray-700 text-base">
                     {formatTime(rideDetails.pickupTime)}
