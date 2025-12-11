@@ -48,7 +48,7 @@ export async function PUT(request: any) {
       notificationSettings
     } = body;
 
-    console.log('PUT /api/user/update: Received notificationSettings:', JSON.stringify(notificationSettings).substring(0, 100) + '...');
+    console.log('PUT /api/user/update: Received notificationSettings:', JSON.stringify(notificationSettings));
 
     const updateData: any = {};
     if (firstName !== undefined) updateData.firstName = firstName;
@@ -60,7 +60,7 @@ export async function PUT(request: any) {
         console.error('PUT /api/user/update: Validation Error - notificationSettings is not an array.');
         return NextResponse.json({ error: 'Invalid format for notification settings. Expected array.' }, { status: 400 });
       }
-      updateData.notificationSettings = notificationSettings;
+      updateData.notificationSettings = JSON.stringify(notificationSettings);
     }
 
 
